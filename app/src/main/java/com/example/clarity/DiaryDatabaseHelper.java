@@ -21,6 +21,9 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
 
     public DiaryDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        Log.d("DatabaseHelper", "DiaryDatabaseHelper constructor called.");
     }
 
     @Override
@@ -71,8 +74,23 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        Log.d("Database", "onUpgrade() is running...");
+        db.execSQL("DROP TABLE IF EXISTS users");
+        db.execSQL("DROP TABLE IF EXISTS pages" );
+        db.execSQL("DROP TABLE IF EXISTS resources");
+        onCreate(db);
     }
+    public void addUser(int userId, String username, String userPassword) {
+        Log.d("DatabaseHelper", "Adding user: userId=" + userId + ", username=" + username + ", userPassword=" + userPassword);
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("userId", userId);
+        values.put("userPassword", userPassword);
+        values.put("username", username);
+        db.insert("users", null, values);
+        db.close();
+    }
+
+
     /*
 
 
@@ -81,25 +99,8 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_DIARY);
 
 
-        db.execSQL("DROP TABLE IF EXISTS resources");
-        onCreate(db);
-    }
-
-    // User Management
-    public void addUser(String username, String password) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_USERNAME, username);
-        values.put(COLUMN_PASSWORD, password);
-        db.insert(TABLE_USERS, null, values);
-        db.close();
-    }
 
     public boolean authenticateUser(String username, String password) {
         SQLiteDatabase db = this.getReadableDatabase();

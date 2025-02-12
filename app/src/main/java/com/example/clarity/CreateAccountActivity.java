@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 public class CreateAccountActivity extends AppCompatActivity {
 
     EditText etCaaUsername, etCaaPassword, etCaaConfirmPassword;
-   // DiaryDatabaseHelper dbHelper;
+    DiaryDatabaseHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,7 +20,7 @@ public class CreateAccountActivity extends AppCompatActivity {
         etCaaUsername = findViewById(R.id.etCaaUsername);
         etCaaPassword = findViewById(R.id.etCaaPassword);
         etCaaConfirmPassword = findViewById(R.id.etCaaConfirmPassword);
-        //dbHelper = new DiaryDatabaseHelper(this);
+        dbHelper = new DiaryDatabaseHelper(this);
     }
 
     // This method is called when the user clicks the 'Create Account' button
