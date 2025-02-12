@@ -1,32 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    android:gravity="center">
+    android:gravity="center"
+    tools:context=".LoginActivity">
 
-    <!-- Username Input -->
+
     <EditText
-        android:id="@+id/editTextUsername"
+        android:id="@+id/etLaUsername"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Username"
         android:inputType="text"
         android:layout_marginBottom="16dp"/>
 
-    <!-- Password Input -->
     <EditText
-        android:id="@+id/editTextPassword"
+        android:id="@+id/etLaPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Password"
         android:inputType="textPassword"
         android:layout_marginBottom="16dp"/>
 
-    <!-- Error Message (Optional) -->
     <TextView
-        android:id="@+id/textViewError"
+        android:id="@+id/tvLaError"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Invalid username or password"
@@ -34,20 +36,22 @@
         android:visibility="gone"
         android:layout_marginBottom="16dp"/>
 
-    <!-- Login Button -->
     <Button
-        android:id="@+id/buttonLogin"
+        android:id="@+id/bLaLogin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Login"
-        android:onClick="onLoginClicked"/>
+        android:onClick="onLoginClicked"
+        />
 
-    <!-- Create Account Button -->
     <Button
-        android:id="@+id/buttonCreateAccount"
+        android:id="@+id/bLaCreateAccount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Create New Account"
-        android:onClick="onCreateAccountClicked"/>
+        android:onClick="onCreateAccountClicked"
+        />
+
 
 </LinearLayout>
+

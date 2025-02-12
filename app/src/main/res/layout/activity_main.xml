@@ -6,13 +6,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="top|center_horizontal"
+    android:gravity="center"
     tools:context=".MainActivity">
 
-    <Button
+    <TextView
+        android:id="@+id/tbMaTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Login"
-        android:id="@+id/buttonLogin"
+        android:text="Title"
+
         />
 </LinearLayout>

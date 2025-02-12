@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Title for Create Account -->
+    <TextView
+        android:id="@+id/tvCaaCreateAccount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Create Account"
+        android:textSize="24sp"
+        android:layout_gravity="center"
+        android:paddingBottom="20dp"/>
+
+    <!-- Username Input -->
+    <EditText
+        android:id="@+id/etCaaUsername"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Username"
+        android:inputType="text"/>
+
+    <!-- Password Input -->
+    <EditText
+        android:id="@+id/etCaaPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Password"
+        android:inputType="textPassword"
+        android:layout_marginTop="16dp"/>
+
+    <!-- Confirm Password Input -->
+    <EditText
+        android:id="@+id/etCaaConfirmPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Confirm Password"
+        android:inputType="textPassword"
+        android:layout_marginTop="16dp"/>
+
+    <!-- Create Account Button -->
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Create Account"
+        android:layout_marginTop="32dp"
+        android:onClick="onCreateAccountClicked"/>
+
+    <!-- Back to Login Button -->
+    <TextView
+        android:id="@+id/tvCaaBackToLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Already have an account? Log in"
+        android:textColor="@android:color/holo_blue_dark"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:onClick="onBackToLoginClicked"/>
+</LinearLayout>
