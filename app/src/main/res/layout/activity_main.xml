@@ -11,9 +11,10 @@
 
     <TextView
         android:id="@+id/tbMaTitle"
+        android:textSize="60dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Title"
+        android:text="Success"
 
         />
 </LinearLayout>
