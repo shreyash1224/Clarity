@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 public class LoginActivity extends AppCompatActivity {
 
     EditText etLaUsername, etLaPassword;
-    //DiaryDatabaseHelper dbHelper;
+    DiaryDatabaseHelper dbHelper;
     SharedPreferences sharedPreferences;
 
     @Override
@@ -22,7 +22,7 @@ public class LoginActivity extends AppCompatActivity {
 
         etLaUsername = findViewById(R.id.etLaUsername);
         etLaPassword = findViewById(R.id.etLaPassword);
-        //dbHelper = new DiaryDatabaseHelper(this);
+        dbHelper = new DiaryDatabaseHelper(this);
         sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
         
     }
