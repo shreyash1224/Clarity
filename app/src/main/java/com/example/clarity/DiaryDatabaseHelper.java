@@ -51,7 +51,6 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
         String resourceTable = "CREATE TABLE IF NOT EXISTS resources("
                 + "resourceId INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + "resourceUri TEXT NOT NULL CHECK (LENGTH(resourceUri) > 0), "
-                + "resourceNumber INTEGER CHECK (resourceNumber > 0), "
                 + "resourceType TEXT NOT NULL CHECK (LENGTH(resourceType) <= 20), "
                 + "pageId INTEGER NOT NULL, "
                 + "FOREIGN KEY (pageId) REFERENCES pages(pageId) ON DELETE CASCADE);";
@@ -79,15 +78,30 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS resources");
         onCreate(db);
     }
-    public void addUser(int userId, String username, String userPassword) {
+    public long addUser(String username, String userPassword) {
+        int userId = getNextAvailableId("users", "userId");
+
         Log.d("DatabaseHelper", "Adding user: userId=" + userId + ", username=" + username + ", userPassword=" + userPassword);
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("userId", userId);
         values.put("userPassword", userPassword);
         values.put("username", username);
-        db.insert("users", null, values);
+        long result =  db.insert("users", null, values);
         db.close();
+        Log.d("Databasae","User Added. " +"Result: "+result);
+        return result;
+    }
+
+
+    public boolean authenticateUser(String username, String password) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query("users", null, "username" + "=? AND " + "userPassword" + "=?",
+                new String[]{username, password}, null, null, null);
+
+        boolean authenticated = cursor != null && cursor.moveToFirst();
+        if (cursor != null) cursor.close();
+        return authenticated;
     }
 
 
@@ -254,5 +268,51 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
         return resourceUris;
     }
     */
+
+
+    public int getNextAvailableId(String tableName, String idColumn) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        int newId = 1; // Default to 1 if the table is empty
+
+        Cursor cursor = db.rawQuery(
+                "SELECT MIN(t1." + idColumn + " + 1) AS newId " +
+                        "FROM " + tableName + " t1 " +
+                        "LEFT JOIN " + tableName + " t2 " +
+                        "ON t1." + idColumn + " + 1 = t2." + idColumn + " " +
+                        "WHERE t2." + idColumn + " IS NULL", null);
+
+        if (cursor.moveToFirst() && !cursor.isNull(0)) {
+            newId = cursor.getInt(0);
+        }
+        cursor.close();
+        return newId;
+    }
+    public int getPageIdByTitle(String pageTitle) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        int pageId = -1; // Default value if page is not found
+
+        Cursor cursor = db.rawQuery("SELECT pageId FROM pages WHERE pageTitle = ?", new String[]{pageTitle});
+        if (cursor.moveToFirst()) {
+            pageId = cursor.getInt(0);
+        }
+        cursor.close();
+        db.close();
+
+        return pageId;
+    }
+
+    public int getUserIdByUsername(String username) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        int userId = -1; // Default value if user is not found
+
+        Cursor cursor = db.rawQuery("SELECT userId FROM users WHERE username = ?", new String[]{username});
+        if (cursor.moveToFirst()) {
+            userId = cursor.getInt(0);
+        }
+        cursor.close();
+        db.close();
+
+        return userId;
+    }
 
 }
