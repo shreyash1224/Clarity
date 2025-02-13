@@ -116,10 +116,17 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();
         editor.apply();
+        editor.apply();
 
         Intent intent = new Intent(MainActivity.this, LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
+    }
+
+    public void addPage(View view) {
+        Toast.makeText(this, "Adding Page.", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(MainActivity.this, DiaryPageActivity.class);
+        startActivity(intent);
     }
 }

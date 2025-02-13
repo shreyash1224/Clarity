@@ -14,13 +14,13 @@
         android:paddingBottom="56dp"> <!-- Ensures content is not blocked by the delete button -->
 
         <EditText
-            android:id="@+id/editTitle"
+            android:id="@+id/etDpaTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Title" />
 
         <EditText
-            android:id="@+id/editContent"
+            android:id="@+id/etDpaContent"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
@@ -31,18 +31,19 @@
 
     <!-- Floating Action Button (Overlays on top of the content) -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/deleteButton"
+        android:id="@+id/fabDpaDeleteButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
+        android:layout_marginBottom="80dp"
+        android:layout_marginRight="16dp"
         android:contentDescription="Delete Page"
         app:srcCompat="@android:drawable/ic_menu_delete"
         android:onClick="deletePage" />
 
     <!-- Bottom Toolbar -->
     <LinearLayout
-        android:id="@+id/bottomToolbar"
+        android:id="@+id/tbDpaBottomToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
@@ -52,14 +53,14 @@
         android:padding="8dp">
 
         <ImageButton
-            android:id="@+id/resourceImageButton"
+            android:id="@+id/ibDpaAddImageButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Resource Image"
             android:onClick="onResourceImageClick"
             android:padding="8dp"
-            android:src="@drawable/images" />
+            android:src="@drawable/ic_images" />
 
     </LinearLayout>
 

@@ -42,7 +42,6 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
                 + "pageId INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + "pageTitle TEXT NOT NULL CHECK (LENGTH(pageTitle) > 0 AND LENGTH(pageTitle) <= 100), "
                 + "pageDate DATETIME DEFAULT (datetime('now', 'localtime')), "
-                + "pageCount INTEGER DEFAULT 1 CHECK (pageCount >= 1), "
                 + "userId INTEGER NOT NULL, "
                 + "FOREIGN KEY (userId) REFERENCES users(userId) ON DELETE CASCADE);";
 
@@ -50,7 +49,7 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
 
         String resourceTable = "CREATE TABLE IF NOT EXISTS resources("
                 + "resourceId INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + "resourceUri TEXT NOT NULL CHECK (LENGTH(resourceUri) > 0), "
+                + "resourceContent TEXT NOT NULL CHECK (LENGTH(resourceContent) > 0), "
                 + "resourceType TEXT NOT NULL CHECK (LENGTH(resourceType) <= 20), "
                 + "pageId INTEGER NOT NULL, "
                 + "FOREIGN KEY (pageId) REFERENCES pages(pageId) ON DELETE CASCADE);";
@@ -112,6 +111,71 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
         db.close();
         return exists;
     }
+
+//    + "resourceId INTEGER PRIMARY KEY AUTOINCREMENT, "
+//            + "resourceContent TEXT NOT NULL CHECK (LENGTH(resourceContent) > 0), "
+//            + "resourceType TEXT NOT NULL CHECK (LENGTH(resourceType) <= 20), "
+//            + "pageId INTEGER NOT NULL, "
+//            + "FOREIGN KEY (pageId) REFERENCES pages(pageId) ON DELETE CASCADE);";
+
+//
+//    + "pageId INTEGER PRIMARY KEY AUTOINCREMENT, "
+//            + "pageTitle TEXT NOT NULL CHECK (LENGTH(pageTitle) > 0 AND LENGTH(pageTitle) <= 100), "
+//            + "pageDate DATETIME DEFAULT (datetime('now', 'localtime')), "
+//            + "userId INTEGER NOT NULL, "
+//            + "FOREIGN KEY (userId) REFERENCES users(userId) ON DELETE CASCADE);";
+
+
+    //Adding page to Diary.
+    public int updatePage(Integer pageId, String title, String content, int userId, String resourceType) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        if (pageId == null) {
+            // Insert new page
+            ContentValues pageValues = new ContentValues();
+            pageValues.put("pageTitle", title);
+            pageValues.put("userId", userId);
+
+            long newPageId = db.insert("pages", null, pageValues);
+            if (newPageId == -1) {
+                Log.e("DiaryDatabaseHelper", "Failed to insert new page.");
+                return Integer.parseInt(null);
+            }
+            pageId = (int) newPageId;
+            Log.d("DiaryDatabaseHelper", "Page added successfully with ID: " + pageId);
+        } else {
+            // Update existing page
+            ContentValues pageValues = new ContentValues();
+            pageValues.put("pageTitle", title);
+            db.update("pages", pageValues, "pageId = ?", new String[]{String.valueOf(pageId)});
+            Log.d("DiaryDatabaseHelper", "Page updated successfully with ID: " + pageId);
+        }
+
+        // Insert or update resource
+        if (content != null && !content.isEmpty() && resourceType != null && !resourceType.isEmpty()) {
+            ContentValues resourceValues = new ContentValues();
+            resourceValues.put("resourceContent", content);
+            resourceValues.put("resourceType", resourceType);
+            resourceValues.put("pageId", pageId);
+
+            int rowsUpdated = db.update("resources", resourceValues, "pageId = ?", new String[]{String.valueOf(pageId)});
+            if (rowsUpdated == 0) {
+                // Insert if no resource exists
+                long newResourceId = db.insert("resources", null, resourceValues);
+                if (newResourceId == -1) {
+                    Log.e("DiaryDatabaseHelper", "Failed to insert resource for page ID: " + pageId);
+                } else {
+                    Log.d("DiaryDatabaseHelper", "Resource added successfully with ID: " + newResourceId);
+                }
+            } else {
+                Log.d("DiaryDatabaseHelper", "Resource updated successfully for page ID: " + pageId);
+            }
+        }
+
+        return pageId;
+    }
+
+
 
 
 
@@ -256,30 +320,31 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
 
 
     // Resource Management
-    public void addResource(String pageId, String resourceUri) {
+    public void addResource(String pageId, String resourceContent) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COLUMN_PAGE_ID, pageId);
-        values.put("resourceUri", resourceUri);
+        values.put("resourceContent", resourceContent);
         db.insert("resources", null, values);
         db.close();
     }
 
     @SuppressLint("Range")
     public ArrayList<String> getResourcesForPage(String pageId) {
-        ArrayList<String> resourceUris = new ArrayList<>();
+        ArrayList<String> resourceContents = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query("resources", new String[]{"resourceUri"}, COLUMN_PAGE_ID + "=?",
+        Cursor cursor = db.query("resources", new String[]{"resourceContent"}, COLUMN_PAGE_ID + "=?",
                 new String[]{pageId}, null, null, null);
         while (cursor.moveToNext()) {
-            resourceUris.add(cursor.getString(cursor.getColumnIndex("resourceUri")));
+            resourceContents.add(cursor.getString(cursor.getColumnIndex("resourceContent")));
         }
         cursor.close();
-        return resourceUris;
+        return resourceContents;
     }
     */
 
 
+    //To get next available id as per column name.
     public int getNextAvailableId(String tableName, String idColumn) {
         SQLiteDatabase db = this.getReadableDatabase();
         int newId = 1; // Default to 1 if the table is empty
@@ -297,19 +362,19 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return newId;
     }
-    public int getPageIdByTitle(String pageTitle) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        int pageId = -1; // Default value if page is not found
-
-        Cursor cursor = db.rawQuery("SELECT pageId FROM pages WHERE pageTitle = ?", new String[]{pageTitle});
-        if (cursor.moveToFirst()) {
-            pageId = cursor.getInt(0);
-        }
-        cursor.close();
-        db.close();
-
-        return pageId;
-    }
+//    public int getPageIdByTitle(String pageTitle) {
+//        SQLiteDatabase db = this.getReadableDatabase();
+//        int pageId = -1; // Default value if page is not found
+//
+//        Cursor cursor = db.rawQuery("SELECT pageId FROM pages WHERE pageTitle = ?", new String[]{pageTitle});
+//        if (cursor.moveToFirst()) {
+//            pageId = cursor.getInt(0);
+//        }
+//        cursor.close();
+//        db.close();
+//
+//        return pageId;
+//    }
 
     public int getUserIdByUsername(String username) {
         SQLiteDatabase db = this.getReadableDatabase();
