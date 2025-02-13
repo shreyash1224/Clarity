@@ -58,20 +58,27 @@ public class CreateAccountActivity extends AppCompatActivity {
         }
 
          */
-        long result = dbHelper.addUser(username, password);
-        if(password.length() < 6){
-            Toast.makeText(this, "Password must be at least 6 characters long", Toast.LENGTH_SHORT).show();
-        }else {
-            if (result != -1) {
-                Toast.makeText(this, "Account created successfully", Toast.LENGTH_SHORT).show();
 
-                Intent intent = new Intent(CreateAccountActivity.this, LoginActivity.class);
-                startActivity(intent);
-                finish();
-            } else {
-                Toast.makeText(this, "Error creating account", Toast.LENGTH_SHORT).show();
+
+        if (dbHelper.isUsernameTaken(username)) {
+            Toast.makeText(this, "Username already taken. Please choose another.", Toast.LENGTH_SHORT).show();
+        } else {
+            if(password.length() < 6){
+                Toast.makeText(this, "Password must be at least 6 characters long", Toast.LENGTH_SHORT).show();
+            }else {
+                long result = dbHelper.addUser(username, password);
+                if (result != -1) {
+                    Toast.makeText(this, "Account created successfully", Toast.LENGTH_SHORT).show();
+
+                    Intent intent = new Intent(CreateAccountActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    Toast.makeText(this, "Error creating account", Toast.LENGTH_SHORT).show();
+                }
             }
         }
+
 
 
 

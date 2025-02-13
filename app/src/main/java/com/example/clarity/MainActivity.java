@@ -5,18 +5,21 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
+import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -87,6 +90,36 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this, username+" "+userId, Toast.LENGTH_LONG).show();
         tvUserName.setText(username);
         tvUserId.setText(String.valueOf(userId));
+
+        // Handle navigation item clicks
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                if (item.getItemId() == R.id.nav_home) {
+                    Toast.makeText(MainActivity.this, "Home Selected", Toast.LENGTH_SHORT).show();
+                } else if (item.getItemId() == R.id.nav_settings) {
+                    Toast.makeText(MainActivity.this, "Settings Selected", Toast.LENGTH_SHORT).show();
+                }
+                drawerLayout.closeDrawer(GravityCompat.START);
+                return true;
+            }
+        });
+
+        // Logout Button
     }
 
+
+    //Logging out.
+    public void logout(View view) {
+
+        Log.d("MainActivity", "Logging out...");
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.apply();
+
+        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
 }

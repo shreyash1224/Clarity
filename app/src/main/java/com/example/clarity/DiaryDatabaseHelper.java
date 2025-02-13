@@ -33,7 +33,7 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
 
         String userTable = "CREATE TABLE IF NOT EXISTS users("
                 + "userId INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + "userName TEXT NOT NULL CHECK (LENGTH(userName) > 0 AND LENGTH(userName) <= 50), "
+                + "userName TEXT NOT NULL CHECK (LENGTH(userName) > 0 AND LENGTH(userName) <= 50) UNIQUE, "
                 + "userPassword TEXT NOT NULL CHECK (LENGTH(userPassword) >= 6));";
 
         db.execSQL(userTable);
@@ -103,6 +103,16 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
         if (cursor != null) cursor.close();
         return authenticated;
     }
+
+    public boolean isUsernameTaken(String username) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM users WHERE username = ?", new String[]{username});
+        boolean exists = cursor.getCount() > 0;
+        cursor.close();
+        db.close();
+        return exists;
+    }
+
 
 
     /*

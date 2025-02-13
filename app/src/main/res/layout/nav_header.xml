@@ -28,10 +28,12 @@
         android:paddingBottom="8dp"/>
 
     <Button
-        android:id="@+id/btnLogout"
+        android:id="@+id/bNhLogout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Logout"
         android:background="@android:color/holo_red_dark"
-        android:textColor="@android:color/white"/>
+        android:textColor="@android:color/white"
+        android:onClick="logout"
+        />
 </LinearLayout>

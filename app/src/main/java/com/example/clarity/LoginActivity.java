@@ -57,10 +57,16 @@ public class LoginActivity extends AppCompatActivity {
 
 
 
+        //
+
+
+
 
     }
 
 
+
+    //Creating Account
     public void onCreateAccountClicked (View view){
         Intent intent = new Intent(this, CreateAccountActivity.class);
         Toast.makeText(this, "Creating New Account.", Toast.LENGTH_SHORT).show();
