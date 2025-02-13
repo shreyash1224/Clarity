@@ -32,7 +32,9 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("PRAGMA foreign_keys = ON;"); // Enable foreign keys
 
         String userTable = "CREATE TABLE IF NOT EXISTS users("
+
                 + "userId INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + "userDate DATETIME DEFAULT (datetime('now', 'localtime')),"
                 + "userName TEXT NOT NULL CHECK (LENGTH(userName) > 0 AND LENGTH(userName) <= 50) UNIQUE, "
                 + "userPassword TEXT NOT NULL CHECK (LENGTH(userPassword) >= 6));";
 
@@ -177,6 +179,34 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
 
 
 
+    // Getting all the pages
+    public ArrayList<DiaryPage> getAllPages() {
+        ArrayList<DiaryPage> pages = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Corrected table and column names
+        Cursor cursor = db.rawQuery("SELECT * FROM pages ORDER BY pageDate DESC", null);
+
+        Log.d("DiaryDatabaseHelper", "Fetching all pages...");
+
+        if (cursor.moveToFirst()) {
+            do {
+                // Corrected column names to match the database
+                int id = cursor.getInt(cursor.getColumnIndex("pageId"));
+                String title = cursor.getString(cursor.getColumnIndex("pageTitle"));
+                String date = cursor.getString(cursor.getColumnIndex("pageDate"));
+
+                Log.d("DiaryDatabaseHelper", "Page Loaded: ID=" + id + ", Title=" + title);
+
+                pages.add(new DiaryPage(id, title, date));
+            } while (cursor.moveToNext());
+        } else {
+            Log.d("DiaryDatabaseHelper", "No pages found.");
+        }
+
+        cursor.close();
+        return pages;
+    }
 
 
     /*

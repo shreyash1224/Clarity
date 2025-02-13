@@ -26,6 +26,8 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
 
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity {
 
 
@@ -105,7 +107,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Logout Button
+        //List View
+        listView = findViewById(R.id.lvMalistView);
     }
 
 
@@ -115,7 +118,6 @@ public class MainActivity extends AppCompatActivity {
         Log.d("MainActivity", "Logging out...");
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();
-        editor.apply();
         editor.apply();
 
         Intent intent = new Intent(MainActivity.this, LoginActivity.class);
@@ -128,5 +130,26 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this, "Adding Page.", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(MainActivity.this, DiaryPageActivity.class);
         startActivity(intent);
+    }
+
+    private void loadPages() {
+        DiaryDatabaseHelper dbHelper = new DiaryDatabaseHelper(this);
+        ArrayList<DiaryPage> pages = dbHelper.getAllPages();
+
+        Log.d("MainActivity", "Loading " + pages.size() + " pages into ListView.");
+
+        if (pages.isEmpty()) {
+            Toast.makeText(this, "No diary pages found.", Toast.LENGTH_SHORT).show();
+        }
+
+        DiaryPageAdapter adapter = new DiaryPageAdapter(this, pages);
+        listView.setAdapter(adapter);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Toast.makeText(this, "Loading Pages", Toast.LENGTH_SHORT).show();
+        loadPages();  // Refresh pages when MainActivity is resumed
     }
 }
