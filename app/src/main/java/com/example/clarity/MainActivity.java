@@ -39,8 +39,6 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
 
     private ListView listView;
-    ArrayList<String> pages;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,17 +113,6 @@ public class MainActivity extends AppCompatActivity {
 
         //List View
         listView = findViewById(R.id.lvMalistView);
-        // Open a diary page when clicked
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String pageTitle = pages.get(position);
-                Intent intent = new Intent(MainActivity.this, DiaryPageActivity.class);
-                intent.putExtra("pageTitle", pageTitle);
-//                startActivity(intent);
-                Toast.makeText(MainActivity.this, "onItemClicked:"+position, Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
 
@@ -153,37 +140,11 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-
-
-
-    // Loading pages
-//    private void loadPages() {
-//        sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
-//        int userId = sharedPreferences.getInt("userId", -1);
-//        DiaryDatabaseHelper dbHelper = new DiaryDatabaseHelper(this);
-//        ArrayList<DiaryPage> pages = dbHelper.getAllPages(userId);
-//
-//        Log.d("MainActivity", "Loading " + pages.size() + " pages into ListView.");
-//
-//        if (pages.isEmpty()) {
-//            Toast.makeText(this, "No diary pages found.", Toast.LENGTH_SHORT).show();
-//        }
-//
-//        DiaryPageAdapter adapter = new DiaryPageAdapter(this, pages);
-//        listView.setAdapter(adapter);
-//    }
-
     private void loadPages() {
         sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
         int userId = sharedPreferences.getInt("userId", -1);
         DiaryDatabaseHelper dbHelper = new DiaryDatabaseHelper(this);
-
-        pages = new ArrayList<>(); // Initialize the class-level pages list
-        ArrayList<DiaryPage> diaryPages = dbHelper.getAllPages(userId);
-
-        for (DiaryPage page : diaryPages) {
-            pages.add(page.getPageTitle()); // Assuming DiaryPage has a getTitle() method
-        }
+        ArrayList<DiaryPage> pages = dbHelper.getAllPages(userId);
 
         Log.d("MainActivity", "Loading " + pages.size() + " pages into ListView.");
 
@@ -191,10 +152,24 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "No diary pages found.", Toast.LENGTH_SHORT).show();
         }
 
-        DiaryPageAdapter adapter = new DiaryPageAdapter(this, diaryPages);
+        DiaryPageAdapter adapter = new DiaryPageAdapter(this, pages);
         listView.setAdapter(adapter);
-    }
 
+        // Open a diary page when clicked
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                int pageId = pages.get(position).getPageId();
+                Intent intent = new Intent(MainActivity.this, DiaryPageActivity.class);
+                intent.putExtra("pageId", pageId);
+                startActivity(intent);
+                Toast.makeText(MainActivity.this, ""+pageId, Toast.LENGTH_SHORT).show();
+
+
+            }
+        });
+
+    }
 
     @Override
     protected void onResume() {
