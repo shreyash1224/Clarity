@@ -180,28 +180,28 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
 
 
     // Getting all the pages
-    public ArrayList<DiaryPage> getAllPages() {
+    public ArrayList<DiaryPage> getAllPages(int userId) {
         ArrayList<DiaryPage> pages = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
 
-        // Corrected table and column names
-        Cursor cursor = db.rawQuery("SELECT * FROM pages ORDER BY pageDate DESC", null);
+        // Query to get pages only for the given userId
+        Cursor cursor = db.rawQuery("SELECT * FROM pages WHERE userId = ? ORDER BY pageDate DESC",
+                new String[]{String.valueOf(userId)});
 
-        Log.d("DiaryDatabaseHelper", "Fetching all pages...");
+        Log.d("DiaryDatabaseHelper", "Fetching pages for userId: " + userId);
 
         if (cursor.moveToFirst()) {
             do {
-                // Corrected column names to match the database
-                int id = cursor.getInt(cursor.getColumnIndex("pageId"));
-                String title = cursor.getString(cursor.getColumnIndex("pageTitle"));
-                String date = cursor.getString(cursor.getColumnIndex("pageDate"));
+                @SuppressLint("Range") int id = cursor.getInt(cursor.getColumnIndex("pageId"));
+                @SuppressLint("Range") String title = cursor.getString(cursor.getColumnIndex("pageTitle"));
+                @SuppressLint("Range") String date = cursor.getString(cursor.getColumnIndex("pageDate"));
 
                 Log.d("DiaryDatabaseHelper", "Page Loaded: ID=" + id + ", Title=" + title);
 
                 pages.add(new DiaryPage(id, title, date));
             } while (cursor.moveToNext());
         } else {
-            Log.d("DiaryDatabaseHelper", "No pages found.");
+            Log.d("DiaryDatabaseHelper", "No pages found for userId: " + userId);
         }
 
         cursor.close();

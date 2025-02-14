@@ -12,6 +12,7 @@ public class DiaryPage {
         this.pageDate = pageDate;
     }
 
+
     // Getters
     public int getPageId() {
         return pageId;
