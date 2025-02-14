@@ -1,8 +1,11 @@
 package com.example.clarity;
 import android.content.Intent;
 
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -79,6 +82,36 @@ public class DiaryPageActivity extends AppCompatActivity {
 
     }
 
+    public void  deletePage(View view) {
+        boolean success = false;
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        try {
+            db.beginTransaction();
+
+            // Delete related resources first to avoid foreign key issues
+            db.delete("resources", "pageId = ?", new String[]{String.valueOf(pageId)});
+
+            // Delete the page from the pages table
+            int rowsAffected = db.delete("pages", "pageId = ?", new String[]{String.valueOf(pageId)});
+
+            if (rowsAffected > 0) {
+                success = true;
+            }
+
+            if (success) {
+                Toast.makeText(this, "Page Deleted: " + pageId, Toast.LENGTH_LONG).show();
+                finish();
+            }
+
+            db.setTransactionSuccessful();
+        } catch (SQLiteException e) {
+            Log.e("DB_ERROR", "Error deleting page: " + e.getMessage());
+        } finally {
+            db.endTransaction();
+            db.close();
+        }
+
+    }
 
 
 }
