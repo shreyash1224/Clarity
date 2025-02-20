@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -114,4 +115,11 @@ public class DiaryPageActivity extends AppCompatActivity {
     }
 
 
+    public void onHomeClick(MenuItem item) {
+        Toast.makeText(this, "Home clicked.", Toast.LENGTH_SHORT).show();
+    }
+
+    public void onSettingsClick(MenuItem item) {
+        Toast.makeText(this, "Settings clicked.", Toast.LENGTH_SHORT).show();
+    }
 }
