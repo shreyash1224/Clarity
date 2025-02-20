@@ -4,7 +4,8 @@
     android:id="@+id/dlMaMainPage"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:fitsSystemWindows="true"
+    android:background="@color/beige_background">
 
     <!-- Main Content Area -->
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -23,8 +24,9 @@
                 android:id="@+id/tbMaTopToolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimary"
+                android:background="@color/brown_toolbar"
                 android:title="Clarity"
+                android:titleTextColor="@color/white"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
 
             <!-- ListView -->
@@ -32,16 +34,20 @@
                 android:id="@+id/lvMalistView"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1"/>  <!-- Takes remaining space -->
+                android:layout_weight="1"
+                android:divider="@color/brown_light"
+                android:dividerHeight="1dp"
+                android:background="@color/beige_light"
+
+                />
 
             <!-- Bottom Toolbar -->
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/tbMaBottomToolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimary"
+                android:background="@color/brown_toolbar"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
-
         </LinearLayout>
 
         <!-- Floating Action Button -->
@@ -50,11 +56,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
+            android:layout_marginEnd="16dp"
             android:layout_marginBottom="80dp"
-            android:layout_marginRight="16dp"
-            android:src="@android:drawable/ic_input_add"
+            android:backgroundTint="@color/brown_fab"
             android:contentDescription="Add New Page"
-            android:onClick="addPage"/>
+            android:onClick="addPage"
+            android:src="@drawable/ic_add"/>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <!-- Navigation Drawer -->
@@ -63,7 +70,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="@android:color/white"
+        android:background="@color/beige_light"
         app:headerLayout="@layout/nav_header"
         app:menu="@menu/drawer_menu"/>
 </androidx.drawerlayout.widget.DrawerLayout>

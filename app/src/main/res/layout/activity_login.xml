@@ -6,52 +6,60 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp"
+    android:padding="24dp"
     android:gravity="center"
+    android:background="@color/beige_background"
     tools:context=".LoginActivity">
 
-
+    <!-- Username Input -->
     <EditText
         android:id="@+id/etLaUsername"
+        style="@style/EditTextStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Username"
-        android:inputType="text"
         android:layout_marginBottom="16dp"/>
 
+    <!-- Password Input -->
     <EditText
         android:id="@+id/etLaPassword"
+        style="@style/EditTextStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Password"
-        android:inputType="textPassword"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginBottom="16dp"
+        />
 
+    <!-- Error Message -->
     <TextView
         android:id="@+id/tvLaError"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Invalid username or password"
-        android:textColor="@android:color/holo_red_dark"
+        android:textColor="@color/error_red"
         android:visibility="gone"
         android:layout_marginBottom="16dp"/>
 
+    <!-- Login Button -->
     <Button
         android:id="@+id/bLaLogin"
+        style="@style/ButtonStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Login"
-        android:onClick="onLoginClicked"
-        />
+        android:background="@drawable/rounded_button"
+        android:onClick="onLoginClicked"/>
 
+    <!-- Create Account Button -->
     <Button
         android:id="@+id/bLaCreateAccount"
+        style="@style/ButtonStyle.Secondary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Create New Account"
-        android:onClick="onCreateAccountClicked"
-        />
+        android:background="@drawable/rounded_button_secondary"
 
+        android:onClick="onCreateAccountClicked"
+        android:layout_marginTop="8dp"/>
 
 </LinearLayout>
-

@@ -4,4 +4,19 @@
     <color name="colorAccent">#03DAC5</color>
 
 
+    <color name="beige_background">#F5EDE0</color>
+    <color name="button_brown">#8B5E3C</color>
+    <color name="button_light_brown">#A67C52</color>
+    <color name="brown_text">#5D4037</color>
+    <color name="brown_hint">#8D6E63</color>
+    <color name="error_red">#D32F2F</color>
+
+
+    <color name="brown_toolbar">#5D4037</color> <!-- Dark Brown -->
+    <color name="white">#FFFFFF</color> <!-- White -->
+    <color name="brown_light">#8D6E63</color> <!-- Lighter Brown -->
+    <color name="beige_light">#F5E1C8</color> <!-- Soft Beige -->
+    <color name="brown_fab">#795548</color> <!-- Medium Brown for FAB -->
+
+
 </resources>

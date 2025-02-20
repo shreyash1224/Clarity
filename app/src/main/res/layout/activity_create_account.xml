@@ -1,63 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/createAccountActivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="24dp"
+    android:gravity="center"
+    android:background="@color/beige_background"
+    tools:context=".CreateAccountActivity">
 
-    <!-- Title for Create Account -->
+    <!-- Title -->
     <TextView
         android:id="@+id/tvCaaCreateAccount"
+        android:textSize="40dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Create Account"
-        android:textSize="24sp"
         android:layout_gravity="center"
         android:paddingBottom="20dp"/>
 
     <!-- Username Input -->
     <EditText
         android:id="@+id/etCaaUsername"
+        style="@style/EditTextStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Enter Username"
-        android:inputType="text"/>
+        android:layout_marginBottom="16dp"/>
 
     <!-- Password Input -->
     <EditText
         android:id="@+id/etCaaPassword"
+        style="@style/EditTextStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Enter Password"
-        android:inputType="textPassword"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginBottom="16dp"/>
 
     <!-- Confirm Password Input -->
     <EditText
         android:id="@+id/etCaaConfirmPassword"
+        style="@style/EditTextStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Confirm Password"
-        android:inputType="textPassword"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginBottom="16dp"/>
 
     <!-- Create Account Button -->
     <Button
+        android:id="@+id/bCaaCreateAccount"
+        style="@style/ButtonStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Create Account"
-        android:layout_marginTop="32dp"
-        android:onClick="onCreateAccountClicked"/>
+        android:onClick="onCreateAccountClicked"
+        android:layout_marginTop="32dp"/>
 
-    <!-- Back to Login Button -->
+    <!-- Back to Login -->
     <TextView
         android:id="@+id/tvCaaBackToLogin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Already have an account? Log in"
-        android:textColor="@android:color/holo_blue_dark"
+        android:textColor="@color/brown_text"
+        android:textSize="14sp"
         android:layout_marginTop="16dp"
         android:gravity="center"
         android:onClick="onBackToLoginClicked"/>
+
 </LinearLayout>
