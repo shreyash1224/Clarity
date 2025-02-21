@@ -5,17 +5,14 @@
         android:id="@+id/nav_home"
         android:title="Home"
         android:icon="@android:drawable/ic_menu_view"
-        android:onClick="onHomeClick"
         />
 
     <item
         android:id="@+id/nav_settings"
         android:title="Settings"
         android:icon="@android:drawable/ic_menu_preferences"
-        android:onClick="onSettingsClick"
         />
 
 </menu>
-
 
 

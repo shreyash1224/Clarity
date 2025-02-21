@@ -39,6 +39,7 @@
                 android:dividerHeight="1dp"
                 android:background="@color/beige_light"
 
+
                 />
 
             <!-- Bottom Toolbar -->
@@ -49,6 +50,7 @@
                 android:background="@color/brown_toolbar"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
         </LinearLayout>
+
 
         <!-- Floating Action Button -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
