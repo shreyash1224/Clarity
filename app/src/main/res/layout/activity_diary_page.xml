@@ -49,7 +49,7 @@
         android:layout_marginRight="16dp"
         android:contentDescription="Delete Page"
         android:backgroundTint="@color/brown_fab"
-        app:srcCompat="@android:drawable/ic_menu_delete"
+        android:src="@drawable/ic_delete"
         android:onClick="deletePage" />
 
     <!-- Bottom Toolbar -->
