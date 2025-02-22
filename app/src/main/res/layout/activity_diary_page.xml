@@ -63,6 +63,18 @@
         android:background="@color/brown_toolbar"
         android:padding="8dp">
 
+
+        <ImageButton
+            android:id="@+id/ibDpaAddTextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Resource Text"
+            android:onClick="onResourceTextClick"
+            android:padding="8dp"
+            android:src="@drawable/ic_edit_text"
+            />
+
         <ImageButton
             android:id="@+id/ibDpaAddImageButton"
             android:layout_width="wrap_content"
@@ -73,6 +85,7 @@
             android:padding="8dp"
             android:src="@drawable/ic_images"
             />
+
 
     </LinearLayout>
 

@@ -122,4 +122,12 @@ public class DiaryPageActivity extends AppCompatActivity {
     public void onSettingsClick(MenuItem item) {
         Toast.makeText(this, "Settings clicked.", Toast.LENGTH_SHORT).show();
     }
+
+    public void onResourceImageClick(View view) {
+        Toast.makeText(this, "Image adder clicked.", Toast.LENGTH_SHORT).show();
+    }
+
+    public void onResourceTextClick(View view) {
+        Toast.makeText(this, "Text adder clicked.", Toast.LENGTH_SHORT).show();
+    }
 }
