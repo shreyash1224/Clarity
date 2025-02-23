@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -149,8 +150,24 @@ public class DiaryPageActivity extends AppCompatActivity {
         if (imm != null) {
             imm.showSoftInput(newEditText, InputMethodManager.SHOW_IMPLICIT);
         }
-    }
 
+        // Set up double-tap detection to delete the EditText
+        newEditText.setOnTouchListener(new View.OnTouchListener() {
+            private long lastClickTime = 0;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    long currentTime = System.currentTimeMillis();
+                    if (currentTime - lastClickTime < 300) { // Double-tap detected (300ms threshold)
+                        contentLayout.removeView(newEditText); // Remove the EditText
+                    }
+                    lastClickTime = currentTime;
+                }
+                return false;
+            }
+        });
+    }
 
     private void saveTextBlocks() {
         dbHelper.deleteTextBlocksByPageId(pageId);
