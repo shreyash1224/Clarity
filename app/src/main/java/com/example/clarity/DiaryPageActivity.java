@@ -1,5 +1,6 @@
 package com.example.clarity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -123,7 +124,6 @@ public class DiaryPageActivity extends AppCompatActivity {
     public void onResourceTextClick(View view) {
         addNewTextBlock("");
     }
-
     private void addNewTextBlock(String text) {
         EditText newEditText = new EditText(this);
         newEditText.setLayoutParams(new LinearLayout.LayoutParams(
@@ -151,23 +151,31 @@ public class DiaryPageActivity extends AppCompatActivity {
             imm.showSoftInput(newEditText, InputMethodManager.SHOW_IMPLICIT);
         }
 
-        // Set up double-tap detection to delete the EditText
-        newEditText.setOnTouchListener(new View.OnTouchListener() {
+        // Enable double-tap delete
+        enableDoubleTapToDelete(newEditText);
+    }
+
+    // ✅ More reliable double-tap deletion using TouchListener
+    @SuppressLint("ClickableViewAccessibility")
+    private void enableDoubleTapToDelete(EditText editText) {
+        editText.setOnTouchListener(new View.OnTouchListener() {
             private long lastClickTime = 0;
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                if (event.getAction() == MotionEvent.ACTION_UP) {  // Detect finger lift (avoids interference)
                     long currentTime = System.currentTimeMillis();
-                    if (currentTime - lastClickTime < 300) { // Double-tap detected (300ms threshold)
-                        contentLayout.removeView(newEditText); // Remove the EditText
+                    if (currentTime - lastClickTime < 300) { // Double-tap detected (300ms)
+                        contentLayout.removeView(editText); // Remove the EditText
+                        return true; // Consume the event
                     }
                     lastClickTime = currentTime;
                 }
-                return false;
+                return false; // Allow normal text input and cursor movement
             }
         });
     }
+
 
     private void saveTextBlocks() {
         dbHelper.deleteTextBlocksByPageId(pageId);
