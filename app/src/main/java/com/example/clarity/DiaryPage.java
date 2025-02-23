@@ -35,7 +35,7 @@ public class DiaryPage {
     }
 
 
-    public String getPagetContent() {
+    public String getPageContent() {
         return content;
     }
 

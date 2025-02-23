@@ -1,133 +1,117 @@
 package com.example.clarity;
-import android.content.Intent;
 
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
-
-
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.SharedPreferences;
-
 
 public class DiaryPageActivity extends AppCompatActivity {
     SharedPreferences sharedPreferences;
     private EditText editTitle, editContent;
     private DiaryDatabaseHelper dbHelper;
-
-
-
     private Integer pageId = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_diary_page);
-        Toast.makeText(this, "Diary Page Activity onCreate() called.", Toast.LENGTH_SHORT).show();
+        Log.d("DiaryPageActivity", "onCreate() called.");
+
         dbHelper = new DiaryDatabaseHelper(this);
-        // Initialize SharedPreferences
         sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
 
         editTitle = findViewById(R.id.etDpaTitle);
-        editContent = findViewById(R.id.etDpaContent);
+//        editContent = findViewById(R.id.etDpaContent);
 
-        // Get pageId from Intent
         Intent intent = getIntent();
-        pageId = intent.getIntExtra("pageId", -1); // Default -1 if not found
-        Log.d("Page Activity", "pageId: " + pageId);
+        pageId = intent.getIntExtra("pageId", -1);
+        Log.d("DiaryPageActivity", "pageId received: " + pageId);
 
-
-        //Loading existing page
         if (pageId != -1) {
             DiaryPage page = dbHelper.getPageById(pageId);
-            Log.d("Diary Page Activity:", "After if");
             if (page != null) {
-                Log.d("Diary Page Activity:", "After if page");
                 editTitle.setText(page.getPageTitle());
-                Log.d("Page Activity Debug: ", page.getPageTitle());
-                editContent.setText(page.getPagetContent());
-
-                Log.d("Page Activity Debug: ", page.getPagetContent());
+                editContent.setText(page.getPageContent());
+                Log.d("DiaryPageActivity", "Loaded page: " + page.toString());
             } else {
-                Toast.makeText(this, "Page null", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Failed to load page.", Toast.LENGTH_LONG).show();
             }
         }
-
     }
 
+    @Override
     protected void onPause() {
         super.onPause();
 
-        editTitle = findViewById(R.id.etDpaTitle);
-        editContent = findViewById(R.id.etDpaContent);
-
-        String title = editTitle.getText().toString();
-        String content = editContent.getText().toString();
+        String title = editTitle.getText().toString().trim();
+        String content = editContent.getText().toString().trim();
         int userId = sharedPreferences.getInt("userId", -1);
 
         if (!title.isEmpty() || !content.isEmpty()) {
-            if (pageId == -1) {  // New page (instead of checking for null)
+            if (pageId == -1) {
                 pageId = dbHelper.updatePage(-1, title, content, userId, "Text");
-                Toast.makeText(this, "New Page Created: " + pageId, Toast.LENGTH_SHORT).show();
-            } else {  // Existing page update
+                Log.d("DiaryPageActivity", "New Page Created: " + pageId);
+                Toast.makeText(this, "New Page Created", Toast.LENGTH_SHORT).show();
+            } else {
                 dbHelper.updatePage(pageId, title, content, userId, "Text");
-                Toast.makeText(this, "Page Updated: " + pageId, Toast.LENGTH_SHORT).show();
+                Log.d("DiaryPageActivity", "Page Updated: " + pageId);
+                Toast.makeText(this, "Page Updated", Toast.LENGTH_SHORT).show();
             }
-            Log.d("Page Activity", "pageId after update: " + pageId);
         }
-
     }
 
-    public void  deletePage(View view) {
-        boolean success = false;
+    public void deletePage(View view) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         try {
             db.beginTransaction();
 
-            // Delete related resources first to avoid foreign key issues
             db.delete("resources", "pageId = ?", new String[]{String.valueOf(pageId)});
-
-            // Delete the page from the pages table
             int rowsAffected = db.delete("pages", "pageId = ?", new String[]{String.valueOf(pageId)});
 
             if (rowsAffected > 0) {
-                success = true;
-            }
-
-            if (success) {
-                Toast.makeText(this, "Page Deleted: " + pageId, Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Page Deleted", Toast.LENGTH_LONG).show();
                 finish();
             }
-
             db.setTransactionSuccessful();
         } catch (SQLiteException e) {
-            Log.e("DB_ERROR", "Error deleting page: " + e.getMessage());
+            Log.e("DiaryPageActivity", "Error deleting page: " + e.getMessage());
         } finally {
             db.endTransaction();
             db.close();
         }
-
-    }
-
-
-    public void onHomeClick(MenuItem item) {
-        Toast.makeText(this, "Home clicked.", Toast.LENGTH_SHORT).show();
-    }
-
-    public void onSettingsClick(MenuItem item) {
-        Toast.makeText(this, "Settings clicked.", Toast.LENGTH_SHORT).show();
     }
 
     public void onResourceImageClick(View view) {
+        // TODO: Implement image selection and insertion logic
         Toast.makeText(this, "Image adder clicked.", Toast.LENGTH_SHORT).show();
     }
 
     public void onResourceTextClick(View view) {
-        Toast.makeText(this, "Text adder clicked.", Toast.LENGTH_SHORT).show();
+        LinearLayout contentLayout = findViewById(R.id.llDpaContentLayout); // Make sure you have an ID for the parent layout
+
+        EditText newEditText = new EditText(this);
+        newEditText.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        ));
+        newEditText.setHint("New Text Block");
+        newEditText.setTextSize(16);
+        newEditText.setPadding(8, 8, 8, 8);
+        newEditText.setBackgroundColor(Color.TRANSPARENT);
+        newEditText.setTextColor(getResources().getColor(R.color.brown_light));
+        newEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+
+        contentLayout.addView(newEditText);
     }
+
 }

@@ -25,18 +25,23 @@
             android:padding="8dp"
             android:textStyle="bold" />
 
-        <EditText
-            android:id="@+id/etDpaContent"
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:gravity="start|top"
-            android:hint="Content"
-            android:background="@android:color/transparent"
-            android:textColor="@color/brown_light"
-            android:textSize="16sp"
-            android:padding="8dp"
-            android:inputType="textMultiLine" />
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:id="@+id/llDpaContentLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+            </LinearLayout>
+
+        </ScrollView>
+
     </LinearLayout>
 
     <!-- Floating Action Button (Overlays on top of the content) -->
@@ -57,11 +62,11 @@
         android:id="@+id/tbDpaBottomToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
         android:orientation="horizontal"
         android:gravity="start"
         android:background="@color/brown_toolbar"
-        android:padding="8dp">
+        android:padding="8dp"
+        android:layout_gravity="bottom">
 
 
         <ImageButton
