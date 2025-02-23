@@ -7,14 +7,19 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.InputType;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -207,6 +212,79 @@ public class DiaryPageActivity extends AppCompatActivity {
 
         contentLayout.addView(newEditText); // Add to the UI
     }
+
+
+    private static final int PICK_IMAGE_REQUEST = 1;
+
+
+    private void openImagePicker() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        intent.setType("image/*");
+        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+    }
+
+
+    public void onResourceImageClick(View view) {
+        openImagePicker();
+        Toast.makeText(this, "Adding Image clicked.", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
+            Uri imageUri = data.getData();
+            if (imageUri != null) {
+                insertImage(imageUri);
+            }
+        }
+    }
+    private void insertImage(Uri imageUri) {
+        EditText focusedEditText = getCurrentFocusedEditText();
+
+        if (focusedEditText == null) {
+            Toast.makeText(this, "No active text block found!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Create ImageView
+        ImageView imageView = new ImageView(this);
+        imageView.setImageURI(imageUri);
+        imageView.setAdjustViewBounds(true);
+        imageView.setMaxHeight(focusedEditText.getLineHeight() * 8);
+        imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        imageView.setTag(imageUri);
+
+        // Insert Image Below the Focused EditText
+        int cursorIndex = contentLayout.indexOfChild(focusedEditText);
+        contentLayout.addView(imageView, cursorIndex + 1);
+
+        // Save to Database
+        saveImageToDatabase(imageUri);
+    }
+
+    private EditText getCurrentFocusedEditText() {
+        for (int i = 0; i < contentLayout.getChildCount(); i++) {
+            View view = contentLayout.getChildAt(i);
+            if (view instanceof EditText && view.hasFocus()) {
+                return (EditText) view;
+            }
+        }
+        return null; // No active EditText found
+    }
+
+
+    private void saveImageToDatabase(Uri imageUri) {
+        if (pageId == -1) {
+            Toast.makeText(this, "Page ID not found!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        int resourceOrder = contentLayout.getChildCount(); // Get order based on layout
+        dbHelper.insertResource(pageId, "image", imageUri.toString(), resourceOrder);
+    }
+
 
 }
 

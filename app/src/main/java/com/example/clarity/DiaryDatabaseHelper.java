@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.net.Uri;
 import android.util.Log;
 
 
@@ -382,6 +383,18 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
     }
 
 
+
+    public void insertResource(int pageId, String resourceType, String resourceContent, int resourceOrder) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("pageId", pageId);
+        values.put("resourceType", resourceType);
+        values.put("resourceContent", resourceContent);
+        values.put("resourceOrder", resourceOrder);
+
+        db.insert("resources", null, values);
+        db.close();
+    }
 
 
 }
