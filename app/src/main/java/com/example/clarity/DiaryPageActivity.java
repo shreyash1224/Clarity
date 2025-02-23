@@ -1,5 +1,6 @@
 package com.example.clarity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -135,8 +137,20 @@ public class DiaryPageActivity extends AppCompatActivity {
         newEditText.setTextColor(getResources().getColor(R.color.brown_light));
         newEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
 
+        // Add the new EditText to the layout
         contentLayout.addView(newEditText);
+
+        // Move focus to the new EditText
+        newEditText.requestFocus();
+        newEditText.setSelection(newEditText.getText().length()); // Cursor at the end
+
+        // Show the keyboard automatically
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            imm.showSoftInput(newEditText, InputMethodManager.SHOW_IMPLICIT);
+        }
     }
+
 
     private void saveTextBlocks() {
         dbHelper.deleteTextBlocksByPageId(pageId);
@@ -151,12 +165,6 @@ public class DiaryPageActivity extends AppCompatActivity {
         }
     }
 
-    private void loadTextBlocks() {
-        List<String> textBlocks = dbHelper.getTextBlocksByPageId(pageId);
-        for (String text : textBlocks) {
-            addNewTextBlock(text);
-        }
-    }
     private void addTextBlockToUI(String textContent) {
         LinearLayout contentLayout = findViewById(R.id.llDpaContentLayout);
 
