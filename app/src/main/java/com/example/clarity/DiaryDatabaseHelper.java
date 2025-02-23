@@ -285,7 +285,7 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
         try {
             db.beginTransaction();
             db.delete("resources", "pageId = ? AND resourceType = ?",
-                    new String[]{String.valueOf(pageId), "Text"});
+                    new String[]{String.valueOf(pageId), "text"});
             db.setTransactionSuccessful();
             Log.d("DiaryDatabaseHelper", "Deleted text blocks for pageId: " + pageId);
         } catch (SQLiteException e) {
@@ -303,7 +303,7 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
 
             ContentValues values = new ContentValues();
             values.put("pageId", pageId);
-            values.put("resourceType", "Text");  // Storing as a text resource
+            values.put("resourceType", "text");  // Storing as a text resource
             values.put("resourceContent", textContent);
             values.put("resourceOrder", resourceOrder);
 
@@ -330,19 +330,55 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
 
         Cursor cursor = null;
         try {
-            String query = "SELECT resourceContent FROM resources WHERE pageId = ? AND resourceType = 'Text' ORDER BY resourceOrder ASC";
+            String query = "SELECT resourceContent FROM resources WHERE pageId = ? AND resourceType = 'text' ORDER BY resourceOrder ASC";
             cursor = db.rawQuery(query, new String[]{String.valueOf(pageId)});
 
             while (cursor.moveToNext()) {
                 textBlocks.add(cursor.getString(0)); // Get text content
             }
+
+            printTableContents(db);
+
         } catch (SQLiteException e) {
             Log.e("DiaryDatabaseHelper", "Error fetching text blocks: " + e.getMessage());
         } finally {
             if (cursor != null) cursor.close();
             db.close();
         }
+
         return textBlocks;
+    }
+
+
+    public void printTableContents(SQLiteDatabase db) {
+        Cursor cursor = db.rawQuery("SELECT * FROM resources ORDER BY resourceOrder", null);
+        Log.d("DiaryDatabaseHelper", "------ Resources Table Contents ------");
+
+        if (cursor.moveToFirst()) {
+
+
+//            String resourceTable = "CREATE TABLE IF NOT EXISTS resources("
+//                    + "resourceId INTEGER PRIMARY KEY AUTOINCREMENT, "
+//                    + "resourceContent TEXT NOT NULL CHECK (LENGTH(resourceContent) > 0), "
+//                    + "resourceType TEXT NOT NULL CHECK (LENGTH(resourceType) <= 20), "
+//                    + "resourceOrder INTEGER NOT NULL, "
+//                    + "pageId INTEGER NOT NULL, "
+//                    + "FOREIGN KEY (pageId) REFERENCES pages(pageId) ON DELETE CASCADE);";
+
+            do {
+                int id = cursor.getInt(0); // Assuming first column is resourceId
+                String content = cursor.getString(1);
+                String type = cursor.getString(2);
+                int order = cursor.getInt(3);
+                int pageId = cursor.getInt(4);
+
+                Log.d("DiaryDatabaseHelper", "ID: " + id + ", PageID: " + pageId +
+                        ", Type: " + type + ", Content: " + content + ", Order: " + order);
+            } while (cursor.moveToNext());
+        } else {
+            Log.d("DiaryDatabaseHelper", "No data found in resources table.");
+        }
+        cursor.close();
     }
 
 

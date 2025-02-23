@@ -46,9 +46,13 @@ public class DiaryPageActivity extends AppCompatActivity {
 
                 // Fetch and display text blocks
                 List<String> textBlocks = dbHelper.getTextBlocksByPageId(pageId);
+                Log.d("DiaryPageActivity", "Retrieved text blocks: " + textBlocks.size());
+
                 for (String text : textBlocks) {
+                    Log.d("DiaryPageActivity", "Text Block: " + text);
                     addTextBlockToUI(text);
                 }
+
 
                 Log.d("DiaryPageActivity", "Loaded page: " + page.toString());
             } else {
