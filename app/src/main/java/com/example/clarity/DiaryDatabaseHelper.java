@@ -391,28 +391,31 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
 
 
 //insertResource() done
-    public void insertResource(int pageId, String resourceType, String resourceContent, int resourceOrder) {
-        SQLiteDatabase db = this.getWritableDatabase();
+public long insertResource(int pageId, String resourceType, String resourceContent, int resourceOrder) {
+    SQLiteDatabase db = this.getWritableDatabase();
+    long result = -1; // Default to -1 (failure)
 
-        try {
-            ContentValues values = new ContentValues();
-            values.put("pageId", pageId);
-            values.put("resourceType", resourceType);
-            values.put("resourceContent", resourceContent);
-            values.put("resourceOrder", resourceOrder);
+    try {
+        ContentValues values = new ContentValues();
+        values.put("pageId", pageId);
+        values.put("resourceType", resourceType);
+        values.put("resourceContent", resourceContent);
+        values.put("resourceOrder", resourceOrder);
 
-            long result = db.insert("resources", null, values);
-            if (result == -1) {
-                Log.e("DB_ERROR", "Failed to insert resource for pageId: " + pageId);
-            } else {
-                Log.d("DB_SUCCESS", "Resource inserted successfully for pageId: " + pageId + ", order: " + resourceOrder);
-            }
-        } catch (SQLiteException e) {
-            Log.e("DB_ERROR", "Database error while inserting resource: " + e.getMessage());
-        } finally {
-            db.close();
+        result = db.insert("resources", null, values);
+        if (result == -1) {
+            Log.e("DB_ERROR", "Failed to insert resource for pageId: " + pageId);
+        } else {
+            Log.d("DB_SUCCESS", "Resource inserted successfully for pageId: " + pageId + ", order: " + resourceOrder);
         }
+    } catch (SQLiteException e) {
+        Log.e("DB_ERROR", "Database error while inserting resource: " + e.getMessage());
+    } finally {
+        db.close();
     }
+
+    return result;  // ✅ Now it correctly returns the insert result
+}
 
 
     //getResourcesByPageId() done
@@ -439,55 +442,67 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
 
 
     //--
-    public List<String> getTextBlocksByPageId(int pageId) {
-        List<String> textBlocks = new ArrayList<>();
+//    public List<String> getTextBlocksByPageId(int pageId) {
+//        List<String> textBlocks = new ArrayList<>();
+//        SQLiteDatabase db = this.getReadableDatabase();
+//
+//        Cursor cursor = null;
+//        try {
+//            String query = "SELECT resourceContent FROM resources WHERE pageId = ? AND resourceType = 'text' ORDER BY resourceOrder ASC";
+//            cursor = db.rawQuery(query, new String[]{String.valueOf(pageId)});
+//
+//            while (cursor.moveToNext()) {
+//                textBlocks.add(cursor.getString(0)); // Get text content
+//            }
+//
+//
+//        } catch (SQLiteException e) {
+//            Log.e("DiaryDatabaseHelper", "Error fetching text blocks: " + e.getMessage());
+//        } finally {
+//            if (cursor != null) cursor.close();
+//            db.close();
+//        }
+//
+//        return textBlocks;
+//    }
+////--
+//    public List<String> getImagePathsByPageId(int pageId) {
+//        List<String> imagePaths = new ArrayList<>();
+//        SQLiteDatabase db = this.getReadableDatabase();
+//
+////        Cursor cursor = db.rawQuery("SELECT * FROM resources ORDER BY resourceOrder", null);
+//
+//        Cursor cursor = db.rawQuery("SELECT resourceContent FROM RESOURCES WHERE pageId = ? AND resourceType = 'image'",
+//                new String[]{String.valueOf(pageId)});
+//
+//        Log.d("DiaryDatabaseHelper", "🔍 Checking images for pageId: " + pageId);
+//
+//        if (cursor != null) {
+//            while (cursor.moveToNext()) {
+//                String path = cursor.getString(0);
+//                Log.d("DiaryDatabaseHelper", "✅ Retrieved image path: " + path);
+//                imagePaths.add(path);
+//            }
+//            cursor.close();
+//        } else {
+//            Log.e("DiaryDatabaseHelper", "❌ Cursor is null while fetching images for pageId: " + pageId);
+//        }
+//
+//        return imagePaths;
+//    }
+
+
+    public int getLastResourceOrder(int pageId) {
         SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT MAX(resourceOrder) FROM resources WHERE pageId = ?", new String[]{String.valueOf(pageId)});
 
-        Cursor cursor = null;
-        try {
-            String query = "SELECT resourceContent FROM resources WHERE pageId = ? AND resourceType = 'text' ORDER BY resourceOrder ASC";
-            cursor = db.rawQuery(query, new String[]{String.valueOf(pageId)});
-
-            while (cursor.moveToNext()) {
-                textBlocks.add(cursor.getString(0)); // Get text content
-            }
-
-
-        } catch (SQLiteException e) {
-            Log.e("DiaryDatabaseHelper", "Error fetching text blocks: " + e.getMessage());
-        } finally {
-            if (cursor != null) cursor.close();
-            db.close();
+        int lastOrder = 0; // Default to 0 if no resources exist
+        if (cursor.moveToFirst() && !cursor.isNull(0)) {
+            lastOrder = cursor.getInt(0);
         }
-
-        return textBlocks;
+        cursor.close();
+        return lastOrder;
     }
-//--
-    public List<String> getImagePathsByPageId(int pageId) {
-        List<String> imagePaths = new ArrayList<>();
-        SQLiteDatabase db = this.getReadableDatabase();
-
-//        Cursor cursor = db.rawQuery("SELECT * FROM resources ORDER BY resourceOrder", null);
-
-        Cursor cursor = db.rawQuery("SELECT resourceContent FROM RESOURCES WHERE pageId = ? AND resourceType = 'image'",
-                new String[]{String.valueOf(pageId)});
-
-        Log.d("DiaryDatabaseHelper", "🔍 Checking images for pageId: " + pageId);
-
-        if (cursor != null) {
-            while (cursor.moveToNext()) {
-                String path = cursor.getString(0);
-                Log.d("DiaryDatabaseHelper", "✅ Retrieved image path: " + path);
-                imagePaths.add(path);
-            }
-            cursor.close();
-        } else {
-            Log.e("DiaryDatabaseHelper", "❌ Cursor is null while fetching images for pageId: " + pageId);
-        }
-
-        return imagePaths;
-    }
-
 
 
     public void debugResourcesTable() {
@@ -506,5 +521,28 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
     }
 
+
+    public ArrayList<Resource> getResourcesForPage(int pageId) {
+        ArrayList<Resource> resources = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT resourceType, resourceContent, resourceOrder FROM resources WHERE pageId = ? ORDER BY resourceOrder ASC",
+                new String[]{String.valueOf(pageId)});
+
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                String type = cursor.getString(0);
+                String content = cursor.getString(1);
+                int order = cursor.getInt(2);
+                resources.add(new Resource(pageId, type, content, order));
+            }
+            cursor.close();
+        }
+
+        db.close();
+        return resources;
+    }
+
 }
+
 

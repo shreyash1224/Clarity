@@ -83,13 +83,12 @@
         <ImageButton
             android:id="@+id/ibDpaAddImageButton"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="35dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Resource Image"
             android:onClick="onResourceImageClick"
             android:padding="8dp"
-            android:src="@drawable/ic_images"
-            />
+            android:src="@drawable/ic_images" />
 
 
     </LinearLayout>
