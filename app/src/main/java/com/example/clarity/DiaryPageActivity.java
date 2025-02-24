@@ -4,8 +4,11 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,6 +17,7 @@ import android.text.InputType;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -23,6 +27,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,14 +38,17 @@ public class DiaryPageActivity extends AppCompatActivity {
     private Integer pageId = -1;
     private LinearLayout contentLayout;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_diary_page);
-        Log.d("DiaryPageActivity", "onCreate() called.");
+
 
         dbHelper = new DiaryDatabaseHelper(this);
         sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+
+        Log.d("DatabaseCheck","Diary Page Activity onCreate() called.");
 
         editTitle = findViewById(R.id.etDpaTitle);
         contentLayout = findViewById(R.id.llDpaContentLayout);
@@ -48,6 +56,7 @@ public class DiaryPageActivity extends AppCompatActivity {
         Intent intent = getIntent();
         pageId = intent.getIntExtra("pageId", -1);
         Log.d("DiaryPageActivity", "pageId received: " + pageId);
+
         if (pageId != -1) {
             DiaryPage page = dbHelper.getPageById(pageId);
             if (page != null) {
@@ -62,12 +71,23 @@ public class DiaryPageActivity extends AppCompatActivity {
                     addTextBlockToUI(text);
                 }
 
+                // Fetch and display images
+
+                Log.d("DiaryPageActivity", "Fetching images for pageId: " + pageId);
+                List<String> imagePaths = dbHelper.getImagePathsByPageId(pageId);
+                Log.d("DiaryPageActivity", "Retrieved images: " + imagePaths.size());
+
+                for (String imagePath : imagePaths) {
+                    Log.d("DiaryPageActivity", "Image Path: " + imagePath);
+                    addImageToUI(imagePath);
+                }
 
                 Log.d("DiaryPageActivity", "Loaded page: " + page.toString());
             } else {
                 Toast.makeText(this, "Failed to load page.", Toast.LENGTH_LONG).show();
             }
         }
+
 
 
     }
@@ -182,18 +202,18 @@ public class DiaryPageActivity extends AppCompatActivity {
     }
 
 
-    private void saveTextBlocks() {
-        dbHelper.deleteTextBlocksByPageId(pageId);
-        for (int i = 0; i < contentLayout.getChildCount(); i++) {
-            View view = contentLayout.getChildAt(i);
-            if (view instanceof EditText) {
-                String text = ((EditText) view).getText().toString().trim();
-                if (!text.isEmpty()) {
-                    dbHelper.insertTextBlock(pageId, text, i);
-                }
-            }
-        }
-    }
+//    private void saveTextBlocks() {
+//        dbHelper.deleteTextBlocksByPageId(pageId);
+//        for (int i = 0; i < contentLayout.getChildCount(); i++) {
+//            View view = contentLayout.getChildAt(i);
+//            if (view instanceof EditText) {
+//                String text = ((EditText) view).getText().toString().trim();
+//                if (!text.isEmpty()) {
+//                    dbHelper.insertTextBlock(pageId, text, i);
+//                }
+//            }
+//        }
+//    }
 
     private void addTextBlockToUI(String textContent) {
         LinearLayout contentLayout = findViewById(R.id.llDpaContentLayout);
@@ -212,7 +232,30 @@ public class DiaryPageActivity extends AppCompatActivity {
 
         contentLayout.addView(newEditText); // Add to the UI
     }
+    private void addImageToUI(String imagePath) {
+        Log.d("DiaryPageActivity", "Adding image to UI");
+        Log.d("DatabaseCheck", "------ Resources Table Contents ------");
 
+        File file = new File(imagePath);
+        if (!file.exists()) {
+            Log.e("DiaryPageActivity", "Image file not found: " + imagePath);
+            return;
+        }
+        else{
+            Log.d("DiaryPageActivity", "Checking file existence: " + imagePath);
+
+        }
+
+        Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
+        ImageView imageView = new ImageView(this);
+        imageView.setLayoutParams(new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        ));
+        imageView.setImageBitmap(bitmap);
+
+        contentLayout.addView(imageView);
+    }
 
     private static final int PICK_IMAGE_REQUEST = 1;
 
@@ -274,15 +317,57 @@ public class DiaryPageActivity extends AppCompatActivity {
         return null; // No active EditText found
     }
 
-
     private void saveImageToDatabase(Uri imageUri) {
         if (pageId == -1) {
             Toast.makeText(this, "Page ID not found!", Toast.LENGTH_SHORT).show();
             return;
         }
 
+        // Convert URI to absolute file path
+        String imagePath = getRealPathFromURI(imageUri);
+        if (imagePath == null) {
+            Toast.makeText(this, "Failed to get image path!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         int resourceOrder = contentLayout.getChildCount(); // Get order based on layout
-        dbHelper.insertResource(pageId, "image", imageUri.toString(), resourceOrder);
+        dbHelper.insertResource(pageId, "image", imagePath, resourceOrder);
+        Log.d("DiaryPageActivity", "Printing Resource Table In saveImageToDatabase()");
+        Log.d("DatabaseCheck", "------ Resources Table Contents ------");
+    }
+
+    // Convert URI to absolute file path
+    private String getRealPathFromURI(Uri uri) {
+        String[] projection = {MediaStore.Images.Media.DATA};
+        Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
+        if (cursor != null) {
+            int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            String path = cursor.getString(columnIndex);
+            cursor.close();
+            return path;
+        }
+        return null;
+    }
+
+
+    public void debugResourcesTable() {
+        Log.d("DatabaseCheck", "DebugResourceTable() Called In Diary Database.");
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM Resources", null);
+
+
+
+        while (cursor.moveToNext()) {
+            int id = cursor.getInt(0);
+            String content = cursor.getString(1);
+            String type = cursor.getString(2);
+            int order = cursor.getInt(3);
+            int pageId = cursor.getInt(4);
+
+            Log.d("DatabaseCheck", "ID: " + id + ", PageID: " + pageId + ", Type: " + type + ", Content: " + content + ", Order: " + order);
+        }
+        cursor.close();
     }
 
 
