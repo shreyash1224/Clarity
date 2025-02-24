@@ -37,6 +37,7 @@ public class DiaryPageActivity extends AppCompatActivity {
     private DiaryDatabaseHelper dbHelper;
     private Integer pageId = -1;
     private LinearLayout contentLayout;
+    private static final int PICK_IMAGE_REQUEST = 1;
 
 
     @Override
@@ -234,7 +235,7 @@ public class DiaryPageActivity extends AppCompatActivity {
     }
     private void addImageToUI(String imagePath) {
         Log.d("DiaryPageActivity", "Adding image to UI");
-        Log.d("DatabaseCheck", "------ Resources Table Contents ------");
+        debugResourcesTable();
 
         File file = new File(imagePath);
         if (!file.exists()) {
@@ -257,7 +258,6 @@ public class DiaryPageActivity extends AppCompatActivity {
         contentLayout.addView(imageView);
     }
 
-    private static final int PICK_IMAGE_REQUEST = 1;
 
 
     private void openImagePicker() {
@@ -317,6 +317,7 @@ public class DiaryPageActivity extends AppCompatActivity {
         return null; // No active EditText found
     }
 
+
     private void saveImageToDatabase(Uri imageUri) {
         if (pageId == -1) {
             Toast.makeText(this, "Page ID not found!", Toast.LENGTH_SHORT).show();
@@ -335,6 +336,7 @@ public class DiaryPageActivity extends AppCompatActivity {
         Log.d("DiaryPageActivity", "Printing Resource Table In saveImageToDatabase()");
         Log.d("DatabaseCheck", "------ Resources Table Contents ------");
     }
+
 
     // Convert URI to absolute file path
     private String getRealPathFromURI(Uri uri) {

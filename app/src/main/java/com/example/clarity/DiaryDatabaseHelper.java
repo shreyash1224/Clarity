@@ -56,7 +56,7 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
                 + "resourceId INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + "resourceContent TEXT NOT NULL CHECK (LENGTH(resourceContent) > 0), "
                 + "resourceType TEXT NOT NULL CHECK (LENGTH(resourceType) <= 20), "
-                + "resourceOrder INTEGER UNIQUE NOT NULL, "
+                + "resourceOrder INTEGER  NOT NULL, "
                 + "pageId INTEGER NOT NULL, "
                 + "FOREIGN KEY (pageId) REFERENCES pages(pageId) ON DELETE CASCADE);";
 
@@ -423,14 +423,16 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
             Log.e("DiaryDatabaseHelper", "❌ Cursor is null while fetching images for pageId: " + pageId);
         }
 
+        Log.d("DatabaseCheck","Get Image Paths By Page Id funtion.");
+        debugResourcesTable(db);
         return imagePaths;
     }
 
 
 
-    public void debugResourcesTable() {
+    public void debugResourcesTable(SQLiteDatabase db) {
         Log.d("DatabaseCheck", "DebugResourceTable() Called In Diary Database.");
-        SQLiteDatabase db = this.getReadableDatabase();
+
         Cursor cursor = db.rawQuery("SELECT * FROM Resources", null);
         while (cursor.moveToNext()) {
             int id = cursor.getInt(0);
