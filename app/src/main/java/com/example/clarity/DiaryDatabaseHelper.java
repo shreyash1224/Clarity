@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.util.Log;
+import android.util.Pair;
 
 
 import java.util.ArrayList;
@@ -121,9 +122,9 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
         return exists;
     }
 
-    //Adding page to Diary.
 
-    public int updatePage(int pageId, String title, ArrayList<String> textBlocks, int userId) {
+    //updatePage() done
+    public int updatePage(int pageId, String title, List<Resource> resources, int userId) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         if (pageId == -1) {
@@ -147,8 +148,8 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
             Log.d("DiaryDatabaseHelper", "Page updated successfully with ID: " + pageId);
         }
 
-        // Fetch existing text block IDs and their resourceOrder values for this page
-        Cursor cursor = db.rawQuery("SELECT resourceId, resourceOrder FROM resources WHERE pageId = ? AND resourceType = 'text' ORDER BY resourceOrder ASC",
+        // Fetch existing resource IDs and their resourceOrder values for this page
+        Cursor cursor = db.rawQuery("SELECT resourceId, resourceOrder FROM resources WHERE pageId = ? ORDER BY resourceOrder ASC",
                 new String[]{String.valueOf(pageId)});
 
         ArrayList<Integer> existingIds = new ArrayList<>();
@@ -169,31 +170,32 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
         }
         orderCursor.close();
 
-        // Now insert or update text blocks with a unique resourceOrder
-        for (int i = 0; i < textBlocks.size(); i++) {
+        // Insert or update resources
+        for (int i = 0; i < resources.size(); i++) {
+            Resource resource = resources.get(i);
             ContentValues values = new ContentValues();
-            values.put("resourceContent", textBlocks.get(i));
+            values.put("resourceContent", resource.getContent());
+            values.put("resourceType", resource.getType());
+            values.put("pageId", pageId);
 
             if (i < existingIds.size()) {
-                // Update existing text block while keeping its original order
+                // Update existing resource while keeping its original order
                 values.put("resourceOrder", existingOrders.get(i));
                 db.update("resources", values, "resourceId = ?", new String[]{String.valueOf(existingIds.get(i))});
             } else {
-                // Insert new text block with a unique resourceOrder
-                maxOrder++; // Ensure unique order for new insertions
+                // Insert new resource with a unique resourceOrder
+                maxOrder++;
                 values.put("resourceOrder", maxOrder);
-                values.put("resourceType", "text");
-                values.put("pageId", pageId);
                 long newResourceId = db.insert("resources", null, values);
                 if (newResourceId == -1) {
-                    Log.e("DiaryDatabaseHelper", "Failed to insert text block for page ID: " + pageId);
+                    Log.e("DiaryDatabaseHelper", "Failed to insert resource for page ID: " + pageId);
                 }
             }
         }
 
-        // Remove extra old text blocks that are no longer needed
-        if (existingIds.size() > textBlocks.size()) {
-            for (int i = textBlocks.size(); i < existingIds.size(); i++) {
+        // Remove extra old resources that are no longer needed
+        if (existingIds.size() > resources.size()) {
+            for (int i = resources.size(); i < existingIds.size(); i++) {
                 db.delete("resources", "resourceId = ?", new String[]{String.valueOf(existingIds.get(i))});
             }
         }
@@ -201,43 +203,55 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
         return pageId;
     }
 
-
-    // Getting all the pages
+    //getAllPages() done
     public ArrayList<DiaryPage> getAllPages(int userId) {
         ArrayList<DiaryPage> pages = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
 
-        // Query to get pages along with their content
-        String query = "SELECT p.pageId, p.pageTitle, p.pageDate, " +
-                "(SELECT r.resourceContent FROM resources r WHERE r.pageId = p.pageId LIMIT 1) AS content " +
-                "FROM pages p WHERE p.userId = ? ORDER BY p.pageDate DESC";
-
-        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
+        // Query to get all pages for the user
+        String pageQuery = "SELECT pageId, pageTitle, pageDate FROM pages WHERE userId = ? ORDER BY pageDate DESC";
+        Cursor pageCursor = db.rawQuery(pageQuery, new String[]{String.valueOf(userId)});
 
         Log.d("DiaryDatabaseHelper", "Fetching pages for userId: " + userId);
 
-        if (cursor.moveToFirst()) {
+        if (pageCursor.moveToFirst()) {
             do {
-                @SuppressLint("Range") int id = cursor.getInt(cursor.getColumnIndex("pageId"));
-                @SuppressLint("Range") String title = cursor.getString(cursor.getColumnIndex("pageTitle"));
-                @SuppressLint("Range") String date = cursor.getString(cursor.getColumnIndex("pageDate"));
-                @SuppressLint("Range") String content = cursor.getString(cursor.getColumnIndex("content"));
+                @SuppressLint("Range") int id = pageCursor.getInt(pageCursor.getColumnIndex("pageId"));
+                @SuppressLint("Range") String title = pageCursor.getString(pageCursor.getColumnIndex("pageTitle"));
+                @SuppressLint("Range") String date = pageCursor.getString(pageCursor.getColumnIndex("pageDate"));
 
-                Log.d("DiaryDatabaseHelper", "Page Loaded: ID=" + id + ", Title=" + title + ", Content=" + content);
+                // Fetch all resources for this page
+                ArrayList<Resource> resources = new ArrayList<>();
+                String resourceQuery = "SELECT resourceId, resourceType, resourceContent, resourceOrder " +
+                        "FROM resources WHERE pageId = ? ORDER BY resourceOrder ASC";
+                Cursor resourceCursor = db.rawQuery(resourceQuery, new String[]{String.valueOf(id)});
 
-                pages.add(new DiaryPage(id, title, date, content)); // Use updated constructor
-            } while (cursor.moveToNext());
+                while (resourceCursor.moveToNext()) {
+                    @SuppressLint("Range") int resourceId = resourceCursor.getInt(resourceCursor.getColumnIndex("resourceId"));
+                    @SuppressLint("Range") String type = resourceCursor.getString(resourceCursor.getColumnIndex("resourceType"));
+                    @SuppressLint("Range") String content = resourceCursor.getString(resourceCursor.getColumnIndex("resourceContent"));
+                    @SuppressLint("Range") int order = resourceCursor.getInt(resourceCursor.getColumnIndex("resourceOrder"));
+
+                    resources.add(new Resource(resourceId, id, type, content, order));
+                }
+                resourceCursor.close();
+
+                // Add page with all its resources
+                pages.add(new DiaryPage(id, title, date, resources));
+
+                Log.d("DiaryDatabaseHelper", "Page Loaded: ID=" + id + ", Title=" + title + ", Resources=" + resources.size());
+
+            } while (pageCursor.moveToNext());
         } else {
             Log.d("DiaryDatabaseHelper", "No pages found for userId: " + userId);
         }
 
-        cursor.close();
+        pageCursor.close();
         return pages;
-
     }
 
 
-    //To get next available id as per column name.
+    //Not related
     public int getNextAvailableId(String tableName, String idColumn) {
         SQLiteDatabase db = this.getReadableDatabase();
         int newId = 1; // Default to 1 if the table is empty
@@ -257,6 +271,7 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
     }
 
 
+    //Not related
     public int getUserIdByUsername(String username) {
         SQLiteDatabase db = this.getReadableDatabase();
         int userId = -1; // Default value if user is not found
@@ -271,92 +286,159 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
         return userId;
     }
 
+    //getPageById() done
     public DiaryPage getPageById(int pageId) {
         SQLiteDatabase db = this.getReadableDatabase();
         DiaryPage diaryPage = null;
-        Cursor cursor = null;
+        Cursor pageCursor = null;
+        Cursor resourceCursor = null;
 
         try {
             // Fetch page details
-            cursor = db.rawQuery("SELECT p.pageId, p.pageTitle, p.pageDate, " +
-                            "(SELECT GROUP_CONCAT(r.resourceContent, '\n') FROM resources r WHERE r.pageId = p.pageId) AS content " +
-                            "FROM pages p WHERE p.pageId = ?",
+            pageCursor = db.rawQuery("SELECT pageId, pageTitle, pageDate FROM pages WHERE pageId = ?",
                     new String[]{String.valueOf(pageId)});
 
-            if (cursor != null && cursor.moveToFirst()) {
-                int id = cursor.getInt(cursor.getColumnIndexOrThrow("pageId"));
-                String title = cursor.getString(cursor.getColumnIndexOrThrow("pageTitle"));
-                String date = cursor.getString(cursor.getColumnIndexOrThrow("pageDate"));
-                String content = cursor.getString(cursor.getColumnIndexOrThrow("content")); // Fetch content
+            if (pageCursor.moveToFirst()) {
+                int id = pageCursor.getInt(pageCursor.getColumnIndexOrThrow("pageId"));
+                String title = pageCursor.getString(pageCursor.getColumnIndexOrThrow("pageTitle"));
+                String date = pageCursor.getString(pageCursor.getColumnIndexOrThrow("pageDate"));
 
-                diaryPage = new DiaryPage(id, title, date, content);
+                // Fetch all resources for the given page, ordered correctly
+                ArrayList<Resource> resources = new ArrayList<>();
+                resourceCursor = db.rawQuery("SELECT resourceId, resourceType, resourceContent, resourceOrder " +
+                                "FROM resources WHERE pageId = ? ORDER BY resourceOrder ASC",
+                        new String[]{String.valueOf(pageId)});
+
+                while (resourceCursor.moveToNext()) {
+                    int resourceId = resourceCursor.getInt(resourceCursor.getColumnIndexOrThrow("resourceId"));
+                    String type = resourceCursor.getString(resourceCursor.getColumnIndexOrThrow("resourceType"));
+                    String content = resourceCursor.getString(resourceCursor.getColumnIndexOrThrow("resourceContent"));
+                    int order = resourceCursor.getInt(resourceCursor.getColumnIndexOrThrow("resourceOrder"));
+
+                    resources.add(new Resource(resourceId, id, type, content, order));
+                }
+
+                // Create DiaryPage with all resources
+                diaryPage = new DiaryPage(id, title, date, resources);
             }
         } catch (SQLiteException e) {
             Log.e("DB_ERROR", "Database error: " + e.getMessage());
         } finally {
-            if (cursor != null) cursor.close();
+            if (pageCursor != null) pageCursor.close();
+            if (resourceCursor != null) resourceCursor.close();
             db.close();
         }
 
         return diaryPage;
     }
 
-    public int getNextResourceOrder(int pageId) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT MAX(resourceOrder) FROM resources WHERE pageId = ?",
-                new String[]{String.valueOf(pageId)});
-        int nextOrder = 1;
-        if (cursor.moveToFirst() && !cursor.isNull(0)) {
-            nextOrder = cursor.getInt(0) + 1;
-        }
-        cursor.close();
-        return nextOrder;
-    }
 
-    public void deleteTextBlocksByPageId(int pageId) {
+//    public int getNextResourceOrder(int pageId) {
+//        SQLiteDatabase db = this.getReadableDatabase();
+//        Cursor cursor = db.rawQuery("SELECT MAX(resourceOrder) FROM resources WHERE pageId = ?",
+//                new String[]{String.valueOf(pageId)});
+//        int nextOrder = 1;
+//        if (cursor.moveToFirst() && !cursor.isNull(0)) {
+//            nextOrder = cursor.getInt(0) + 1;
+//        }
+//        cursor.close();
+//        return nextOrder;
+//    }
+//
+//    public void deleteTextBlocksByPageId(int pageId) {
+//        SQLiteDatabase db = this.getWritableDatabase();
+//        try {
+//            db.beginTransaction();
+//            db.delete("resources", "pageId = ? AND resourceType = ?",
+//                    new String[]{String.valueOf(pageId), "text"});
+//            db.setTransactionSuccessful();
+//            Log.d("DiaryDatabaseHelper", "Deleted text blocks for pageId: " + pageId);
+//        } catch (SQLiteException e) {
+//            Log.e("DiaryDatabaseHelper", "Error deleting text blocks: " + e.getMessage());
+//        } finally {
+//            db.endTransaction();
+//            db.close();
+//        }
+//    }
+//
+//    public void insertTextBlock(int pageId, String textContent, int resourceOrder) {
+//        SQLiteDatabase db = this.getWritableDatabase();
+//        try {
+//            db.beginTransaction();
+//
+//            ContentValues values = new ContentValues();
+//            values.put("pageId", pageId);
+//            values.put("resourceType", "text");  // Storing as a text resource
+//            values.put("resourceContent", textContent);
+//            values.put("resourceOrder", resourceOrder);
+//
+//            long result = db.insert("resources", null, values);
+//            if (result == -1) {
+//                Log.e("DiaryDatabaseHelper", "Failed to insert text block for pageId: " + pageId);
+//            } else {
+//                Log.d("DiaryDatabaseHelper", "Inserted text block for pageId: " + pageId);
+//            }
+//
+//            db.setTransactionSuccessful();
+//        } catch (SQLiteException e) {
+//            Log.e("DiaryDatabaseHelper", "Error inserting text block: " + e.getMessage());
+//        } finally {
+//            db.endTransaction();
+//            db.close();
+//        }
+//    }
+
+
+
+//insertResource() done
+    public void insertResource(int pageId, String resourceType, String resourceContent, int resourceOrder) {
         SQLiteDatabase db = this.getWritableDatabase();
-        try {
-            db.beginTransaction();
-            db.delete("resources", "pageId = ? AND resourceType = ?",
-                    new String[]{String.valueOf(pageId), "text"});
-            db.setTransactionSuccessful();
-            Log.d("DiaryDatabaseHelper", "Deleted text blocks for pageId: " + pageId);
-        } catch (SQLiteException e) {
-            Log.e("DiaryDatabaseHelper", "Error deleting text blocks: " + e.getMessage());
-        } finally {
-            db.endTransaction();
-            db.close();
-        }
-    }
 
-    public void insertTextBlock(int pageId, String textContent, int resourceOrder) {
-        SQLiteDatabase db = this.getWritableDatabase();
         try {
-            db.beginTransaction();
-
             ContentValues values = new ContentValues();
             values.put("pageId", pageId);
-            values.put("resourceType", "text");  // Storing as a text resource
-            values.put("resourceContent", textContent);
+            values.put("resourceType", resourceType);
+            values.put("resourceContent", resourceContent);
             values.put("resourceOrder", resourceOrder);
 
             long result = db.insert("resources", null, values);
             if (result == -1) {
-                Log.e("DiaryDatabaseHelper", "Failed to insert text block for pageId: " + pageId);
+                Log.e("DB_ERROR", "Failed to insert resource for pageId: " + pageId);
             } else {
-                Log.d("DiaryDatabaseHelper", "Inserted text block for pageId: " + pageId);
+                Log.d("DB_SUCCESS", "Resource inserted successfully for pageId: " + pageId + ", order: " + resourceOrder);
             }
-
-            db.setTransactionSuccessful();
         } catch (SQLiteException e) {
-            Log.e("DiaryDatabaseHelper", "Error inserting text block: " + e.getMessage());
+            Log.e("DB_ERROR", "Database error while inserting resource: " + e.getMessage());
         } finally {
-            db.endTransaction();
             db.close();
         }
     }
 
 
+    //getResourcesByPageId() done
+    public List<Pair<String, String>> getResourcesByPageId(int pageId) {
+        List<Pair<String, String>> resources = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT resourceType, resourceContent FROM resources WHERE pageId = ? ORDER BY resourceOrder",
+                new String[]{String.valueOf(pageId)});
+
+        if (cursor.moveToFirst()) {
+            do {
+                String type = cursor.getString(cursor.getColumnIndexOrThrow("resourceType"));
+                String content = cursor.getString(cursor.getColumnIndexOrThrow("resourceContent"));
+                resources.add(new Pair<>(type, content));
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return resources;
+    }
+
+
+
+
+    //--
     public List<String> getTextBlocksByPageId(int pageId) {
         List<String> textBlocks = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
@@ -380,27 +462,7 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
 
         return textBlocks;
     }
-
-
-    public void insertResource(int pageId, String resourceType, String resourceContent, int resourceOrder) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put("pageId", pageId);
-        values.put("resourceType", resourceType);
-        values.put("resourceContent", resourceContent);
-        values.put("resourceOrder", resourceOrder);
-
-        db.insert("resources", null, values);
-
-
-        db.close();
-    }
-
-
-
-
-
-
+//--
     public List<String> getImagePathsByPageId(int pageId) {
         List<String> imagePaths = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();

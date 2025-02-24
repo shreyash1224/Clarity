@@ -1,6 +1,5 @@
 package com.example.clarity;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,41 +14,46 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.InputType;
 import android.util.Log;
-import android.view.MotionEvent;
+import android.util.Pair;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.ImageButton;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import java.io.FileOutputStream;
 
 public class DiaryPageActivity extends AppCompatActivity {
     SharedPreferences sharedPreferences;
     private EditText editTitle;
     private DiaryDatabaseHelper dbHelper;
-    private Integer pageId = -1;
+    private int pageId = -1;
     private LinearLayout contentLayout;
     private static final int PICK_IMAGE_REQUEST = 1;
 
 
     @Override
+    //onCreate() done
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_diary_page);
 
-
         dbHelper = new DiaryDatabaseHelper(this);
         sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
 
-        Log.d("DatabaseCheck","Diary Page Activity onCreate() called.");
+        Log.d("DatabaseCheck", "Diary Page Activity onCreate() called.");
 
         editTitle = findViewById(R.id.etDpaTitle);
         contentLayout = findViewById(R.id.llDpaContentLayout);
@@ -59,54 +63,61 @@ public class DiaryPageActivity extends AppCompatActivity {
         Log.d("DiaryPageActivity", "pageId received: " + pageId);
 
         if (pageId != -1) {
-            DiaryPage page = dbHelper.getPageById(pageId);
-            if (page != null) {
-                editTitle.setText(page.getPageTitle());
-
-                // Fetch and display text blocks
-                List<String> textBlocks = dbHelper.getTextBlocksByPageId(pageId);
-                Log.d("DiaryPageActivity", "Retrieved text blocks: " + textBlocks.size());
-
-                for (String text : textBlocks) {
-                    Log.d("DiaryPageActivity", "Text Block: " + text);
-                    addTextBlockToUI(text);
-                }
-
-                // Fetch and display images
-
-                Log.d("DiaryPageActivity", "Fetching images for pageId: " + pageId);
-                List<String> imagePaths = dbHelper.getImagePathsByPageId(pageId);
-                Log.d("DiaryPageActivity", "Retrieved images: " + imagePaths.size());
-
-                for (String imagePath : imagePaths) {
-                    Log.d("DiaryPageActivity", "Image Path: " + imagePath);
-                    addImageToUI(imagePath);
-                }
-
-                Log.d("DiaryPageActivity", "Loaded page: " + page.toString());
-            } else {
-                Toast.makeText(this, "Failed to load page.", Toast.LENGTH_LONG).show();
-            }
+            loadPageData(pageId);
         }
-
-
-
     }
 
+
+    //loadPageData() done
+    private void loadPageData(int pageId) {
+        DiaryPage page = dbHelper.getPageById(pageId);
+        if (page != null) {
+            editTitle.setText(page.getPageTitle());
+
+            List<Pair<String, String>> resources = dbHelper.getResourcesByPageId(pageId);
+            Log.d("DiaryPageActivity", "Retrieved " + resources.size() + " resources.");
+
+            for (Pair<String, String> resource : resources) {
+                String type = resource.first;
+                String content = resource.second;
+
+                if (type.equals("text")) {
+                    Log.d("DiaryPageActivity", "Text Block: " + content);
+                    addTextBlockToUI(content);
+                } else if (type.equals("image")) {
+                    Log.d("DiaryPageActivity", "Image Path: " + content);
+                    addImageToUI(content);
+                }
+            }
+
+            Log.d("DiaryPageActivity", "Loaded page: " + page);
+        } else {
+            Toast.makeText(this, "Failed to load page.", Toast.LENGTH_LONG).show();
+        }
+    }
+
+
+    //onPause() done
     @Override
     protected void onPause() {
         super.onPause();
 
         String title = editTitle.getText().toString().trim();
-        ArrayList<String> contentBlocks = new ArrayList<>();
+        ArrayList<Resource> contentBlocks = new ArrayList<>();
         LinearLayout contentLayout = findViewById(R.id.llDpaContentLayout);
 
         for (int i = 0; i < contentLayout.getChildCount(); i++) {
             View view = contentLayout.getChildAt(i);
+
             if (view instanceof EditText) {
                 String text = ((EditText) view).getText().toString().trim();
                 if (!text.isEmpty()) {
-                    contentBlocks.add(text);
+                    contentBlocks.add(new Resource(pageId, "text", text, i));
+                }
+            } else if (view instanceof ImageView) {
+                String imagePath = (String) view.getTag();  // Retrieve image path from setTag()
+                if (imagePath != null) {
+                    contentBlocks.add(new Resource(pageId, "image", imagePath, i));
                 }
             }
         }
@@ -127,30 +138,67 @@ public class DiaryPageActivity extends AppCompatActivity {
     }
 
 
+
+
+    //deletePage() done
     public void deletePage(View view) {
+        if (pageId == -1) {
+            Toast.makeText(this, "No page to delete!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         try {
             db.beginTransaction();
+
+            // Get image file paths before deleting resources
+            Cursor cursor = db.rawQuery("SELECT resourceContent FROM resources WHERE pageId = ? AND resourceType = 'image'",
+                    new String[]{String.valueOf(pageId)});
+
+            while (cursor.moveToNext()) {
+                String imagePath = cursor.getString(0);
+                if (imagePath != null) {
+                    File imageFile = new File(imagePath);
+                    if (imageFile.exists() && imageFile.delete()) {
+                        Log.d("DiaryPageActivity", "Deleted image file: " + imagePath);
+                    } else {
+                        Log.e("DiaryPageActivity", "Failed to delete image file: " + imagePath);
+                    }
+                }
+            }
+            cursor.close();
+
+            // Delete resources linked to the page
             db.delete("resources", "pageId = ?", new String[]{String.valueOf(pageId)});
+
+            // Delete the actual page
             int rowsAffected = db.delete("pages", "pageId = ?", new String[]{String.valueOf(pageId)});
 
             if (rowsAffected > 0) {
                 Toast.makeText(this, "Page Deleted", Toast.LENGTH_LONG).show();
                 finish();
+            } else {
+                Toast.makeText(this, "Page not found!", Toast.LENGTH_SHORT).show();
             }
+
             db.setTransactionSuccessful();
         } catch (SQLiteException e) {
             Log.e("DiaryPageActivity", "Error deleting page: " + e.getMessage());
+            Toast.makeText(this, "Error deleting page!", Toast.LENGTH_SHORT).show();
         } finally {
             db.endTransaction();
             db.close();
         }
     }
 
-    public void onResourceTextClick(View view) {
-        addNewTextBlock("");
-    }
+
+    //addNewTextBlock() done
     private void addNewTextBlock(String text) {
+        // Avoid adding unnecessary empty blocks
+        if (text.isEmpty() && hasEmptyTextBlock()) {
+            return;
+        }
+
         EditText newEditText = new EditText(this);
         newEditText.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -161,7 +209,7 @@ public class DiaryPageActivity extends AppCompatActivity {
         newEditText.setTextSize(16);
         newEditText.setPadding(8, 8, 8, 8);
         newEditText.setBackgroundColor(Color.TRANSPARENT);
-        newEditText.setTextColor(getResources().getColor(R.color.brown_light));
+        newEditText.setTextColor(ContextCompat.getColor(this, R.color.brown_light)); // API-safe color
         newEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
 
         // Add the new EditText to the layout
@@ -178,29 +226,35 @@ public class DiaryPageActivity extends AppCompatActivity {
         }
 
         // Enable double-tap delete
-        enableDoubleTapToDelete(newEditText);
+//        enableDoubleTapToDelete(newEditText);
     }
 
-    // ✅ More reliable double-tap deletion using TouchListener
-    @SuppressLint("ClickableViewAccessibility")
-    private void enableDoubleTapToDelete(EditText editText) {
-        editText.setOnTouchListener(new View.OnTouchListener() {
-            private long lastClickTime = 0;
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_UP) {  // Detect finger lift (avoids interference)
-                    long currentTime = System.currentTimeMillis();
-                    if (currentTime - lastClickTime < 300) { // Double-tap detected (300ms)
-                        contentLayout.removeView(editText); // Remove the EditText
-                        return true; // Consume the event
-                    }
-                    lastClickTime = currentTime;
+    //hasEmptyTextBlock() done
+    private boolean hasEmptyTextBlock() {
+        for (int i = 0; i < contentLayout.getChildCount(); i++) {
+            View child = contentLayout.getChildAt(i);
+            if (child instanceof EditText) {
+                String text = ((EditText) child).getText().toString().trim();
+                if (text.isEmpty()) {
+                    return true; // Found an empty text block
                 }
-                return false; // Allow normal text input and cursor movement
             }
-        });
+        }
+        return false;
     }
+
+    //onResourceTextClick() done
+    public void onResourceTextClick(View view) {
+        addNewTextBlock("");
+    }
+
+
+
+
+
+
+
+
 
 
 //    private void saveTextBlocks() {
@@ -216,8 +270,15 @@ public class DiaryPageActivity extends AppCompatActivity {
 //        }
 //    }
 
+
+//    addTextBlockToUI() done
     private void addTextBlockToUI(String textContent) {
         LinearLayout contentLayout = findViewById(R.id.llDpaContentLayout);
+
+        // Prevent adding unnecessary empty blocks
+        if (textContent.isEmpty() && hasEmptyTextBlock()) {
+            return;
+        }
 
         EditText newEditText = new EditText(this);
         newEditText.setLayoutParams(new LinearLayout.LayoutParams(
@@ -226,40 +287,123 @@ public class DiaryPageActivity extends AppCompatActivity {
         ));
         newEditText.setText(textContent); // Set the retrieved text
         newEditText.setTextSize(16);
-        newEditText.setPadding(8, 8, 8, 8);
+        int paddingPx = (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, 8, getResources().getDisplayMetrics()
+        );
+        newEditText.setPadding(paddingPx, paddingPx, paddingPx, paddingPx);
         newEditText.setBackgroundColor(Color.TRANSPARENT);
-        newEditText.setTextColor(getResources().getColor(R.color.brown_light));
+        newEditText.setTextColor(ContextCompat.getColor(this, R.color.brown_light)); // API-safe color
         newEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
 
-        contentLayout.addView(newEditText); // Add to the UI
+        contentLayout.addView(newEditText); // Add to UI
+
+        // Move focus to the new EditText
+        newEditText.requestFocus();
+        newEditText.setSelection(newEditText.getText().length()); // Cursor at the end
+
+        // Show the keyboard automatically
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            imm.showSoftInput(newEditText, InputMethodManager.SHOW_IMPLICIT);
+        }
     }
+
+
+//    addImageButton() done
     private void addImageToUI(String imagePath) {
-        Log.d("DiaryPageActivity", "Adding image to UI");
+        Log.d("DatabaseCheck", "Adding image to UI: " + imagePath);
         debugResourcesTable();
+        if (imagePath == null || imagePath.trim().isEmpty()) {
+            Log.e("DiaryPageActivity", "Invalid image path.");
+            return;
+        }
 
         File file = new File(imagePath);
         if (!file.exists()) {
             Log.e("DiaryPageActivity", "Image file not found: " + imagePath);
             return;
         }
-        else{
-            Log.d("DiaryPageActivity", "Checking file existence: " + imagePath);
 
-        }
+        Log.d("DiaryPageActivity", "Adding image to UI: " + imagePath);
+        debugResourcesTable();
 
-        Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
+        // Optimize Bitmap Loading (Prevent OutOfMemoryError)
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(imagePath, options);
+
+        int reqWidth = contentLayout.getWidth(); // Match parent width
+        int reqHeight = 600; // Limit height
+
+        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+        options.inJustDecodeBounds = false;
+
+        Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
+
+        // Create ImageView
         ImageView imageView = new ImageView(this);
-        imageView.setLayoutParams(new LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,  // Maintain aspect ratio
+                reqHeight
+        );
+        layoutParams.setMargins(10, 10, 10, 10); // Add spacing
+        imageView.setLayoutParams(layoutParams);
+        imageView.setImageBitmap(bitmap);
+        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
+        // Optional: Add delete button
+        FrameLayout frameLayout = new FrameLayout(this);
+        frameLayout.setLayoutParams(new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
         ));
-        imageView.setImageBitmap(bitmap);
 
-        contentLayout.addView(imageView);
+        frameLayout.addView(imageView);
+        frameLayout.addView(createDeleteButton(frameLayout)); // Add delete button
+
+        contentLayout.addView(frameLayout);
+    }
+
+    // Function to calculate inSampleSize for efficient image loading
+
+    //calculateInSampleSize() done
+    private int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        int height = options.outHeight;
+        int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+            int halfHeight = height / 2;
+            int halfWidth = width / 2;
+
+            while ((halfHeight / inSampleSize) >= reqHeight && (halfWidth / inSampleSize) >= reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+        return inSampleSize;
+    }
+
+    // Function to create a delete button for images
+    //createDeleteButton() done
+    private ImageView createDeleteButton(final View parentView) {
+        ImageView deleteButton = new ImageView(this);
+        deleteButton.setImageResource(R.drawable.ic_delete); // Add a close icon in drawable
+        deleteButton.setBackgroundResource(R.drawable.rounded_button);
+        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
+                80, 80, Gravity.TOP | Gravity.END
+        );
+        layoutParams.setMargins(10, 10, 10, 10);
+        deleteButton.setLayoutParams(layoutParams);
+
+        deleteButton.setOnClickListener(v -> {
+            contentLayout.removeView(parentView);
+        });
+
+        return deleteButton;
     }
 
 
-
+    //openImagePicker() done
     private void openImagePicker() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         intent.setType("image/*");
@@ -267,11 +411,13 @@ public class DiaryPageActivity extends AppCompatActivity {
     }
 
 
+    //onResourceImageClick() done
     public void onResourceImageClick(View view) {
         openImagePicker();
         Toast.makeText(this, "Adding Image clicked.", Toast.LENGTH_SHORT).show();
     }
 
+    //onActivityResult() done
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -279,10 +425,42 @@ public class DiaryPageActivity extends AppCompatActivity {
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
             Uri imageUri = data.getData();
             if (imageUri != null) {
-                insertImage(imageUri);
+                String savedImagePath = saveImageToInternalStorage(imageUri);
+                if (savedImagePath != null) {
+                    insertImage(Uri.parse(savedImagePath));
+                } else {
+                    Log.e("DiaryPageActivity", "Failed to save image.");
+                    Toast.makeText(this, "Failed to add image", Toast.LENGTH_SHORT).show();
+                }
             }
         }
     }
+
+    //saveImageToInternalStorage() done
+    private String saveImageToInternalStorage(Uri imageUri) {
+        try {
+            Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+
+            File directory = new File(getFilesDir(), "diary_images");
+            if (!directory.exists()) {
+                directory.mkdirs();
+            }
+
+            String fileName = "IMG_" + System.currentTimeMillis() + ".jpg";
+            File file = new File(directory, fileName);
+            FileOutputStream fos = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+            fos.close();
+
+            return file.getAbsolutePath();
+        } catch (IOException e) {
+            Log.e("DiaryPageActivity", "Error saving image: " + e.getMessage());
+            return null;
+        }
+    }
+
+
+    //insertImage() done
     private void insertImage(Uri imageUri) {
         EditText focusedEditText = getCurrentFocusedEditText();
 
@@ -291,22 +469,23 @@ public class DiaryPageActivity extends AppCompatActivity {
             return;
         }
 
+        // Save Image and Get Path
+        saveImageToDatabase(imageUri);
+
         // Create ImageView
         ImageView imageView = new ImageView(this);
         imageView.setImageURI(imageUri);
         imageView.setAdjustViewBounds(true);
         imageView.setMaxHeight(focusedEditText.getLineHeight() * 8);
         imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        imageView.setTag(imageUri);
 
-        // Insert Image Below the Focused EditText
+        // Insert Image Below Focused EditText
         int cursorIndex = contentLayout.indexOfChild(focusedEditText);
         contentLayout.addView(imageView, cursorIndex + 1);
-
-        // Save to Database
-        saveImageToDatabase(imageUri);
     }
 
+
+    //getCurrentFocusedEditText() done
     private EditText getCurrentFocusedEditText() {
         for (int i = 0; i < contentLayout.getChildCount(); i++) {
             View view = contentLayout.getChildAt(i);
@@ -314,42 +493,48 @@ public class DiaryPageActivity extends AppCompatActivity {
                 return (EditText) view;
             }
         }
-        return null; // No active EditText found
-    }
 
-    private void saveImageToDatabase(Uri imageUri) {
-        if (pageId == -1) {
-            Toast.makeText(this, "Page ID not found!", Toast.LENGTH_SHORT).show();
-            return;
+        // If no EditText is focused, use the last one
+        for (int i = contentLayout.getChildCount() - 1; i >= 0; i--) {
+            View view = contentLayout.getChildAt(i);
+            if (view instanceof EditText) {
+                return (EditText) view;
+            }
         }
 
-        // Convert URI to absolute file path
-        String imagePath = getRealPathFromURI(imageUri);
-        if (imagePath == null) {
-            Toast.makeText(this, "Failed to get image path!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        int resourceOrder = contentLayout.getChildCount(); // Get order based on layout
-        dbHelper.insertResource(pageId, "image", imagePath, resourceOrder);
-        Log.d("DiaryPageActivity", "Printing Resource Table In saveImageToDatabase()");
-        Log.d("DatabaseCheck", "------ Resources Table Contents ------");
-    }
-
-    // Convert URI to absolute file path
-    private String getRealPathFromURI(Uri uri) {
-        String[] projection = {MediaStore.Images.Media.DATA};
-        Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
-        if (cursor != null) {
-            int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            cursor.moveToFirst();
-            String path = cursor.getString(columnIndex);
-            cursor.close();
-            return path;
-        }
+        // If no EditText exists, create a new one
         return null;
+
     }
 
+
+
+    //saveImageToDatabase() done
+    private void saveImageToDatabase(Uri imageUri) {
+        try {
+            // Convert URI to Bitmap
+            Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+
+            // Create a file inside app's internal storage
+            File imageFile = new File(getFilesDir(), "image_" + System.currentTimeMillis() + ".jpg");
+
+            // Save the bitmap to the file
+            FileOutputStream fos = new FileOutputStream(imageFile);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+            fos.close();
+
+            // Get absolute file path
+            String imagePath = imageFile.getAbsolutePath();
+
+            // Save Image Path to Database
+            int resourceOrder = contentLayout.indexOfChild(getCurrentFocusedEditText()) + 1;
+            dbHelper.insertResource(pageId, "image", imagePath, resourceOrder);
+
+            Log.d("DiaryPageActivity", "Image saved: " + imagePath);
+        } catch (IOException e) {
+            Log.e("DiaryPageActivity", "Error saving image: " + e.getMessage());
+        }
+    }
 
     public void debugResourcesTable() {
         Log.d("DatabaseCheck", "DebugResourceTable() Called In Diary Database.");
