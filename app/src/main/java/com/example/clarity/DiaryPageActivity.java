@@ -317,7 +317,6 @@ public class DiaryPageActivity extends AppCompatActivity {
         return null; // No active EditText found
     }
 
-
     private void saveImageToDatabase(Uri imageUri) {
         if (pageId == -1) {
             Toast.makeText(this, "Page ID not found!", Toast.LENGTH_SHORT).show();
@@ -336,7 +335,6 @@ public class DiaryPageActivity extends AppCompatActivity {
         Log.d("DiaryPageActivity", "Printing Resource Table In saveImageToDatabase()");
         Log.d("DatabaseCheck", "------ Resources Table Contents ------");
     }
-
 
     // Convert URI to absolute file path
     private String getRealPathFromURI(Uri uri) {
