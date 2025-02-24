@@ -302,69 +302,45 @@ public class DiaryPageActivity extends AppCompatActivity {
 
 
 //    addImageButton() done
-    private void addImageToUI(String imagePath) {
+private void addImageToUI(String imagePath) {
+    Log.d("addImageToUI", "📸 Attempting to add image: " + imagePath);
 
-        Log.d("addImageToUI", "📸 Attempting to add image: " + imagePath);
-
-        if (imagePath == null || imagePath.trim().isEmpty()) {
-            Log.e("addImageToUI", "❌ Invalid image path.");
-            return;
-        }
-
-        File file = new File(imagePath);
-        if (!file.exists()) {
-            Log.e("addImageToUI", "❌ Image file not found: " + imagePath);
-            return;
-        }
-
-        // Optimize Bitmap Loading (Prevent OutOfMemoryError)
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(imagePath, options);
-
-        int reqWidth = contentLayout.getWidth(); // Match parent width
-        int reqHeight = 600; // Limit height
-
-        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
-        options.inJustDecodeBounds = false;
-
-        Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
-        if (bitmap == null) {
-            Log.e("addImageToUI", "❌ Failed to decode image.");
-            return;
-        }
-
-        // Create ImageView
-        ImageView imageView = new ImageView(this);
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,  // Maintain aspect ratio
-                reqHeight
-        );
-        layoutParams.setMargins(10, 10, 10, 10);
-        imageView.setLayoutParams(layoutParams);
-        imageView.setImageBitmap(bitmap);
-        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-
-        // ✅ Store image path in Tag for retrieval in onPause()
-        imageView.setTag(imagePath);
-
-        // Create container for ImageView + Delete Button
-        FrameLayout frameLayout = new FrameLayout(this);
-        frameLayout.setLayoutParams(new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-        ));
-
-        frameLayout.addView(imageView);
-        frameLayout.addView(createDeleteButton(frameLayout, imagePath)); // Add delete button
-
-        contentLayout.addView(frameLayout);
-
-        Log.d("addImageToUI", "✅ Successfully added image: " + imagePath);
+    if (imagePath == null || imagePath.trim().isEmpty()) {
+        Log.e("addImageToUI", "❌ Invalid image path.");
+        return;
     }
 
-    // Function to calculate inSampleSize for efficient image loading
+    // Convert the file path into a URI
+    Uri imageUri = Uri.parse(imagePath);
 
+    // Create ImageView
+    ImageView imageView = new ImageView(this);
+    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,  // Maintain aspect ratio
+            600  // Limit height
+    );
+    layoutParams.setMargins(10, 10, 10, 10);
+    imageView.setLayoutParams(layoutParams);
+    imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+    imageView.setImageURI(imageUri); // ✅ Use setImageURI instead of BitmapFactory.decodeFile()
+
+    // ✅ Store image path in Tag for retrieval in onPause()
+    imageView.setTag(imagePath);
+
+    // Create container for ImageView + Delete Button
+    FrameLayout frameLayout = new FrameLayout(this);
+    frameLayout.setLayoutParams(new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+    ));
+
+    frameLayout.addView(imageView);
+    frameLayout.addView(createDeleteButton(frameLayout, imagePath)); // Add delete button
+
+    contentLayout.addView(frameLayout);
+
+    Log.d("addImageToUI", "✅ Successfully added image: " + imagePath);
+}
     //calculateInSampleSize() done
     private int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
         int height = options.outHeight;
