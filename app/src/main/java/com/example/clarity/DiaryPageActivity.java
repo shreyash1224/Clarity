@@ -88,7 +88,8 @@ public class DiaryPageActivity extends AppCompatActivity {
                     //Step 2: Checking if the imagePath(content is getting passed to the addImageToUI())
                     Log.d("Debug","loadPageData()->Image Path: " + content);
 
-                    addImageToUI(content);
+//                    addImageToUI(content);
+                    insertImage(Uri.parse(content));
                 }
             }
 
