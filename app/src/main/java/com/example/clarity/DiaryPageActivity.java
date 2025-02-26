@@ -1,8 +1,10 @@
 package com.example.clarity;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
@@ -10,6 +12,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.InputType;
@@ -43,6 +46,8 @@ public class DiaryPageActivity extends AppCompatActivity {
     private int pageId = -1;
     private LinearLayout contentLayout;
     private static final int PICK_IMAGE_REQUEST = 1;
+    private static final int REQUEST_CODE_STORAGE_PERMISSION = 100;
+
 
 
     @Override
@@ -59,13 +64,24 @@ public class DiaryPageActivity extends AppCompatActivity {
         editTitle = findViewById(R.id.etDpaTitle);
         contentLayout = findViewById(R.id.llDpaContentLayout);
 
+        // ✅ Request storage permission before loading data
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // Android 13+
+            if (checkSelfPermission(Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.READ_MEDIA_IMAGES}, REQUEST_CODE_STORAGE_PERMISSION);
+            }
+        } else { // Android 12 and below
+            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE_STORAGE_PERMISSION);
+            }
+        }
+
+        // ✅ Load the page data only after permissions are granted
         Intent intent = getIntent();
         pageId = intent.getIntExtra("pageId", -1);
 
         if (pageId != -1) {
             loadPageData(pageId);
         }
-
     }
 
 

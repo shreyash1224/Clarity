@@ -67,14 +67,14 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
 
 
 
-        String CREATE_TASKS_TABLE = "CREATE TABLE IF NOT EXISTS tasks (" +
+        String tasksTable = "CREATE TABLE IF NOT EXISTS tasks (" +
                 "taskId INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "taskTitle TEXT NOT NULL, " +
                 "startTime TEXT NOT NULL, " +
                 "endTime TEXT NOT NULL, " +
                 "recurring TEXT NOT NULL DEFAULT 'NONE'" +
                 ");";
-        db.execSQL(CREATE_TASKS_TABLE);
+        db.execSQL(tasksTable);
         Log.d("Task","Task Table Created Successfully.");
 
 
