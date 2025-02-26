@@ -20,6 +20,7 @@ import android.util.Log;
 import android.util.Pair;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -158,6 +159,7 @@ public class DiaryPageActivity extends AppCompatActivity {
         for (int i = 0; i < contentLayout.getChildCount(); i++) {
             View view = contentLayout.getChildAt(i);
 
+
             if (view instanceof EditText) {
                 String text = ((EditText) view).getText().toString().trim();
                 if (!text.isEmpty()) {
@@ -250,32 +252,56 @@ public class DiaryPageActivity extends AppCompatActivity {
 
 
     //addNewTextBlock() done
+//    private void addNewTextBlock() {
+//        String text = "";
+//        // Avoid adding unnecessary empty blocks
+//        if (hasEmptyTextBlock()) {
+//            return;
+//        }
+//
+//        EditText newEditText = new EditText(this);
+//        newEditText.setLayoutParams(new LinearLayout.LayoutParams(
+//                LinearLayout.LayoutParams.MATCH_PARENT,
+//                LinearLayout.LayoutParams.WRAP_CONTENT
+//        ));
+//        newEditText.setHint("New Text Block");
+//        newEditText.setText(text);
+//        newEditText.setTextSize(16);
+//        newEditText.setPadding(8, 8, 8, 8);
+//        newEditText.setBackgroundColor(Color.TRANSPARENT);
+//        newEditText.setTextColor(ContextCompat.getColor(this, R.color.brown_light)); // API-safe color
+//        newEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+//
+//        // Add the new EditText to the layout
+//        contentLayout.addView(newEditText);
+//
+//        // Move focus to the new EditText
+//        newEditText.requestFocus();
+//        newEditText.setSelection(newEditText.getText().length()); // Cursor at the end
+//
+//        // Show the keyboard automatically
+//        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+//        if (imm != null) {
+//            imm.showSoftInput(newEditText, InputMethodManager.SHOW_IMPLICIT);
+//        }
+//
+//        // Enable double-tap delete
+////        enableDoubleTapToDelete(newEditText);
+//    }
+
     private void addNewTextBlock() {
-        String text = "";
         // Avoid adding unnecessary empty blocks
         if (hasEmptyTextBlock()) {
             return;
         }
 
-        EditText newEditText = new EditText(this);
-        newEditText.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        ));
-        newEditText.setHint("New Text Block");
-        newEditText.setText(text);
-        newEditText.setTextSize(16);
-        newEditText.setPadding(8, 8, 8, 8);
-        newEditText.setBackgroundColor(Color.TRANSPARENT);
-        newEditText.setTextColor(ContextCompat.getColor(this, R.color.brown_light)); // API-safe color
-        newEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
 
-        // Add the new EditText to the layout
-        contentLayout.addView(newEditText);
 
-        // Move focus to the new EditText
-        newEditText.requestFocus();
-        newEditText.setSelection(newEditText.getText().length()); // Cursor at the end
+        View textBlock = getLayoutInflater().inflate(R.layout.text_block, contentLayout, false);
+        LinearLayout contentLayout = findViewById(R.id.llDpaContentLayout);
+
+        EditText newEditText = textBlock.findViewById(R.id.etTextBlock);
+        newEditText.requestFocus(); // Move focus to the new EditText
 
         // Show the keyboard automatically
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -283,9 +309,10 @@ public class DiaryPageActivity extends AppCompatActivity {
             imm.showSoftInput(newEditText, InputMethodManager.SHOW_IMPLICIT);
         }
 
-        // Enable double-tap delete
-//        enableDoubleTapToDelete(newEditText);
+        // Add the text block to the layout
+        contentLayout.addView(textBlock);
     }
+
 
     //hasEmptyTextBlock() done
     private boolean hasEmptyTextBlock() {
@@ -352,89 +379,8 @@ public class DiaryPageActivity extends AppCompatActivity {
     }
 
 
-//    addImageButton() done
-    private void addImageToUI(String imagePath) {
-        Log.d("addImageToUI", "📸 Attempting to add image: " + imagePath);
 
-        if (imagePath == null || imagePath.trim().isEmpty()) {
-            Log.e("addImageToUI", "❌ Invalid image path.");
-            return;
-        }
 
-        // Convert the file path into a URI
-        Uri imageUri = Uri.parse(imagePath);
-
-        // Create ImageView
-        ImageView imageView = new ImageView(this);
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,  // Maintain aspect ratio
-                600  // Limit height
-        );
-        layoutParams.setMargins(10, 10, 10, 10);
-        imageView.setLayoutParams(layoutParams);
-        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        imageView.setImageURI(imageUri); // ✅ Use setImageURI instead of BitmapFactory.decodeFile()
-
-        /*
-         Step 2: Store image URI inside ImageView for later retrieval
-        Checking if the Tag is set second time while on pause.
-
-        While loading first there is imagePath, but not second time.
-        */
-        Log.d("Debug", "addImageToUI()-> Image Path: " + imagePath);
-        imageView.setTag(imagePath);
-
-        // Create container for ImageView + Delete Button
-        FrameLayout frameLayout = new FrameLayout(this);
-        frameLayout.setLayoutParams(new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-        ));
-
-        frameLayout.addView(imageView);
-        frameLayout.addView(createDeleteButton(frameLayout, imagePath)); // Add delete button
-
-        contentLayout.addView(frameLayout);
-
-        Log.d("addImageToUI", "✅ Successfully added image: " + imagePath);
-    }
-//    //calculateInSampleSize() done
-//    private int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
-//        int height = options.outHeight;
-//        int width = options.outWidth;
-//        int inSampleSize = 1;
-//
-//        if (height > reqHeight || width > reqWidth) {
-//            int halfHeight = height / 2;
-//            int halfWidth = width / 2;
-//
-//            while ((halfHeight / inSampleSize) >= reqHeight && (halfWidth / inSampleSize) >= reqWidth) {
-//                inSampleSize *= 2;
-//            }
-//        }
-//        return inSampleSize;
-//    }
-
-    // Function to create a delete button for images
-    //createDeleteButton() done
-    private View createDeleteButton(FrameLayout parent, String imagePath) {
-        ImageButton deleteButton = new ImageButton(this);
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-        );
-        params.gravity = Gravity.TOP | Gravity.END; // Position at top-right
-        deleteButton.setLayoutParams(params);
-        deleteButton.setImageResource(android.R.drawable.ic_delete);
-        deleteButton.setBackgroundColor(Color.TRANSPARENT);
-
-        deleteButton.setOnClickListener(v -> {
-            contentLayout.removeView(parent); // Remove the image container from UI
-            Log.d("DeleteButton", "🗑 Image removed from UI: " + imagePath);
-        });
-
-        return deleteButton;
-    }
 
 
     //openImagePicker() done
@@ -516,21 +462,25 @@ public class DiaryPageActivity extends AppCompatActivity {
             return;
         }
 
-        // Create ImageView
-        ImageView imageView = new ImageView(this);
-        imageView.setImageURI(imageUri);
-        imageView.setAdjustViewBounds(true);
-        imageView.setMaxHeight(focusedEditText.getLineHeight() * 8);
-        imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        // Inflate Image Block XML (like text block)
+        View imageBlock = getLayoutInflater().inflate(R.layout.image_block, contentLayout, false);
 
-        // 🔹 Store image URI inside ImageView for later retrieval
-        imageView.setTag(imageUri.toString());  // ✅ Add this line
+        // Get ImageView & Delete Button
+        ImageView imageView = imageBlock.findViewById(R.id.ivImageBlock);
+        ImageButton deleteButton = imageBlock.findViewById(R.id.btnDeleteImage);
+
+        // Set Image
+        imageView.setImageURI(imageUri);
+        imageView.setTag(imageUri.toString());
+
+        // Delete Button Functionality
+        deleteButton.setOnClickListener(v -> contentLayout.removeView(imageBlock));
 
         // Insert Image Below Focused EditText
         int cursorIndex = contentLayout.indexOfChild(focusedEditText);
-        contentLayout.addView(imageView, cursorIndex + 1);
-
+        contentLayout.addView(imageBlock, cursorIndex + 1);
     }
+
 
     //getCurrentFocusedEditText() done
     private EditText getCurrentFocusedEditText() {
@@ -607,18 +557,23 @@ public class DiaryPageActivity extends AppCompatActivity {
 
 
     private void addTaskBlock(Task task) {
-        View taskView = getLayoutInflater().inflate(R.layout.task_block, null);
         LinearLayout contentLayout = findViewById(R.id.llDpaContentLayout);
 
+        // Inflate Task Block XML properly
+        View taskView = getLayoutInflater().inflate(R.layout.task_block, contentLayout, false);
+
+        // Get UI Elements
         TextView title = taskView.findViewById(R.id.taskTitle);
         TextView time = taskView.findViewById(R.id.taskTime);
         TextView recurring = taskView.findViewById(R.id.taskRecurring);
         CheckBox completion = taskView.findViewById(R.id.taskCompletion);
+
         taskView.setTag(task);
 
+        // Set Task Data
         title.setText(task.getTaskTitle());
         time.setText(task.getStartTime() + " - " + task.getEndTime());
-        recurring.setText("Recurring: "+task.getRecurring());
+        recurring.setText("Recurring: " + task.getRecurring());
         completion.setChecked(task.getCompletion().equals("Completed"));
 
         // Update task completion status on checkbox change
@@ -627,10 +582,9 @@ public class DiaryPageActivity extends AppCompatActivity {
             dbHelper.updateTaskCompletion(task.getTaskId(), status);
         });
 
-        contentLayout.addView(taskView);  // Add task block to diary page
+        // Add Task Block to Diary Page
+        contentLayout.addView(taskView);
     }
-
-
 
 }
 
