@@ -38,7 +38,7 @@ public class DiaryPageAdapter extends ArrayAdapter<DiaryPage> {
 
         // Set text
         titleView.setText(page.getPageTitle());
-        pageIdView.setText("#"+page.getPageId());
+        pageIdView.setText("#"+ page.getPageId());
 
         return convertView;
     }

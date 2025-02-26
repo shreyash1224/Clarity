@@ -15,13 +15,14 @@
             android:id="@+id/tvDiplPageTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="4"
+            android:layout_weight="6"
             android:gravity="start"
             android:text="Diary Page Title"
             android:textSize="18sp"
             android:textStyle="bold"
             android:ellipsize="end"
             android:maxLines="1"
+            android:layout_marginEnd="20dp"
             android:textColor="@color/brown_toolbar" /> <!-- Title text color -->
 
         <TextView
@@ -29,9 +30,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="end"
+            android:gravity="start"
             android:text="Page Id"
-            android:textAlignment="textEnd"
+            android:textAlignment="textStart"
             android:textStyle="bold"
             android:textSize="16sp"
             android:textColor="@color/brown_light" /> <!-- Date text color -->

@@ -106,6 +106,17 @@ public class DiaryPageActivity extends AppCompatActivity {
         Log.d("LIFECYCLE", "onPause() called");
 
         String title = editTitle.getText().toString().trim();
+        if (title.isEmpty()) {
+            Log.e("onPause", "⚠️ Title is empty! Not saving to database.");
+            return; // Prevent the app from attempting an update
+        }
+
+        if (title.length() > 100) {
+            Log.e("onPause", "⚠️ Title exceeds 100 characters! Not saving.");
+            Toast.makeText(this, "Title should be 1-100 characters long", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         ArrayList<Resource> contentBlocks = new ArrayList<>();
         LinearLayout contentLayout = findViewById(R.id.llDpaContentLayout);
 
