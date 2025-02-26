@@ -171,6 +171,7 @@ public class DiaryPageActivity extends AppCompatActivity {
                 Log.d("Debug", "onPause()->Image Path: " + imagePath);
 
                 if (imagePath != null) {
+                    Log.d("Image", "imagePath: "+imagePath);
                     contentBlocks.add(new Resource(pageId, "image", imagePath, contentBlocks.size() + 1));
                     Log.d("onPause", "🖼 Saved Image: " + imagePath);
                 }
@@ -454,6 +455,35 @@ public class DiaryPageActivity extends AppCompatActivity {
 
 
     //insertImage() done
+//    private void insertImage(Uri imageUri) {
+//        EditText focusedEditText = getCurrentFocusedEditText();
+//
+//        if (focusedEditText == null) {
+//            Toast.makeText(this, "No active text block found!", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
+//
+//        // Inflate Image Block XML (like text block)
+//        View imageBlock = getLayoutInflater().inflate(R.layout.image_block, contentLayout, false);
+//
+//        // Get ImageView & Delete Button
+//        ImageView imageView = imageBlock.findViewById(R.id.ivImageBlock);
+//        ImageButton deleteButton = imageBlock.findViewById(R.id.btnDeleteImage);
+//
+//        // Set Image
+//        imageView.setImageURI(imageUri);
+//        imageView.setTag(imageUri.toString());
+//
+//        // Delete Button Functionality
+//        deleteButton.setOnClickListener(v -> contentLayout.removeView(imageBlock));
+//
+//        // Insert Image Below Focused EditText
+//        int cursorIndex = contentLayout.indexOfChild(focusedEditText);
+//        contentLayout.addView(imageBlock, cursorIndex + 1);
+//    }
+//
+
+
     private void insertImage(Uri imageUri) {
         EditText focusedEditText = getCurrentFocusedEditText();
 
@@ -462,25 +492,23 @@ public class DiaryPageActivity extends AppCompatActivity {
             return;
         }
 
-        // Inflate Image Block XML (like text block)
+        // Inflate the image block layout
         View imageBlock = getLayoutInflater().inflate(R.layout.image_block, contentLayout, false);
-
-        // Get ImageView & Delete Button
         ImageView imageView = imageBlock.findViewById(R.id.ivImageBlock);
-        ImageButton deleteButton = imageBlock.findViewById(R.id.btnDeleteImage);
 
-        // Set Image
+        // Set Image and Adjust Properties
         imageView.setImageURI(imageUri);
-        imageView.setTag(imageUri.toString());
+        imageView.setAdjustViewBounds(true);
+        imageView.setMaxHeight(focusedEditText.getLineHeight() * 8); // Maintain max height limit
 
-        // Delete Button Functionality
-        deleteButton.setOnClickListener(v -> contentLayout.removeView(imageBlock));
+        // Store image path in view tag
+        String imagePath = imageUri.toString();
+        imageBlock.setTag(imagePath);
 
         // Insert Image Below Focused EditText
         int cursorIndex = contentLayout.indexOfChild(focusedEditText);
         contentLayout.addView(imageBlock, cursorIndex + 1);
     }
-
 
     //getCurrentFocusedEditText() done
     private EditText getCurrentFocusedEditText() {
@@ -585,6 +613,7 @@ public class DiaryPageActivity extends AppCompatActivity {
         // Add Task Block to Diary Page
         contentLayout.addView(taskView);
     }
+
 
 }
 
