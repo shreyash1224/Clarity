@@ -34,11 +34,11 @@ public class DiaryPageAdapter extends ArrayAdapter<DiaryPage> {
 
         // Find TextViews in list_item_diary_page.xml
         TextView titleView = convertView.findViewById(R.id.tvDiplPageTitle);
-        TextView dateView = convertView.findViewById(R.id.tvDiplPageDate);
+        TextView pageIdView = convertView.findViewById(R.id.tvDiplPageId);
 
         // Set text
         titleView.setText(page.getPageTitle());
-        dateView.setText(page.getPageDate());
+        pageIdView.setText("#"+page.getPageId());
 
         return convertView;
     }

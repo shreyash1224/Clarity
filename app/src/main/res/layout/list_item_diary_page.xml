@@ -25,12 +25,12 @@
             android:textColor="@color/brown_toolbar" /> <!-- Title text color -->
 
         <TextView
-            android:id="@+id/tvDiplPageDate"
+            android:id="@+id/tvDiplPageId"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="end"
-            android:text="Date"
+            android:text="Page Id"
             android:textAlignment="textEnd"
             android:textStyle="bold"
             android:textSize="16sp"
