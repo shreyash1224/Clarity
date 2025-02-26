@@ -55,7 +55,6 @@ public class DiaryPageActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
 
         Log.d("DatabaseCheck", "Diary Page Activity onCreate() called.");
-        debugResourcesTable();
 
         editTitle = findViewById(R.id.etDpaTitle);
         contentLayout = findViewById(R.id.llDpaContentLayout);
@@ -434,7 +433,6 @@ public class DiaryPageActivity extends AppCompatActivity {
                 long resourceId = dbHelper.insertResource(pageId, "image", imageUriString, newOrder);
 
                 if (resourceId != -1) {
-                    debugResourcesTable();
                     insertImage(imageUri);  // Display Image
                 } else {
                     Log.e("DiaryPageActivity", "Failed to save image URI in database.");
@@ -516,12 +514,10 @@ public class DiaryPageActivity extends AppCompatActivity {
 
     }
 
-    public void debugResourcesTable() {
+    public void debugResourcesTable(String checkName) {
+        Log.d(checkName, "DebugResourceTable() Called In Diary Database.");
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM Resources", null);
-
-
-
         while (cursor.moveToNext()) {
             int id = cursor.getInt(0);
             String content = cursor.getString(1);
@@ -529,7 +525,7 @@ public class DiaryPageActivity extends AppCompatActivity {
             int order = cursor.getInt(3);
             int pageId = cursor.getInt(4);
 
-            Log.d("DebugResourceTable", "ID: " + id + ", PageID: " + pageId + ", Type: " + type + ", Content: " + content + ", Order: " + order);
+            Log.d(checkName, "ID: " + id + ", PageID: " + pageId + ", Type: " + type + ", Content: " + content + ", Order: " + order);
         }
         cursor.close();
     }
@@ -547,6 +543,18 @@ public class DiaryPageActivity extends AppCompatActivity {
                 Log.d("Debug", "🔍 ImageView Tag on Resume: " + imagePath);
             }
         }
+    }
+
+
+
+
+    public void onResourceTaskClick(View view) {
+        Toast.makeText(this, "Adding a task.", Toast.LENGTH_SHORT).show();
+        String taskTitle = "test";
+        String startTime = "starting time";
+        String endTime = "ending time";
+        String recurring = "NONE";
+        long taskId = dbHelper.insertTask(taskTitle, startTime, endTime, recurring, pageId);
     }
 
 

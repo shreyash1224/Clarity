@@ -63,6 +63,21 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
 
         db.execSQL(resourceTable);
 
+
+
+
+
+        String CREATE_TASKS_TABLE = "CREATE TABLE IF NOT EXISTS tasks (" +
+                "taskId INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "taskTitle TEXT NOT NULL, " +
+                "startTime TEXT NOT NULL, " +
+                "endTime TEXT NOT NULL, " +
+                "recurring TEXT NOT NULL DEFAULT 'NONE'" +
+                ");";
+        db.execSQL(CREATE_TASKS_TABLE);
+        Log.d("Task","Task Table Created Successfully.");
+
+
         // Add indexes to optimize foreign key searches
         db.execSQL("CREATE INDEX idx_userId ON pages(userId);");
         db.execSQL("CREATE INDEX idx_pageId ON resources(pageId);");
@@ -505,21 +520,6 @@ public long insertResource(int pageId, String resourceType, String resourceConte
     }
 
 
-    public void debugResourcesTable() {
-        Log.d("DatabaseCheck", "DebugResourceTable() Called In Diary Database.");
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM Resources", null);
-        while (cursor.moveToNext()) {
-            int id = cursor.getInt(0);
-            String content = cursor.getString(1);
-            String type = cursor.getString(2);
-            int order = cursor.getInt(3);
-            int pageId = cursor.getInt(4);
-
-            Log.d("DatabaseCheck", "ID: " + id + ", PageID: " + pageId + ", Type: " + type + ", Content: " + content + ", Order: " + order);
-        }
-        cursor.close();
-    }
 
 
     public ArrayList<Resource> getResourcesForPage(int pageId) {
@@ -543,6 +543,70 @@ public long insertResource(int pageId, String resourceType, String resourceConte
         return resources;
     }
 
+    public long insertTask(String taskTitle, String startTime, String endTime, String recurring, int pageId) {
+        Log.d("Task", "Inserting Task...");
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Insert task into tasks table
+        ContentValues taskValues = new ContentValues();
+        taskValues.put("taskTitle", taskTitle);
+        taskValues.put("startTime", startTime);
+        taskValues.put("endTime", endTime);
+        taskValues.put("recurring", recurring);
+
+        long taskId = db.insert("tasks", null, taskValues);
+
+        if (taskId != -1) {
+            // Get last resource order
+            int lastOrder = getLastResourceOrder((int) pageId);
+            Log.d("Task", "Last Resource Order: " + lastOrder);
+
+            // Link task to resources table
+            ContentValues resourceValues = new ContentValues();
+            resourceValues.put("pageId", pageId);
+            resourceValues.put("resourceType", "task");
+            resourceValues.put("resourceContent", String.valueOf(taskId)); // Storing taskId
+            resourceValues.put("resourceOrder", lastOrder + 1);
+
+            long resourceId = db.insert("resources", null, resourceValues);
+            Log.d("Task", "Task linked to resources table with resource ID: " + resourceId);
+        }
+
+//        debugResourcesTable("Task", pageId);
+        Log.d("Task","Task inserted successfully with ID: " + taskId);
+        debugResourcesTable("Task",pageId);
+        return taskId;
+    }
+
+
+    // adding task to resources Table
+    public void debugResourcesTable(String checkName, int pageId) {
+        Log.d(checkName, "DebugResourceTable() Called In Diary Database.");
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM RESOURCES WHERE pageId = ?", new String[]{String.valueOf(pageId)});
+
+//        + "resourceId INTEGER PRIMARY KEY AUTOINCREMENT, "
+//                + "resourceContent TEXT NOT NULL CHECK (LENGTH(resourceContent) > 0), "
+//                + "resourceType TEXT NOT NULL CHECK (LENGTH(resourceType) <= 20), "
+//                + "resourceOrder INTEGER NOT NULL, "
+//                + "pageId INTEGER NOT NULL, "
+//                + "FOREIGN KEY (pageId) REFERENCES pages(pageId) ON DELETE CASCADE);";
+
+        while (cursor.moveToNext()) {
+            int id = cursor.getInt(0);
+            String content = cursor.getString(1);
+            String type = cursor.getString(2);
+            int order = cursor.getInt(3);
+            int retrievedPageId = cursor.getInt(4);  // Fix: Use a separate variable
+
+            Log.d(checkName, "ID: " + id + ", PageID: " + retrievedPageId + ", Type: " + type + ", Content: " + content + ", Order: " + order);
+        }
+
+        cursor.close();
+    }
+
 }
+
 
 
