@@ -72,8 +72,10 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
                 "taskTitle TEXT NOT NULL, " +
                 "startTime TEXT NOT NULL, " +
                 "endTime TEXT NOT NULL, " +
-                "recurring TEXT NOT NULL DEFAULT 'NONE'" +
+                "recurring TEXT NOT NULL DEFAULT 'NONE', " +
+                "completion TEXT NOT NULL DEFAULT 'Pending'" +  // New column
                 ");";
+
         db.execSQL(tasksTable);
         Log.d("Task","Task Table Created Successfully.");
 
@@ -604,6 +606,40 @@ public long insertResource(int pageId, String resourceType, String resourceConte
         }
 
         cursor.close();
+    }
+
+    public void updateTaskCompletion(int taskId, String status) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("completion", status);  // Store "Completed" or "Pending"
+
+        int rowsAffected = db.update("tasks", values, "taskId = ?", new String[]{String.valueOf(taskId)});
+        db.close();
+
+        if (rowsAffected == 0) {
+            Log.e("DB_ERROR", "Failed to update completion status for taskId: " + taskId);
+        }
+    }
+
+
+    public Task getTaskById(int taskId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Task task = null;
+
+        Cursor cursor = db.rawQuery("SELECT * FROM tasks WHERE taskId = ?", new String[]{String.valueOf(taskId)});
+
+        if (cursor != null && cursor.moveToFirst()) {
+            String title = cursor.getString(cursor.getColumnIndexOrThrow("taskTitle"));
+            String startTime = cursor.getString(cursor.getColumnIndexOrThrow("startTime"));
+            String endTime = cursor.getString(cursor.getColumnIndexOrThrow("endTime"));
+            String recurring = cursor.getString(cursor.getColumnIndexOrThrow("recurring"));
+            String completion = cursor.getString(cursor.getColumnIndexOrThrow("completion")); // Ensure you added this column
+
+            task = new Task(taskId, title, startTime, endTime, recurring, completion);
+            cursor.close();
+        }
+
+        return task;
     }
 
 }

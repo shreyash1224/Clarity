@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp"
+    android:background="@color/brown_light">
+
+    <!-- Task Title -->
+    <TextView
+        android:id="@+id/taskTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Task Title"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/black" />
+
+    <!-- Task Timing -->
+    <TextView
+        android:id="@+id/taskTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start - End"
+        android:textSize="14sp"
+        android:textColor="@android:color/darker_gray" />
+
+    <!-- Recurring Status -->
+    <TextView
+        android:id="@+id/taskRecurring"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Recurring: No"
+        android:textSize="14sp"
+        android:textColor="@android:color/holo_blue_dark" />
+
+    <!-- Completion Checkbox -->
+    <CheckBox
+        android:id="@+id/taskCompletion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Completion Status" />
+
+</LinearLayout>

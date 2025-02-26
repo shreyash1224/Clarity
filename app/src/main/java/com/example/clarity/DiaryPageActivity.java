@@ -23,11 +23,13 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -105,8 +107,25 @@ public class DiaryPageActivity extends AppCompatActivity {
 
 //                    addImageToUI(content);
                     insertImage(Uri.parse(content));
+                } else if (type.equals("task")) {
+                Log.d("Task", "LoadPage: Adding task block to UI.");
+
+                // Convert content (which stores taskId) to an integer
+                int taskId = Integer.parseInt(content);
+
+                // Fetch the task using the correct taskId
+                Task task = dbHelper.getTaskById(taskId);
+
+                // If task exists, add it to the UI
+                if (task != null) {
+                    addTaskBlock(task);
+                } else {
+                    Log.e("Task", "Failed to load task with ID: " + taskId);
                 }
             }
+
+
+        }
 
         } else {
             Toast.makeText(this, "Failed to load page.", Toast.LENGTH_LONG).show();
@@ -146,14 +165,18 @@ public class DiaryPageActivity extends AppCompatActivity {
                     Log.d("onPause", "📌 Saved Text Block: " + text);
                 }
             } else if (view instanceof ImageView) {
-                String imagePath = (String) view.getTag(); // Fix: Store as String
-                //There is not imagePath at second time.
-                Log.d("Debug","onPause()->Image Path: " + imagePath);
+                String imagePath = (String) view.getTag();
+                Log.d("Debug", "onPause()->Image Path: " + imagePath);
 
                 if (imagePath != null) {
                     contentBlocks.add(new Resource(pageId, "image", imagePath, contentBlocks.size() + 1));
                     Log.d("onPause", "🖼 Saved Image: " + imagePath);
                 }
+            } else if (view.getTag() instanceof Task) {
+                // Ensure task data is saved
+                Task task = (Task) view.getTag();
+                contentBlocks.add(new Resource(pageId, "task", String.valueOf(task.getTaskId()), contentBlocks.size() + 1));
+                Log.d("onPause", "✅ Saved Task Block: " + task.getTaskTitle());
             }
         }
 
@@ -172,6 +195,7 @@ public class DiaryPageActivity extends AppCompatActivity {
             Log.d("onPause", "⚠️ Nothing to save, skipping database update.");
         }
     }
+
 
     //deletePage() done
     public void deletePage(View view) {
@@ -561,17 +585,51 @@ public class DiaryPageActivity extends AppCompatActivity {
         }
     }
 
-
+// Task------------------------------
 
 
     public void onResourceTaskClick(View view) {
         Toast.makeText(this, "Adding a task.", Toast.LENGTH_SHORT).show();
-        String taskTitle = "test";
-        String startTime = "starting time";
-        String endTime = "ending time";
-        String recurring = "NONE";
-        long taskId = dbHelper.insertTask(taskTitle, startTime, endTime, recurring, pageId);
+        TaskDialog.showTaskDialog(this, (title, startTime, endTime, recurring) -> {
+            // Save task details to the database
+
+            long taskId = dbHelper.insertTask(title, startTime, endTime, String.valueOf(recurring), pageId);
+
+            if (taskId != -1) {
+                // Load the task block in UI
+                Task task = dbHelper.getTaskById((int) taskId);
+                if (task != null) {
+                    addTaskBlock(task);
+                }
+            }
+        });
     }
+
+
+    private void addTaskBlock(Task task) {
+        View taskView = getLayoutInflater().inflate(R.layout.task_block, null);
+        LinearLayout contentLayout = findViewById(R.id.llDpaContentLayout);
+
+        TextView title = taskView.findViewById(R.id.taskTitle);
+        TextView time = taskView.findViewById(R.id.taskTime);
+        TextView recurring = taskView.findViewById(R.id.taskRecurring);
+        CheckBox completion = taskView.findViewById(R.id.taskCompletion);
+        taskView.setTag(task);
+
+        title.setText(task.getTaskTitle());
+        time.setText(task.getStartTime() + " - " + task.getEndTime());
+        recurring.setText("Recurring: "+task.getRecurring());
+        completion.setChecked(task.getCompletion().equals("Completed"));
+
+        // Update task completion status on checkbox change
+        completion.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            String status = isChecked ? "Completed" : "Pending";
+            dbHelper.updateTaskCompletion(task.getTaskId(), status);
+        });
+
+        contentLayout.addView(taskView);  // Add task block to diary page
+    }
+
 
 
 }
