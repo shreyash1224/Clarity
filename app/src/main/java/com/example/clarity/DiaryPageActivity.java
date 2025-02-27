@@ -588,6 +588,8 @@ public class DiaryPageActivity extends AppCompatActivity {
     }
 
 
+    public void deleteTextResource(View view) {
+    }
 }
 
 
