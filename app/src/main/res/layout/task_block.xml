@@ -5,7 +5,9 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:padding="8dp"
-    android:background="@color/brown_light">
+    android:background="@color/brown_light"
+    android:focusable="true"
+    >
 
 
 

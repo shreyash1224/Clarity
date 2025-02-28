@@ -489,13 +489,15 @@ private void addTextBlockToUI(String textContent) {
         EditText focusedEditText = getCurrentFocusedEditText();
         ViewGroup textBlock = null;
 
-        if (focusedEditText != null) {
-            textBlock = (ViewGroup) focusedEditText.getParent(); // Get the parent LinearLayout
-        }
 
         // Create ImageView
         ImageView imageView = new ImageView(this);
         imageView.setImageURI(imageUri);
+
+        imageView.setFocusable(true);
+        imageView.setFocusableInTouchMode(true);
+        imageView.requestFocus();
+
 
         // 🔹 Calculate max height based on 10 lines of text
         int maxHeight = (focusedEditText != null)
