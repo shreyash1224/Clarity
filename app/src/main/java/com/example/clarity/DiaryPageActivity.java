@@ -734,10 +734,63 @@ private void addTextBlockToUI(String textContent) {
 
         for (DiaryPage page : pages) {
             if (page.getPageId() == pageId) {
-                addDiaryPage(pageId, page.getPageTitle()); // Add the view
+                addPageBlock(page, pageId); // Add the view
+
+                // ✅ Set pageId as the tag
+
                 break;
             }
         }
+    }
+
+    private void addPageBlock(DiaryPage page, int pageId) {
+
+
+
+        LinearLayout contentLayout = findViewById(R.id.llDpaContentLayout);
+
+        // Inflate Page Block layout (Use a new XML file like page_block.xml)
+        View pageView = getLayoutInflater().inflate(R.layout.page_block, contentLayout, false);
+        pageView.setTag(pageId);
+        Log.d("addPageBlock", "Adding page to diary page. Tag:"+pageView.getTag());
+
+        // Get UI Elements
+        TextView title = pageView.findViewById(R.id.tvBpPageTitle);
+        TextView pageIdText = pageView.findViewById(R.id.tvBpPageId);
+
+        // Set Data
+        title.setText(page.getPageTitle());
+        pageIdText.setText("Page ID: " + page.getPageId());
+
+        // ✅ Set pageId as the tag
+        pageView.setTag(pageId);
+
+        Log.d("Diary", "📄 Page Block Added with ID: " + pageView.getTag());
+
+        // Add the Page Block to the Diary Page
+        contentLayout.addView(pageView);
+    }
+
+
+
+}
+
+
+
+//    public void onPageSelected(int pageId) {
+//        Log.d("Diary", "Page selected: " + pageId);
+//        Toast.makeText(this, "Selected Page ID: " + pageId, Toast.LENGTH_SHORT).show();
+//
+//        // Save the selected page as a resource
+//        DiaryDatabaseHelper dbHelper = new DiaryDatabaseHelper(this);
+//        List<DiaryPage> pages = dbHelper.getAllDiaryPages();
+//
+//        for (DiaryPage page : pages) {
+//            if (page.getPageId() == pageId) {
+//                addDiaryPage(pageId, page.getPageTitle()); // Add the view
+//                break;
+//            }
+
 
 //        long resourceId = dbHelper.addResource(pageId, "page", String.valueOf(pageId));
 //
@@ -746,22 +799,7 @@ private void addTextBlockToUI(String textContent) {
 //        } else {
 //            Toast.makeText(this, "Failed to save page as resource!", Toast.LENGTH_SHORT).show();
 //        }
-    }
-
-    private void addDiaryPage(int pageId, String title) {
-        LayoutInflater inflater = LayoutInflater.from(this);
-        View pageView = inflater.inflate(R.layout.page_block, null, false);
-
-        TextView tvPageTitle = pageView.findViewById(R.id.tvDiplPageTitle);
-        TextView tvPageId = pageView.findViewById(R.id.tvDiplPageId);
-
-        tvPageTitle.setText(title);
-        tvPageId.setText("#"+String.valueOf(pageId));
-
-        // Add the view to the diary page layout
-        LinearLayout diaryPageContainer = findViewById(R.id.llDpaContentLayout);
-        diaryPageContainer.addView(pageView);
-    }
+//    }
 
 
 
@@ -769,7 +807,10 @@ private void addTextBlockToUI(String textContent) {
 
 
 
-}
+
+
+
+
 
 
 //Todo: Cleaning of database. Especially for tasks and image. View Removing is done for task and text only image remaining.

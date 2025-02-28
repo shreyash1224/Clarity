@@ -4,15 +4,18 @@
     android:layout_height="wrap_content"
     android:padding="10dp"
     android:orientation="vertical"
-    android:background="@color/beige_light"> <!-- Background color -->
+    android:background="@color/brown_light"> <!-- Background color -->
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+
+        >
 
         <TextView
-            android:id="@+id/tvDiplPageTitle"
+
+            android:id="@+id/tvBpPageTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="6"
@@ -26,7 +29,7 @@
             android:textColor="@color/brown_toolbar" /> <!-- Title text color -->
 
         <TextView
-            android:id="@+id/tvDiplPageId"
+            android:id="@+id/tvBpPageId"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -35,7 +38,7 @@
             android:textAlignment="textStart"
             android:textStyle="bold"
             android:textSize="16sp"
-            android:textColor="@color/brown_light" /> <!-- Date text color -->
+            android:textColor="@color/beige_light" /> <!-- Date text color -->
 
     </LinearLayout>
 
