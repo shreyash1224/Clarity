@@ -86,9 +86,19 @@ public class MainActivity extends AppCompatActivity {
         // Get Username from SharedPreferences
         tvUserName = headerView.findViewById(R.id.tvUsername);
         tvUserId = headerView.findViewById(R.id.tvUserId);
+        // ✅ Fix: Check login status properly
         sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
-        String username = sharedPreferences.getString("username", "Guest");
+        String username = sharedPreferences.getString("username", null);
         int userId = sharedPreferences.getInt("userId", -1);
+
+        if (username == null || userId == -1) {
+            // User is not logged in, redirect to LoginActivity
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish(); // Prevent going back to MainActivity
+        }
+
         Toast.makeText(this, username+" "+userId, Toast.LENGTH_LONG).show();
         tvUserName.setText(username);
         tvUserId.setText(String.valueOf(userId));
@@ -97,9 +107,12 @@ public class MainActivity extends AppCompatActivity {
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                if (item.getItemId() == R.id.nav_home) {
-                    Toast.makeText(MainActivity.this, "Home Selected", Toast.LENGTH_SHORT).show();
+                if (item.getItemId() == R.id.nav_profile) {
+
+                    Toast.makeText(MainActivity.this, "Profile Selected", Toast.LENGTH_SHORT).show();
                 } else if (item.getItemId() == R.id.nav_settings) {
+
+
                     Toast.makeText(MainActivity.this, "Settings Selected", Toast.LENGTH_SHORT).show();
                 }
                 drawerLayout.closeDrawer(GravityCompat.START);
@@ -175,5 +188,10 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         Toast.makeText(this, "Loading Pages", Toast.LENGTH_SHORT).show();
         loadPages();  // Refresh pages when MainActivity is resumed
+    }
+
+    public void settingsActivity(MenuItem item) {
+        Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+        startActivity(intent);
     }
 }

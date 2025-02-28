@@ -2,8 +2,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/nav_home"
-        android:title="Home"
+        android:id="@+id/nav_profile"
+        android:title="Profile"
         android:icon="@android:drawable/ic_menu_view"
         />
 
@@ -11,6 +11,7 @@
         android:id="@+id/nav_settings"
         android:title="Settings"
         android:icon="@android:drawable/ic_menu_preferences"
+        android:onClick="settingsActivity"
         />
 
 </menu>
