@@ -160,11 +160,15 @@ public class DiaryPageActivity extends AppCompatActivity {
             View view = contentLayout.getChildAt(i);
 
 
-            if (view instanceof EditText) {
-                String text = ((EditText) view).getText().toString().trim();
-                if (!text.isEmpty()) {
-                    contentBlocks.add(new Resource(pageId, "text", text, contentBlocks.size() + 1));
-                    Log.d("onPause", "📌 Saved Text Block: " + text);
+            if (view instanceof LinearLayout) { // Check if it's a LinearLayout container
+                EditText editText = view.findViewById(R.id.etTextBlock);
+
+                if (editText != null) {
+                    String text = editText.getText().toString().trim();
+                    if (!text.isEmpty()) {
+                        contentBlocks.add(new Resource(pageId, "text", text, contentBlocks.size() + 1));
+                        Log.d("onPause", "📌 Saved Text Block: " + text);
+                    }
                 }
             } else if (view instanceof ImageView) {
                 String imagePath = (String) view.getTag();
@@ -296,11 +300,10 @@ public class DiaryPageActivity extends AppCompatActivity {
             return;
         }
 
-
-
+        // Inflate the text block layout
         View textBlock = getLayoutInflater().inflate(R.layout.text_block, contentLayout, false);
-        LinearLayout contentLayout = findViewById(R.id.llDpaContentLayout);
 
+        // Find the EditText inside the new text block
         EditText newEditText = textBlock.findViewById(R.id.etTextBlock);
         newEditText.requestFocus(); // Move focus to the new EditText
 
@@ -310,7 +313,7 @@ public class DiaryPageActivity extends AppCompatActivity {
             imm.showSoftInput(newEditText, InputMethodManager.SHOW_IMPLICIT);
         }
 
-        // Add the text block to the layout
+        // Add the new text block to the layout
         contentLayout.addView(textBlock);
     }
 
@@ -343,42 +346,34 @@ public class DiaryPageActivity extends AppCompatActivity {
 
     
 //    addTextBlockToUI() done
-    private void addTextBlockToUI(String textContent) {
-        LinearLayout contentLayout = findViewById(R.id.llDpaContentLayout);
+private void addTextBlockToUI(String textContent) {
+    LinearLayout contentLayout = findViewById(R.id.llDpaContentLayout);
 
-        // Prevent adding unnecessary empty blocks
-        if (textContent.isEmpty() && hasEmptyTextBlock()) {
-            return;
-        }
-
-        EditText newEditText = new EditText(this);
-        newEditText.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        ));
-        newEditText.setText(textContent); // Set the retrieved text
-        newEditText.setTextSize(16);
-        int paddingPx = (int) TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP, 8, getResources().getDisplayMetrics()
-        );
-        newEditText.setPadding(paddingPx, paddingPx, paddingPx, paddingPx);
-        newEditText.setBackgroundColor(Color.TRANSPARENT);
-        newEditText.setTextColor(ContextCompat.getColor(this, R.color.brown_light)); // API-safe color
-        newEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
-
-        contentLayout.addView(newEditText); // Add to UI
-
-        // Move focus to the new EditText
-        newEditText.requestFocus();
-        newEditText.setSelection(newEditText.getText().length()); // Cursor at the end
-
-        // Show the keyboard automatically
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        if (imm != null) {
-            imm.showSoftInput(newEditText, InputMethodManager.SHOW_IMPLICIT);
-        }
+    // Prevent adding unnecessary empty blocks
+    if (textContent.isEmpty() && hasEmptyTextBlock()) {
+        return;
     }
 
+    // Inflate the text block layout (text_block.xml)
+    View textBlock = getLayoutInflater().inflate(R.layout.text_block, contentLayout, false);
+
+    // Get the EditText inside the layout
+    EditText newEditText = textBlock.findViewById(R.id.etTextBlock);
+    newEditText.setText(textContent); // Set the retrieved text
+    newEditText.setSelection(newEditText.getText().length()); // Place cursor at the end
+
+    // Add the complete text block layout to the content area
+    contentLayout.addView(textBlock);
+
+    // Move focus to the new EditText
+    newEditText.requestFocus();
+
+    // Show the keyboard automatically
+    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+    if (imm != null) {
+        imm.showSoftInput(newEditText, InputMethodManager.SHOW_IMPLICIT);
+    }
+}
 
 
 
@@ -588,8 +583,18 @@ public class DiaryPageActivity extends AppCompatActivity {
     }
 
 
-    public void deleteTextResource(View view) {
+    public void deleteResource(View view) {
+        // Get the resource container (assuming the button is inside a resource layout)
+        ViewGroup parent = (ViewGroup) view.getParent();
+
+        if (parent != null) {
+            ViewGroup grandParent = (ViewGroup) parent.getParent();
+            if (grandParent != null) {
+                grandParent.removeView(parent); // Removes the whole block
+            }
+        }
     }
+
 }
 
 

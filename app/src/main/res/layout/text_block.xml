@@ -22,7 +22,10 @@
         android:gravity="top"
         android:focusable="true"
         android:focusableInTouchMode="true"
-        android:layout_marginBottom="20dp"/>
+        android:layout_marginBottom="20dp"
+        android:longClickable="true"
+
+        />
 
     <ImageButton
         android:id="@+id/deleteTextResource"
@@ -31,7 +34,7 @@
         android:layout_gravity="end"
         android:layout_height="wrap_content"
         android:src="@android:drawable/ic_delete"
-        android:onClick="deleteTextResource"
+        android:onClick="deleteResource"
         />
 
 
