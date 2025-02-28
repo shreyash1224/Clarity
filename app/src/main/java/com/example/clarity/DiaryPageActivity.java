@@ -451,31 +451,76 @@ private void addTextBlockToUI(String textContent) {
 
     //insertImage() done
 
+//    private void insertImage(Uri imageUri) {
+//        EditText focusedEditText = getCurrentFocusedEditText();
+//
+//        if (focusedEditText == null) {
+//            Toast.makeText(this, "No active text block found!", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
+//
+//
+//
+//        // Create ImageView
+//        ImageView imageView = new ImageView(this);
+//        imageView.setImageURI(imageUri);
+//        imageView.setAdjustViewBounds(true);
+//        imageView.setMaxHeight(focusedEditText.getLineHeight() * 8);
+//        imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+//
+//        // 🔹 Store image URI inside ImageView for later retrieval
+//        imageView.setTag(imageUri.toString());  // ✅ Add this line
+//
+//        // Insert Image Below Focused EditText
+//        int cursorIndex = contentLayout.indexOfChild(focusedEditText);
+//        contentLayout.addView(imageView, cursorIndex + 1);
+//
+//    }
+//
+//
+
     private void insertImage(Uri imageUri) {
         EditText focusedEditText = getCurrentFocusedEditText();
+        ViewGroup textBlock = null;
 
-        if (focusedEditText == null) {
-            Toast.makeText(this, "No active text block found!", Toast.LENGTH_SHORT).show();
-            return;
+        if (focusedEditText != null) {
+            textBlock = (ViewGroup) focusedEditText.getParent(); // Get the parent LinearLayout
         }
-
-
 
         // Create ImageView
         ImageView imageView = new ImageView(this);
         imageView.setImageURI(imageUri);
-        imageView.setAdjustViewBounds(true);
-        imageView.setMaxHeight(focusedEditText.getLineHeight() * 8);
-        imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        imageView.setScaleType(ImageView.ScaleType.FIT_START);
 
-        // 🔹 Store image URI inside ImageView for later retrieval
-        imageView.setTag(imageUri.toString());  // ✅ Add this line
+        // 🔹 Dynamically Calculate Max Height Based on 40 Lines of Text
+        int maxHeight = (focusedEditText != null)
+                ? focusedEditText.getLineHeight() * 40
+                : 1000; // Fallback default height
 
-        // Insert Image Below Focused EditText
-        int cursorIndex = contentLayout.indexOfChild(focusedEditText);
-        contentLayout.addView(imageView, cursorIndex + 1);
+        // 🔹 Use LayoutParams to Control Both Width and Height
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, // Make width match parent
+                maxHeight // Set calculated max height
+        );
+        layoutParams.setMargins(0, 16, 0, 16); // Add spacing
 
+        imageView.setLayoutParams(layoutParams);
+
+        // Store image URI inside ImageView for later retrieval
+        imageView.setTag(imageUri.toString());
+
+        if (textBlock != null) {
+            // Insert Image Below the Text Block's Parent (LinearLayout)
+            int index = contentLayout.indexOfChild(textBlock);
+            contentLayout.addView(imageView, index + 1);
+        } else {
+            // If no text block exists, add the image at the bottom
+            contentLayout.addView(imageView);
+        }
     }
+
+
+
 
 
     //getCurrentFocusedEditText() done
