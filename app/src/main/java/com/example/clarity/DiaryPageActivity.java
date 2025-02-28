@@ -163,27 +163,31 @@ public class DiaryPageActivity extends AppCompatActivity {
             if (view instanceof LinearLayout) { // Check if it's a LinearLayout container
                 EditText editText = view.findViewById(R.id.etTextBlock);
 
-                if (editText != null) {
+                if (editText != null) {  // Handling Text Block
                     String text = editText.getText().toString().trim();
                     if (!text.isEmpty()) {
                         contentBlocks.add(new Resource(pageId, "text", text, contentBlocks.size() + 1));
                         Log.d("onPause", "📌 Saved Text Block: " + text);
                     }
+                } else { // Handling Task Block
+                    Object tag = view.getTag();
+                    if (tag instanceof Task) {
+                        Task task = (Task) tag;
+                        contentBlocks.add(new Resource(pageId, "task", String.valueOf(task.getTaskId()), contentBlocks.size() + 1));
+                        Log.d("onPause", "✅ Task Block Detected & Saved: " + task.getTaskTitle());
+                    } else {
+                        Log.e("onPause", "❌ Task Block Missing Tag!");
+                    }
                 }
-            } else if (view instanceof ImageView) {
+            } else if (view instanceof ImageView) {  // Handling Image Block
                 String imagePath = (String) view.getTag();
                 Log.d("Debug", "onPause()->Image Path: " + imagePath);
 
                 if (imagePath != null) {
-                    Log.d("Image", "imagePath: "+imagePath);
+                    Log.d("Image", "imagePath: " + imagePath);
                     contentBlocks.add(new Resource(pageId, "image", imagePath, contentBlocks.size() + 1));
                     Log.d("onPause", "🖼 Saved Image: " + imagePath);
                 }
-            } else if (view.getTag() instanceof Task) {
-                // Ensure task data is saved
-                Task task = (Task) view.getTag();
-                contentBlocks.add(new Resource(pageId, "task", String.valueOf(task.getTaskId()), contentBlocks.size() + 1));
-                Log.d("onPause", "✅ Saved Task Block: " + task.getTaskTitle());
             }
         }
 
@@ -203,6 +207,7 @@ public class DiaryPageActivity extends AppCompatActivity {
         }
     }
 
+    //Todo: onPause() changed.
 
     //deletePage() done
     public void deletePage(View view) {
@@ -626,8 +631,8 @@ private void addTextBlockToUI(String textContent) {
         contentLayout.addView(taskView);
     }
 
-//    TODO: Changing addTaskBlock() so it can load the taskBlock appropriately. Problem might be with onPause().
-
+//   Changing addTaskBlock() so it can load the taskBlock appropriately. Problem might be with onPause(). Problem was with onPause if-else there was two if conditions check Linear Layout availability.
+//
 
 
 
@@ -646,5 +651,5 @@ private void addTextBlockToUI(String textContent) {
 }
 
 
-
+//Todo: Cleaning of database. Especially for tasks and image. View Removing is done for task and text only image remaining.
 
