@@ -11,6 +11,7 @@ import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -495,21 +496,35 @@ private void addTextBlockToUI(String textContent) {
         // Create ImageView
         ImageView imageView = new ImageView(this);
         imageView.setImageURI(imageUri);
-        imageView.setScaleType(ImageView.ScaleType.FIT_START);
 
-        // 🔹 Dynamically Calculate Max Height Based on 40 Lines of Text
+        // 🔹 Calculate max height based on 10 lines of text
         int maxHeight = (focusedEditText != null)
-                ? focusedEditText.getLineHeight() * 40
-                : 1000; // Fallback default height
+                ? focusedEditText.getLineHeight() * 10  // 10 lines of text height
+                : 600; // Fallback max height
 
-        // 🔹 Use LayoutParams to Control Both Width and Height
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, // Make width match parent
-                maxHeight // Set calculated max height
-        );
-        layoutParams.setMargins(0, 16, 0, 16); // Add spacing
+        // 🔹 Set the ImageView scale type to maintain aspect ratio
+        imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
-        imageView.setLayoutParams(layoutParams);
+        // 🔹 Measure the image dimensions
+        imageView.post(() -> {
+            Drawable drawable = imageView.getDrawable();
+            if (drawable != null) {
+                int originalWidth = drawable.getIntrinsicWidth();
+                int originalHeight = drawable.getIntrinsicHeight();
+
+                // Calculate new width to maintain aspect ratio
+                int newWidth = (int) (((float) originalWidth / originalHeight) * maxHeight);
+
+                // Apply final layout parameters
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                        newWidth,  // Width proportional to height
+                        maxHeight  // Max height limited to 10 lines
+                );
+
+                layoutParams.setMargins(0, 8, 0, 8); // Add minimal margins
+                imageView.setLayoutParams(layoutParams);
+            }
+        });
 
         // Store image URI inside ImageView for later retrieval
         imageView.setTag(imageUri.toString());
@@ -523,7 +538,6 @@ private void addTextBlockToUI(String textContent) {
             contentLayout.addView(imageView);
         }
     }
-
 
 
 
