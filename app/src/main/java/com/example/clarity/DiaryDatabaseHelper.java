@@ -642,6 +642,16 @@ public long insertResource(int pageId, String resourceType, String resourceConte
         return task;
     }
 
+    public void cleanUpTasks() {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Delete tasks that are NOT referenced in the resources table
+        String deleteQuery = "DELETE FROM tasks WHERE taskId NOT IN (SELECT resourceContent FROM resources WHERE resourceType = 'task')";
+
+        db.execSQL(deleteQuery);
+        Log.d("Database", "🗑 Cleaned up unlinked tasks.");
+    }
+
 }
 
 

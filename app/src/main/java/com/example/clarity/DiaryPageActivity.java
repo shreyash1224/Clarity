@@ -139,6 +139,7 @@ public class DiaryPageActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        debugResourcesTable("Database");
         Log.d("LIFECYCLE", "onPause() called");
 
         String title = editTitle.getText().toString().trim();
@@ -206,6 +207,8 @@ public class DiaryPageActivity extends AppCompatActivity {
         } else {
             Log.d("onPause", "⚠️ Nothing to save, skipping database update.");
         }
+
+        dbHelper.cleanUpTasks();
     }
 
     //Todo: onPause() changed.
@@ -668,4 +671,4 @@ private void addTextBlockToUI(String textContent) {
 
 
 //Todo: Cleaning of database. Especially for tasks and image. View Removing is done for task and text only image remaining.
-
+//Todo: Drag and restructuring of resoucrces.
