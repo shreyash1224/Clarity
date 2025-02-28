@@ -129,9 +129,16 @@ public class DiaryPageActivity extends AppCompatActivity {
                 if (task != null) {
                     addTaskBlock(task);
                 } else {
-                    Log.e("Task", "Failed to load task with ID: " + taskId);
+                    Log.e("Task", "Failed to load page/task with ID: " + taskId);
                 }
-            }
+            }else if (type.equals("page")) {
+                    Log.d("Page", "LoadPage: Adding page block to UI.");
+
+                    int pId = Integer.parseInt(content);
+                    DiaryPage diaryPage = dbHelper.getPageById(pId);
+
+                    addPageBlock(diaryPage);
+                }
 
 
         }
@@ -184,8 +191,9 @@ public class DiaryPageActivity extends AppCompatActivity {
                         Task task = (Task) tag;
                         contentBlocks.add(new Resource(pageId, "task", String.valueOf(task.getTaskId()), contentBlocks.size() + 1));
                         Log.d("onPause", "✅ Task Block Detected & Saved: " + task.getTaskTitle());
-                    } else {
-                        Log.e("onPause", "❌ Task Block Missing Tag!");
+                    } else if (tag instanceof DiaryPage) {
+                        DiaryPage page = (DiaryPage) tag;
+                        contentBlocks.add(new Resource(pageId, "page", String.valueOf(page.getPageId()), contentBlocks.size() + 1));
                     }
                 }
             } else if (view instanceof ImageView) {  // Handling Image Block
@@ -216,6 +224,7 @@ public class DiaryPageActivity extends AppCompatActivity {
         }
 
         dbHelper.cleanUpTasks();
+        debugResourcesTable("pageResource");
     }
 
     //Todo: onPause() changed.
@@ -734,7 +743,7 @@ private void addTextBlockToUI(String textContent) {
 
         for (DiaryPage page : pages) {
             if (page.getPageId() == pageId) {
-                addPageBlock(page, pageId); // Add the view
+                addPageBlock(page); // Add the view
 
                 // ✅ Set pageId as the tag
 
@@ -743,16 +752,16 @@ private void addTextBlockToUI(String textContent) {
         }
     }
 
-    private void addPageBlock(DiaryPage page, int pageId) {
-
-
-
+    private void addPageBlock(DiaryPage page) {
         LinearLayout contentLayout = findViewById(R.id.llDpaContentLayout);
 
-        // Inflate Page Block layout (Use a new XML file like page_block.xml)
+        // Inflate Page Block layout
         View pageView = getLayoutInflater().inflate(R.layout.page_block, contentLayout, false);
-        pageView.setTag(pageId);
-        Log.d("addPageBlock", "Adding page to diary page. Tag:"+pageView.getTag());
+
+        // ✅ Set pageId as the tag
+        pageView.setTag(page);
+
+        Log.d("addPageBlock", "Adding Page Block. Tag: " + pageView.getTag());
 
         // Get UI Elements
         TextView title = pageView.findViewById(R.id.tvBpPageTitle);
@@ -762,15 +771,9 @@ private void addTextBlockToUI(String textContent) {
         title.setText(page.getPageTitle());
         pageIdText.setText("Page ID: " + page.getPageId());
 
-        // ✅ Set pageId as the tag
-        pageView.setTag(pageId);
-
-        Log.d("Diary", "📄 Page Block Added with ID: " + pageView.getTag());
-
-        // Add the Page Block to the Diary Page
+        // ✅ Add the Page Block to the Diary Page
         contentLayout.addView(pageView);
     }
-
 
 
 }
