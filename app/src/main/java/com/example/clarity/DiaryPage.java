@@ -24,6 +24,13 @@ public class DiaryPage {
         this.content = resources;
     }
 
+    public DiaryPage(int pageId, String title) {
+        this.pageId = pageId;
+        this.pageTitle = title;
+        this.pageDate = "";
+        this.content = new ArrayList<>();
+    }
+
     // Getters
     public int getPageId() {
         return pageId;

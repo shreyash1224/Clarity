@@ -653,8 +653,8 @@ public long insertResource(int pageId, String resourceType, String resourceConte
     }
 
 
-    public List<Page> getAllDiaryPages() {
-        List<Page> pageList = new ArrayList<>();
+    public List<DiaryPage> getAllDiaryPages() {
+        List<DiaryPage> pageList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT pageId, pageTitle FROM pages", null);
 
@@ -662,7 +662,7 @@ public long insertResource(int pageId, String resourceType, String resourceConte
             do {
                 int pageId = cursor.getInt(0);
                 String title = cursor.getString(1);
-                pageList.add(new Page(pageId, title));
+                pageList.add(new DiaryPage(pageId, title));
             } while (cursor.moveToNext());
         }
 

@@ -685,10 +685,10 @@ private void addTextBlockToUI(String textContent) {
 
         // Fetch pages from the database
         DiaryDatabaseHelper dbHelper = new DiaryDatabaseHelper(this);
-        List<Page> pages = dbHelper.getAllDiaryPages();
+        List<DiaryPage> pages = dbHelper.getAllDiaryPages();
         List<String> pageTitles = new ArrayList<>();
-        for (Page page : pages) {
-            pageTitles.add(page.getPageId() + " - " + page.getTitle());
+        for (DiaryPage page : pages) {
+            pageTitles.add(page.getPageId() + " - " + page.getPageTitle());
         }
 
         // Use custom adapter with filtering
@@ -730,11 +730,11 @@ private void addTextBlockToUI(String textContent) {
 
         // Save the selected page as a resource
         DiaryDatabaseHelper dbHelper = new DiaryDatabaseHelper(this);
-        List<Page> pages = dbHelper.getAllDiaryPages();
+        List<DiaryPage> pages = dbHelper.getAllDiaryPages();
 
-        for (Page page : pages) {
+        for (DiaryPage page : pages) {
             if (page.getPageId() == pageId) {
-                addDiaryPage(pageId, page.getTitle()); // Add the view
+                addDiaryPage(pageId, page.getPageTitle()); // Add the view
                 break;
             }
         }
@@ -761,12 +761,6 @@ private void addTextBlockToUI(String textContent) {
         // Add the view to the diary page layout
         LinearLayout diaryPageContainer = findViewById(R.id.llDpaContentLayout);
         diaryPageContainer.addView(pageView);
-
-        // Optional: Click listener to open the referenced diary page
-//        pageView.setOnClickListener(v -> {
-//            Toast.makeText(this, "Opening Page ID: " + pageId, Toast.LENGTH_SHORT).show();
-//            openDiaryPage(pageId); // Function to open the diary page
-//        });
     }
 
 
