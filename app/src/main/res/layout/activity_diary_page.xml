@@ -76,18 +76,20 @@
 
         <ImageButton
             android:id="@+id/ibDpaAddTextButton"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Resource Text"
             android:onClick="onResourceTextClick"
             android:padding="8dp"
-            android:src="@drawable/ic_edit_text"
-            />
+            android:src="@android:drawable/stat_notify_chat" />
+
 
         <ImageButton
             android:id="@+id/ibDpaAddImageButton"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="35dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Resource Image"
@@ -97,13 +99,28 @@
 
         <ImageButton
             android:id="@+id/ibDpaAddTaskButton"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="35dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Resource Task"
             android:onClick="onResourceTaskClick"
             android:padding="8dp"
             android:src="@android:drawable/checkbox_on_background" />
+
+
+        <ImageButton
+            android:id="@+id/ibDpaAddPageButton"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="35dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Resource Task"
+            android:onClick="onResourcePageClick"
+            android:padding="8dp"
+            android:src="@drawable/ic_edit_text" />
+
+
 
 
     </LinearLayout>

@@ -652,6 +652,28 @@ public long insertResource(int pageId, String resourceType, String resourceConte
         Log.d("Database", "🗑 Cleaned up unlinked tasks.");
     }
 
+
+    public List<Page> getAllDiaryPages() {
+        List<Page> pageList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT pageId, pageTitle FROM pages", null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                int pageId = cursor.getInt(0);
+                String title = cursor.getString(1);
+                pageList.add(new Page(pageId, title));
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+        return pageList;
+    }
+
+
+
+
 }
 
 

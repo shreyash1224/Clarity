@@ -1,6 +1,7 @@
 package com.example.clarity;
 
 import android.Manifest;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,7 +17,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.util.Pair;
 import android.util.TypedValue;
@@ -25,14 +28,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
@@ -666,6 +673,107 @@ private void addTextBlockToUI(String textContent) {
             }
         }
     }
+
+    public void onResourcePageClick(View view) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_search_page, null);
+        builder.setView(dialogView);
+
+        EditText etSearchPage = dialogView.findViewById(R.id.etSearchPage);
+        ListView lvSearchResults = dialogView.findViewById(R.id.lvSearchResults);
+
+        // Fetch pages from the database
+        DiaryDatabaseHelper dbHelper = new DiaryDatabaseHelper(this);
+        List<Page> pages = dbHelper.getAllDiaryPages();
+        List<String> pageTitles = new ArrayList<>();
+        for (Page page : pages) {
+            pageTitles.add(page.getPageId() + " - " + page.getTitle());
+        }
+
+        // Use custom adapter with filtering
+        PageAdapter adapter = new PageAdapter(this, android.R.layout.simple_list_item_1, pageTitles);
+        lvSearchResults.setAdapter(adapter);
+
+        // Filter search results based on user input
+        etSearchPage.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                adapter.getFilter().filter(s); // Uses custom filter logic
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        // Handle item selection
+        lvSearchResults.setOnItemClickListener((parent, view1, position, id) -> {
+            String selectedItem = adapter.getItem(position);
+            int selectedPageId = Integer.parseInt(selectedItem.split(" - ")[0]); // Extract pageId
+            Toast.makeText(this, "Selected Page ID: " + selectedPageId, Toast.LENGTH_SHORT).show();
+            dialog.dismiss();
+
+            // Pass the selected page ID to a function
+            onPageSelected(selectedPageId);
+        });
+    }
+
+    public void onPageSelected(int pageId) {
+        Log.d("Diary", "Page selected: " + pageId);
+        Toast.makeText(this, "Selected Page ID: " + pageId, Toast.LENGTH_SHORT).show();
+
+        // Save the selected page as a resource
+        DiaryDatabaseHelper dbHelper = new DiaryDatabaseHelper(this);
+        List<Page> pages = dbHelper.getAllDiaryPages();
+
+        for (Page page : pages) {
+            if (page.getPageId() == pageId) {
+                addDiaryPage(pageId, page.getTitle()); // Add the view
+                break;
+            }
+        }
+
+//        long resourceId = dbHelper.addResource(pageId, "page", String.valueOf(pageId));
+//
+//        if (resourceId != -1) {
+//            Toast.makeText(this, "Page saved as resource!", Toast.LENGTH_SHORT).show();
+//        } else {
+//            Toast.makeText(this, "Failed to save page as resource!", Toast.LENGTH_SHORT).show();
+//        }
+    }
+
+    private void addDiaryPage(int pageId, String title) {
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View pageView = inflater.inflate(R.layout.page_block, null, false);
+
+        TextView tvPageTitle = pageView.findViewById(R.id.tvDiplPageTitle);
+        TextView tvPageId = pageView.findViewById(R.id.tvDiplPageId);
+
+        tvPageTitle.setText(title);
+        tvPageId.setText("#"+String.valueOf(pageId));
+
+        // Add the view to the diary page layout
+        LinearLayout diaryPageContainer = findViewById(R.id.llDpaContentLayout);
+        diaryPageContainer.addView(pageView);
+
+        // Optional: Click listener to open the referenced diary page
+//        pageView.setOnClickListener(v -> {
+//            Toast.makeText(this, "Opening Page ID: " + pageId, Toast.LENGTH_SHORT).show();
+//            openDiaryPage(pageId); // Function to open the diary page
+//        });
+    }
+
+
+
+
+
+
 
 }
 
