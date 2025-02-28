@@ -622,10 +622,13 @@ private void addTextBlockToUI(String textContent) {
             String status = isChecked ? "Completed" : "Pending";
             dbHelper.updateTaskCompletion(task.getTaskId(), status);
         });
-
         // Add Task Block to Diary Page
         contentLayout.addView(taskView);
     }
+
+//    TODO: Changing addTaskBlock() so it can load the taskBlock appropriately. Problem might be with onPause().
+
+
 
 
     public void deleteResource(View view) {
