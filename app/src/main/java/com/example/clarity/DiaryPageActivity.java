@@ -1,6 +1,7 @@
 package com.example.clarity;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -65,6 +66,8 @@ public class DiaryPageActivity extends AppCompatActivity {
     //onCreate() done
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
         setContentView(R.layout.activity_diary_page);
 
         dbHelper = new DiaryDatabaseHelper(this);
@@ -240,7 +243,7 @@ public class DiaryPageActivity extends AppCompatActivity {
         try {
             db.beginTransaction();
 
-            // Get image file paths before deleting resources
+            // 1. Get image file paths before deleting resources
             Cursor cursor = db.rawQuery("SELECT resourceContent FROM resources WHERE pageId = ? AND resourceType = 'image'",
                     new String[]{String.valueOf(pageId)});
 
@@ -257,10 +260,13 @@ public class DiaryPageActivity extends AppCompatActivity {
             }
             cursor.close();
 
-            // Delete resources linked to the page
+            // 2. Delete resources linked to the page
             db.delete("resources", "pageId = ?", new String[]{String.valueOf(pageId)});
 
-            // Delete the actual page
+            // 3. Remove all references to this page inside other pages' page_blocks
+            db.delete("resources", "resourceType = 'page' AND resourceContent = ?", new String[]{String.valueOf(pageId)});
+
+            // 4. Delete the actual page
             int rowsAffected = db.delete("pages", "pageId = ?", new String[]{String.valueOf(pageId)});
 
             if (rowsAffected > 0) {
@@ -774,6 +780,53 @@ private void addTextBlockToUI(String textContent) {
         // ✅ Add the Page Block to the Diary Page
         contentLayout.addView(pageView);
     }
+
+
+    public void loadPage(View view) {
+        // Ensure the tag is not null
+        DiaryPage page = (DiaryPage) view.getTag();
+        if (page == null) {
+            Toast.makeText(view.getContext(), "Error: Page ID not set", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Log.d("loadPage","PageId: "+view.getTag());
+
+        try {
+            int pageId = page.getPageId(); // Convert tag to integer
+
+            // Show a Toast message
+            Toast.makeText(view.getContext(), "Loading page: " + pageId, Toast.LENGTH_SHORT).show();
+
+            // Create an Intent to start DiaryPageActivity
+            Intent intent = new Intent(view.getContext(), DiaryPageActivity.class);
+            intent.putExtra("pageId", pageId); // Pass the page ID
+
+            view.getContext().startActivity(intent);
+
+
+        } catch (NumberFormatException e) {
+            Toast.makeText(view.getContext(), "Invalid Page ID", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed(); // Call default back behavior
+
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+
+        // Apply slide-out animation (DiaryPageActivity slides to the right)
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+
+        finish(); // Close current activity
+    }
+
+
+
+
+
 
 
 }

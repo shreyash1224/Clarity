@@ -4,13 +4,14 @@
     android:layout_height="wrap_content"
     android:padding="10dp"
     android:orientation="vertical"
+    android:onClick="loadPage"
+
     android:background="@color/brown_light"> <!-- Background color -->
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-
         >
 
         <TextView
