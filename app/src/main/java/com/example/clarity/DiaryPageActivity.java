@@ -179,8 +179,7 @@ public class DiaryPageActivity extends AppCompatActivity {
         for (int i = 0; i < contentLayout.getChildCount(); i++) {
             View view = contentLayout.getChildAt(i);
 
-
-            if (view instanceof LinearLayout) { // Check if it's a LinearLayout container
+            if (view instanceof LinearLayout) { // Handling Text & Task Blocks
                 EditText editText = view.findViewById(R.id.etTextBlock);
 
                 if (editText != null) {  // Handling Text Block
@@ -198,13 +197,19 @@ public class DiaryPageActivity extends AppCompatActivity {
                     } else if (tag instanceof DiaryPage) {
                         DiaryPage page = (DiaryPage) tag;
                         contentBlocks.add(new Resource(pageId, "page", String.valueOf(page.getPageId()), contentBlocks.size() + 1));
-                    }else if (tag instanceof Image) {  // Ensure it's an Image object
-                        Image image = (Image) tag;
-                        String imagePath = image.getImageUri();  // Extract image path
-                        Log.d("onPause", "🖼 Saved Image: " + imagePath);
-                        contentBlocks.add(new Resource(pageId, "image", imagePath, contentBlocks.size() + 1));
                     }
-
+                }
+            }
+            else if (view instanceof FrameLayout) {
+                // Handling Image Block (FrameLayout)
+                Log.d("Image", "Adding image to database.");
+                Object tag = view.getTag();
+                Log.d("Image", tag.toString());
+                if (tag instanceof Image) { // Ensure it's an Image object
+                    Image image = (Image) tag;
+                    String imagePath = image.getImageUri(); // Extract image path
+                    Log.d("onPause", "🖼 Saved Image: " + imagePath);
+                    contentBlocks.add(new Resource(pageId, "image", imagePath, contentBlocks.size() + 1));
                 }
             }
         }
@@ -448,6 +453,10 @@ private void addTextBlockToUI(String textContent) {
         LayoutInflater inflater = LayoutInflater.from(this);
         View imageBlock = inflater.inflate(R.layout.image_block, contentLayout, false);
         ImageView imageView = imageBlock.findViewById(R.id.imageView);
+
+        Image image = new Image(String.valueOf(imageUri));
+        imageBlock.setTag(image);
+
 
         // Set image in ImageView
         imageView.setImageURI(imageUri);
