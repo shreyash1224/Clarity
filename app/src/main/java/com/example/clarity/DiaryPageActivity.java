@@ -287,43 +287,6 @@ public class DiaryPageActivity extends AppCompatActivity {
     }
 
 
-    //addNewTextBlock() done
-//    private void addNewTextBlock() {
-//        String text = "";
-//        // Avoid adding unnecessary empty blocks
-//        if (hasEmptyTextBlock()) {
-//            return;
-//        }
-//
-//        EditText newEditText = new EditText(this);
-//        newEditText.setLayoutParams(new LinearLayout.LayoutParams(
-//                LinearLayout.LayoutParams.MATCH_PARENT,
-//                LinearLayout.LayoutParams.WRAP_CONTENT
-//        ));
-//        newEditText.setHint("New Text Block");
-//        newEditText.setText(text);
-//        newEditText.setTextSize(16);
-//        newEditText.setPadding(8, 8, 8, 8);
-//        newEditText.setBackgroundColor(Color.TRANSPARENT);
-//        newEditText.setTextColor(ContextCompat.getColor(this, R.color.brown_light)); // API-safe color
-//        newEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
-//
-//        // Add the new EditText to the layout
-//        contentLayout.addView(newEditText);
-//
-//        // Move focus to the new EditText
-//        newEditText.requestFocus();
-//        newEditText.setSelection(newEditText.getText().length()); // Cursor at the end
-//
-//        // Show the keyboard automatically
-//        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-//        if (imm != null) {
-//            imm.showSoftInput(newEditText, InputMethodManager.SHOW_IMPLICIT);
-//        }
-//
-//        // Enable double-tap delete
-////        enableDoubleTapToDelete(newEditText);
-//    }
 
     private void addNewTextBlock() {
         // Avoid adding unnecessary empty blocks
@@ -480,36 +443,6 @@ private void addTextBlockToUI(String textContent) {
     }
 
 
-    //insertImage() done
-
-//    private void insertImage(Uri imageUri) {
-//        EditText focusedEditText = getCurrentFocusedEditText();
-//
-//        if (focusedEditText == null) {
-//            Toast.makeText(this, "No active text block found!", Toast.LENGTH_SHORT).show();
-//            return;
-//        }
-//
-//
-//
-//        // Create ImageView
-//        ImageView imageView = new ImageView(this);
-//        imageView.setImageURI(imageUri);
-//        imageView.setAdjustViewBounds(true);
-//        imageView.setMaxHeight(focusedEditText.getLineHeight() * 8);
-//        imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-//
-//        // 🔹 Store image URI inside ImageView for later retrieval
-//        imageView.setTag(imageUri.toString());  // ✅ Add this line
-//
-//        // Insert Image Below Focused EditText
-//        int cursorIndex = contentLayout.indexOfChild(focusedEditText);
-//        contentLayout.addView(imageView, cursorIndex + 1);
-//
-//    }
-//
-//
-
     private void insertImage(Uri imageUri) {
         EditText focusedEditText = getCurrentFocusedEditText();
         ViewGroup textBlock = null;
@@ -622,7 +555,7 @@ private void addTextBlockToUI(String textContent) {
         }
     }
 
-// Task------------------------------
+
 
 
     public void onResourceTaskClick(View view) {

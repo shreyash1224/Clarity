@@ -350,62 +350,6 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-//    public int getNextResourceOrder(int pageId) {
-//        SQLiteDatabase db = this.getReadableDatabase();
-//        Cursor cursor = db.rawQuery("SELECT MAX(resourceOrder) FROM resources WHERE pageId = ?",
-//                new String[]{String.valueOf(pageId)});
-//        int nextOrder = 1;
-//        if (cursor.moveToFirst() && !cursor.isNull(0)) {
-//            nextOrder = cursor.getInt(0) + 1;
-//        }
-//        cursor.close();
-//        return nextOrder;
-//    }
-//
-//    public void deleteTextBlocksByPageId(int pageId) {
-//        SQLiteDatabase db = this.getWritableDatabase();
-//        try {
-//            db.beginTransaction();
-//            db.delete("resources", "pageId = ? AND resourceType = ?",
-//                    new String[]{String.valueOf(pageId), "text"});
-//            db.setTransactionSuccessful();
-//            Log.d("DiaryDatabaseHelper", "Deleted text blocks for pageId: " + pageId);
-//        } catch (SQLiteException e) {
-//            Log.e("DiaryDatabaseHelper", "Error deleting text blocks: " + e.getMessage());
-//        } finally {
-//            db.endTransaction();
-//            db.close();
-//        }
-//    }
-//
-//    public void insertTextBlock(int pageId, String textContent, int resourceOrder) {
-//        SQLiteDatabase db = this.getWritableDatabase();
-//        try {
-//            db.beginTransaction();
-//
-//            ContentValues values = new ContentValues();
-//            values.put("pageId", pageId);
-//            values.put("resourceType", "text");  // Storing as a text resource
-//            values.put("resourceContent", textContent);
-//            values.put("resourceOrder", resourceOrder);
-//
-//            long result = db.insert("resources", null, values);
-//            if (result == -1) {
-//                Log.e("DiaryDatabaseHelper", "Failed to insert text block for pageId: " + pageId);
-//            } else {
-//                Log.d("DiaryDatabaseHelper", "Inserted text block for pageId: " + pageId);
-//            }
-//
-//            db.setTransactionSuccessful();
-//        } catch (SQLiteException e) {
-//            Log.e("DiaryDatabaseHelper", "Error inserting text block: " + e.getMessage());
-//        } finally {
-//            db.endTransaction();
-//            db.close();
-//        }
-//    }
-
-
 
 //insertResource() done
 public long insertResource(int pageId, String resourceType, String resourceContent, int resourceOrder) {
@@ -458,57 +402,6 @@ public long insertResource(int pageId, String resourceType, String resourceConte
 
 
 
-    //--
-//    public List<String> getTextBlocksByPageId(int pageId) {
-//        List<String> textBlocks = new ArrayList<>();
-//        SQLiteDatabase db = this.getReadableDatabase();
-//
-//        Cursor cursor = null;
-//        try {
-//            String query = "SELECT resourceContent FROM resources WHERE pageId = ? AND resourceType = 'text' ORDER BY resourceOrder ASC";
-//            cursor = db.rawQuery(query, new String[]{String.valueOf(pageId)});
-//
-//            while (cursor.moveToNext()) {
-//                textBlocks.add(cursor.getString(0)); // Get text content
-//            }
-//
-//
-//        } catch (SQLiteException e) {
-//            Log.e("DiaryDatabaseHelper", "Error fetching text blocks: " + e.getMessage());
-//        } finally {
-//            if (cursor != null) cursor.close();
-//            db.close();
-//        }
-//
-//        return textBlocks;
-//    }
-////--
-//    public List<String> getImagePathsByPageId(int pageId) {
-//        List<String> imagePaths = new ArrayList<>();
-//        SQLiteDatabase db = this.getReadableDatabase();
-//
-////        Cursor cursor = db.rawQuery("SELECT * FROM resources ORDER BY resourceOrder", null);
-//
-//        Cursor cursor = db.rawQuery("SELECT resourceContent FROM RESOURCES WHERE pageId = ? AND resourceType = 'image'",
-//                new String[]{String.valueOf(pageId)});
-//
-//        Log.d("DiaryDatabaseHelper", "🔍 Checking images for pageId: " + pageId);
-//
-//        if (cursor != null) {
-//            while (cursor.moveToNext()) {
-//                String path = cursor.getString(0);
-//                Log.d("DiaryDatabaseHelper", "✅ Retrieved image path: " + path);
-//                imagePaths.add(path);
-//            }
-//            cursor.close();
-//        } else {
-//            Log.e("DiaryDatabaseHelper", "❌ Cursor is null while fetching images for pageId: " + pageId);
-//        }
-//
-//        return imagePaths;
-//    }
-
-
     public int getLastResourceOrder(int pageId) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT MAX(resourceOrder) FROM resources WHERE pageId = ?", new String[]{String.valueOf(pageId)});
@@ -521,29 +414,6 @@ public long insertResource(int pageId, String resourceType, String resourceConte
         return lastOrder;
     }
 
-
-
-
-    public ArrayList<Resource> getResourcesForPage(int pageId) {
-        ArrayList<Resource> resources = new ArrayList<>();
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        Cursor cursor = db.rawQuery("SELECT resourceType, resourceContent, resourceOrder FROM resources WHERE pageId = ? ORDER BY resourceOrder ASC",
-                new String[]{String.valueOf(pageId)});
-
-        if (cursor != null) {
-            while (cursor.moveToNext()) {
-                String type = cursor.getString(0);
-                String content = cursor.getString(1);
-                int order = cursor.getInt(2);
-                resources.add(new Resource(pageId, type, content, order));
-            }
-            cursor.close();
-        }
-
-        db.close();
-        return resources;
-    }
 
     public long insertTask(String taskTitle, String startTime, String endTime, String recurring, int pageId) {
         Log.d("Task", "Inserting Task...");
@@ -588,12 +458,6 @@ public long insertResource(int pageId, String resourceType, String resourceConte
 
         Cursor cursor = db.rawQuery("SELECT * FROM RESOURCES WHERE pageId = ?", new String[]{String.valueOf(pageId)});
 
-//        + "resourceId INTEGER PRIMARY KEY AUTOINCREMENT, "
-//                + "resourceContent TEXT NOT NULL CHECK (LENGTH(resourceContent) > 0), "
-//                + "resourceType TEXT NOT NULL CHECK (LENGTH(resourceType) <= 20), "
-//                + "resourceOrder INTEGER NOT NULL, "
-//                + "pageId INTEGER NOT NULL, "
-//                + "FOREIGN KEY (pageId) REFERENCES pages(pageId) ON DELETE CASCADE);";
 
         while (cursor.moveToNext()) {
             int id = cursor.getInt(0);
