@@ -1,79 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:padding="8dp"
-    android:background="@color/brown_light"
-    android:focusable="true"
-    >
+    android:layout_margin="8dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-
-
+    <!-- Task Block Layout -->
     <LinearLayout
-        android:layout_width="0dp"
-        android:layout_weight="9"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        >
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        android:background="@color/brown_light"
+        android:focusable="true">
 
-        <!-- Task Title -->
-        <TextView
-            android:id="@+id/taskTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Task Title"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="@android:color/black" />
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="9"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-        <!-- Task Timing -->
-        <TextView
-            android:id="@+id/taskTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Start - End"
-            android:textSize="14sp"
-            android:textColor="@android:color/darker_gray" />
+            <!-- Task Title -->
+            <TextView
+                android:id="@+id/taskTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Task Title"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/black" />
 
-        <!-- Recurring Status -->
-        <TextView
-            android:id="@+id/taskRecurring"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Recurring: No"
-            android:textSize="14sp"
-            android:textColor="@android:color/holo_blue_dark" />
+            <!-- Task Timing -->
+            <TextView
+                android:id="@+id/taskTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Start - End"
+                android:textSize="14sp"
+                android:textColor="@android:color/darker_gray" />
 
-        <!-- Completion Checkbox -->
-        <CheckBox
-            android:id="@+id/taskCompletion"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Completion Status" />
+            <!-- Recurring Status -->
+            <TextView
+                android:id="@+id/taskRecurring"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Recurring: No"
+                android:textSize="14sp"
+                android:textColor="@android:color/holo_blue_dark" />
 
+            <!-- Completion Checkbox -->
+            <CheckBox
+                android:id="@+id/taskCompletion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Completion Status" />
+        </LinearLayout>
 
+        <!-- Delete Task Button -->
 
     </LinearLayout>
-
-
-    <ImageButton
-        android:id="@+id/deleteTaskResource"
-        android:layout_width="0dp"
-        android:layout_weight="1"
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/deleteResource"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="40dp"
         android:layout_gravity="top|end"
-
-        android:layout_height="match_parent"
-        android:src="@android:drawable/ic_delete"
+        android:backgroundTint="@android:color/transparent"
+        android:src="@drawable/ic_delete_resource"
         android:onClick="deleteResource"
+        android:layout_marginTop="-18dp"
+        android:layout_marginEnd="-18dp"
+        app:elevation="0dp"
+        app:pressedTranslationZ="0dp"
         />
-
-
-
-</LinearLayout>
-
-
-<!--TODO
-    Remaining: Remove the task block from task table after deletion.
--->
+</FrameLayout>

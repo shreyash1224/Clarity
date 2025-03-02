@@ -33,13 +33,14 @@
         <!-- ListView -->
         <ListView
             android:id="@+id/lvTlalistView"
+            android:padding="8dp"
+
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:divider="@color/brown_light"
-            android:dividerHeight="1dp"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="8dp"
             android:background="@color/beige_light"
-
 
             />
 

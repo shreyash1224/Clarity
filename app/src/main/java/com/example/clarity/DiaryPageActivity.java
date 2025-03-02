@@ -179,6 +179,7 @@ public class DiaryPageActivity extends AppCompatActivity {
         for (int i = 0; i < contentLayout.getChildCount(); i++) {
             View view = contentLayout.getChildAt(i);
 
+            Object tag = view.getTag();
             if (view instanceof LinearLayout) { // Handling Text & Task Blocks
                 EditText editText = view.findViewById(R.id.etTextBlock);
 
@@ -188,28 +189,25 @@ public class DiaryPageActivity extends AppCompatActivity {
                         contentBlocks.add(new Resource(pageId, "text", text, contentBlocks.size() + 1));
                         Log.d("onPause", "📌 Saved Text Block: " + text);
                     }
-                } else { // Handling Task Block
-                    Object tag = view.getTag();
-                    if (tag instanceof Task) {
-                        Task task = (Task) tag;
-                        contentBlocks.add(new Resource(pageId, "task", String.valueOf(task.getTaskId()), contentBlocks.size() + 1));
-                        Log.d("onPause", "✅ Task Block Detected & Saved: " + task.getTaskTitle());
-                    } else if (tag instanceof DiaryPage) {
-                        DiaryPage page = (DiaryPage) tag;
-                        contentBlocks.add(new Resource(pageId, "page", String.valueOf(page.getPageId()), contentBlocks.size() + 1));
-                    }
                 }
             }
             else if (view instanceof FrameLayout) {
                 // Handling Image Block (FrameLayout)
                 Log.d("Image", "Adding image to database.");
-                Object tag = view.getTag();
+
                 Log.d("Image", tag.toString());
                 if (tag instanceof Image) { // Ensure it's an Image object
                     Image image = (Image) tag;
                     String imagePath = image.getImageUri(); // Extract image path
                     Log.d("onPause", "🖼 Saved Image: " + imagePath);
                     contentBlocks.add(new Resource(pageId, "image", imagePath, contentBlocks.size() + 1));
+                }else if(tag instanceof Task) {
+                    Task task = (Task) tag;
+                    contentBlocks.add(new Resource(pageId, "task", String.valueOf(task.getTaskId()), contentBlocks.size() + 1));
+                    Log.d("onPause", "✅ Task Block Detected & Saved: " + task.getTaskTitle());
+                }else if (tag instanceof DiaryPage) {
+                    DiaryPage page = (DiaryPage) tag;
+                    contentBlocks.add(new Resource(pageId, "page", String.valueOf(page.getPageId()), contentBlocks.size() + 1));
                 }
             }
         }
@@ -356,25 +354,24 @@ private void addTextBlockToUI(String textContent) {
 
     // Get the EditText inside the layout
     EditText newEditText = textBlock.findViewById(R.id.etTextBlock);
-    newEditText.setText(textContent); // Set the retrieved text
-    newEditText.setSelection(newEditText.getText().length()); // Place cursor at the end
+    newEditText.setText(textContent);
+    newEditText.setSelection(newEditText.getText().length());
 
     // Add the complete text block layout to the content area
     contentLayout.addView(textBlock);
 
-    // Move focus to the new EditText
+    // Ensure the EditText is focusable and request focus
+    newEditText.setFocusableInTouchMode(true);
     newEditText.requestFocus();
 
-    // Show the keyboard automatically
-    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-    if (imm != null) {
-        imm.showSoftInput(newEditText, InputMethodManager.SHOW_IMPLICIT);
-    }
+    // Delay showing the keyboard to ensure proper focus
+    newEditText.postDelayed(() -> {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            imm.showSoftInput(newEditText, InputMethodManager.SHOW_IMPLICIT);
+        }
+    }, 200);
 }
-
-
-
-
 
     //openImagePicker() done
     //Image Trace 2
@@ -627,9 +624,13 @@ private void addTextBlockToUI(String textContent) {
             String status = isChecked ? "Completed" : "Pending";
             dbHelper.updateTaskCompletion(task.getTaskId(), status);
         });
+
+
+
         // Add Task Block to Diary Page
         contentLayout.addView(taskView);
     }
+
 
 //   Changing addTaskBlock() so it can load the taskBlock appropriately. Problem might be with onPause(). Problem was with onPause if-else there was two if conditions check Linear Layout availability.
 //
@@ -734,7 +735,9 @@ private void addTextBlockToUI(String textContent) {
 
         // Set Data
         title.setText(page.getPageTitle());
-        pageIdText.setText("Page ID: " + page.getPageId());
+        pageIdText.setText("#" + page.getPageId());
+
+
 
         // ✅ Add the Page Block to the Diary Page
         contentLayout.addView(pageView);

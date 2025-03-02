@@ -52,7 +52,7 @@ public class TaskAdapter extends BaseAdapter {
             holder.taskTime = convertView.findViewById(R.id.taskTime);
             holder.taskRecurring = convertView.findViewById(R.id.taskRecurring);
             holder.taskCompletion = convertView.findViewById(R.id.taskCompletion);
-            holder.deleteTaskResource = convertView.findViewById(R.id.deleteTaskResource);
+            holder.deleteTaskResource = convertView.findViewById(R.id.deleteResource);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
