@@ -671,7 +671,35 @@ public long insertResource(int pageId, String resourceType, String resourceConte
         return pageList;
     }
 
+    public List<Task> getAllTasks() {
+        List<Task> taskList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
 
+        String query = "SELECT taskId, taskTitle, startTime, endTime, recurring, completion FROM tasks ORDER BY taskId";
+        Cursor cursor = db.rawQuery(query, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                int taskId = cursor.getInt(cursor.getColumnIndexOrThrow("taskId"));
+                String title = cursor.getString(cursor.getColumnIndexOrThrow("taskTitle"));
+                String startTime = cursor.getString(cursor.getColumnIndexOrThrow("startTime"));
+                String endTime = cursor.getString(cursor.getColumnIndexOrThrow("endTime"));
+                String recurring = cursor.getString(cursor.getColumnIndexOrThrow("recurring"));
+                String completion = cursor.getString(cursor.getColumnIndexOrThrow("completion"));
+
+                // Convert 'recurring' column to a boolean (assuming 'NONE' means false)
+                String isRecurring = String.valueOf(!recurring.equalsIgnoreCase("NONE"));
+
+                // Create a Task object and add it to the list
+                Task task = new Task(taskId, title, startTime, endTime, isRecurring, completion);
+                taskList.add(task);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+        return taskList;
+    }
 
 
 }

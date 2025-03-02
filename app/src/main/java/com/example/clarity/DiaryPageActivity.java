@@ -833,41 +833,6 @@ private void addTextBlockToUI(String textContent) {
 
 
 
-//    public void onPageSelected(int pageId) {
-//        Log.d("Diary", "Page selected: " + pageId);
-//        Toast.makeText(this, "Selected Page ID: " + pageId, Toast.LENGTH_SHORT).show();
-//
-//        // Save the selected page as a resource
-//        DiaryDatabaseHelper dbHelper = new DiaryDatabaseHelper(this);
-//        List<DiaryPage> pages = dbHelper.getAllDiaryPages();
-//
-//        for (DiaryPage page : pages) {
-//            if (page.getPageId() == pageId) {
-//                addDiaryPage(pageId, page.getPageTitle()); // Add the view
-//                break;
-//            }
-
-
-//        long resourceId = dbHelper.addResource(pageId, "page", String.valueOf(pageId));
-//
-//        if (resourceId != -1) {
-//            Toast.makeText(this, "Page saved as resource!", Toast.LENGTH_SHORT).show();
-//        } else {
-//            Toast.makeText(this, "Failed to save page as resource!", Toast.LENGTH_SHORT).show();
-//        }
-//    }
-
-
-
-
-
-
-
-
-
-
-
-
 
 //Todo: Cleaning of database. Especially for tasks and image. View Removing is done for task and text only image remaining.
 //Todo: Drag and restructuring of resoucrces.

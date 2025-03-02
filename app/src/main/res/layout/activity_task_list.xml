@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.drawerlayout.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/dlTlaMainPage"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:background="@color/beige_background">
+
+<!-- Main Content Area -->
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:fitsSystemWindows="true">
+
+        <!-- Top Toolbar -->
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/tbTlaTopToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/brown_toolbar"
+            android:title="Clarity"
+            android:titleTextColor="@color/white"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
+
+        <!-- ListView -->
+        <ListView
+            android:id="@+id/lvTlalistView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:divider="@color/brown_light"
+            android:dividerHeight="1dp"
+            android:background="@color/beige_light"
+
+
+            />
+
+        <!-- Bottom Toolbar -->
+        <!--            <androidx.appcompat.widget.Toolbar-->
+        <!--                android:id="@+id/tbMaBottomToolbar"-->
+        <!--                android:layout_width="match_parent"-->
+        <!--                android:layout_height="?attr/actionBarSize"-->
+        <!--                android:background="@color/brown_toolbar"-->
+        <!--                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>-->
+        <LinearLayout
+            android:id="@+id/tbTlaBottomToolbar"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/brown_toolbar"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            >
+            <ImageButton
+                android:id="@+id/ibTlaDpa"
+
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Resource Task"
+                android:padding="8dp"
+                android:onClick="toMainActivity"
+                android:src="@drawable/ic_edit_text" />
+
+            <ImageButton
+                android:id="@+id/ibTlaTpa"
+
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Resource Task"
+                android:padding="8dp"
+                android:onClick="toTaskListActivity"
+                android:src="@android:drawable/checkbox_on_background" />
+
+
+        </LinearLayout>
+    </LinearLayout>
+
+
+    <!-- Floating Action Button -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabMaAddPageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="80dp"
+        android:backgroundTint="@color/brown_fab"
+        android:contentDescription="Add New Page"
+        android:onClick="addPage"
+        android:src="@drawable/ic_add"/>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+<!-- Navigation Drawer -->
+<com.google.android.material.navigation.NavigationView
+    android:id="@+id/nvMaNavDrawer"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:layout_gravity="start"
+    android:background="@color/beige_light"
+    app:headerLayout="@layout/nav_header"
+    app:menu="@menu/drawer_menu"/>
+</androidx.drawerlayout.widget.DrawerLayout>

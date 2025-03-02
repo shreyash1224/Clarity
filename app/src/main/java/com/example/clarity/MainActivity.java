@@ -194,4 +194,13 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
         startActivity(intent);
     }
+
+    public void toMainActivity(View view) {
+        Toast.makeText(this, "Already in main activity...", Toast.LENGTH_SHORT).show();
+    }
+
+    public void toTaskListActivity(View view) {
+        Intent intent = new Intent(MainActivity.this, TaskListActivity.class);
+        startActivity(intent);
+    }
 }
