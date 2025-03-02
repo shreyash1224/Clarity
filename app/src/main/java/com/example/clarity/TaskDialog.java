@@ -32,18 +32,37 @@ public class TaskDialog {
         Button buttonCancel = view.findViewById(R.id.buttonCancel);
         Button buttonSaveTask = view.findViewById(R.id.buttonSaveTask);
 
-        final String[] startTime = {""};
-        final String[] endTime = {""};
+        Calendar now = Calendar.getInstance();
+        Calendar todayEnd = (Calendar) now.clone();
+        todayEnd.set(Calendar.HOUR_OF_DAY, 23);
+        todayEnd.set(Calendar.MINUTE, 59);
+
+        // Default Start & End Times
+        final String[] startTime = {formatDateTime(now)};
+        final String[] endTime = {formatDateTime(todayEnd)};
+
+        buttonStartTime.setText(startTime[0]);
+        buttonEndTime.setText(endTime[0]);
 
         buttonStartTime.setOnClickListener(v -> {
-            showDateTimePicker(context, (date) -> {
+            showDateTimePicker(context, now, null, (date) -> {
                 startTime[0] = date;
                 buttonStartTime.setText(date);
+
+                // Ensure End Time is after Start Time
+                Calendar selectedStart = parseDateTime(date);
+                Calendar selectedEnd = parseDateTime(endTime[0]);
+                if (!selectedEnd.after(selectedStart)) {
+                    selectedEnd = (Calendar) selectedStart.clone();
+                    selectedEnd.add(Calendar.HOUR, 1); // Default to 1 hour after Start Time
+                    endTime[0] = formatDateTime(selectedEnd);
+                    buttonEndTime.setText(endTime[0]);
+                }
             });
         });
 
         buttonEndTime.setOnClickListener(v -> {
-            showDateTimePicker(context, (date) -> {
+            showDateTimePicker(context, now, parseDateTime(startTime[0]), (date) -> {
                 endTime[0] = date;
                 buttonEndTime.setText(date);
             });
@@ -67,18 +86,52 @@ public class TaskDialog {
         });
 
         dialog.show();
-
     }
 
-    private static void showDateTimePicker(Context context, OnDateSelectedListener listener) {
+    private static void showDateTimePicker(Context context, Calendar minTime, Calendar minEndTime, OnDateSelectedListener listener) {
         Calendar calendar = Calendar.getInstance();
         new DatePickerDialog(context, (view, year, month, dayOfMonth) -> {
             new TimePickerDialog(context, (timeView, hourOfDay, minute) -> {
-                String dateTime = String.format(Locale.getDefault(), "%04d-%02d-%02d %02d:%02d",
-                        year, month + 1, dayOfMonth, hourOfDay, minute);
-                listener.onDateSelected(dateTime);
+                Calendar selectedTime = Calendar.getInstance();
+                selectedTime.set(year, month, dayOfMonth, hourOfDay, minute);
+
+                // Ensure start time is not before current time
+                if (minTime != null && selectedTime.before(minTime)) {
+                    Toast.makeText(context, "Start time cannot be in the past!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // Ensure end time is after start time
+                if (minEndTime != null && selectedTime.before(minEndTime)) {
+                    Toast.makeText(context, "End time must be after start time!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                listener.onDateSelected(formatDateTime(selectedTime));
             }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show();
         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
+    }
+
+    private static String formatDateTime(Calendar calendar) {
+        return String.format(Locale.getDefault(), "%04d-%02d-%02d %02d:%02d",
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH) + 1,
+                calendar.get(Calendar.DAY_OF_MONTH),
+                calendar.get(Calendar.HOUR_OF_DAY),
+                calendar.get(Calendar.MINUTE));
+    }
+
+    private static Calendar parseDateTime(String dateTime) {
+        String[] parts = dateTime.split(" ");
+        String[] dateParts = parts[0].split("-");
+        String[] timeParts = parts[1].split(":");
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Integer.parseInt(dateParts[0]), Integer.parseInt(dateParts[1]) - 1,
+                Integer.parseInt(dateParts[2]), Integer.parseInt(timeParts[0]),
+                Integer.parseInt(timeParts[1]));
+
+        return calendar;
     }
 
     interface OnDateSelectedListener {
