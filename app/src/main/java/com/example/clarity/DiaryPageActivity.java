@@ -114,27 +114,31 @@ public class DiaryPageActivity extends AppCompatActivity {
                 if (type.equals("text")) {
                     addTextBlockToUI(content);
                 } else if (type.equals("image")) {
-                    //Step 2: Checking if the imagePath(content is getting passed to the addImageToUI())
-                    Log.d("Debug","loadPageData()->Image Path: " + content);
+                    // Step 1: Log the retrieved image path for debugging
+                    Log.d("Debug", "loadPageData()->Image Path: " + content);
 
-//                    addImageToUI(content);
-                    insertImage(Uri.parse(content));
+                    // Step 2: Create an Image object
+                    Image image = new Image(content);
+
+                    // Step 3: Pass the URI stored in Image object to insertImage()
+                    insertImage(Uri.parse(image.getImageUri()));
+
                 } else if (type.equals("task")) {
-                Log.d("Task", "LoadPage: Adding task block to UI.");
+                    Log.d("Task", "LoadPage: Adding task block to UI.");
 
-                // Convert content (which stores taskId) to an integer
-                int taskId = Integer.parseInt(content);
+                    // Convert content (which stores taskId) to an integer
+                    int taskId = Integer.parseInt(content);
 
-                // Fetch the task using the correct taskId
-                Task task = dbHelper.getTaskById(taskId);
+                    // Fetch the task using the correct taskId
+                    Task task = dbHelper.getTaskById(taskId);
 
-                // If task exists, add it to the UI
-                if (task != null) {
-                    addTaskBlock(task);
-                } else {
-                    Log.e("Task", "Failed to load page/task with ID: " + taskId);
-                }
-            }else if (type.equals("page")) {
+                    // If task exists, add it to the UI
+                    if (task != null) {
+                        addTaskBlock(task);
+                    } else {
+                        Log.e("Task", "Failed to load page/task with ID: " + taskId);
+                    }
+                } else if (type.equals("page")) {
                     Log.d("Page", "LoadPage: Adding page block to UI.");
 
                     int pId = Integer.parseInt(content);
@@ -142,15 +146,12 @@ public class DiaryPageActivity extends AppCompatActivity {
 
                     addPageBlock(diaryPage);
                 }
-
-
-        }
+            }
 
         } else {
             Toast.makeText(this, "Failed to load page.", Toast.LENGTH_LONG).show();
         }
     }
-
 
     //onPause() done
     @Override
@@ -197,16 +198,13 @@ public class DiaryPageActivity extends AppCompatActivity {
                     } else if (tag instanceof DiaryPage) {
                         DiaryPage page = (DiaryPage) tag;
                         contentBlocks.add(new Resource(pageId, "page", String.valueOf(page.getPageId()), contentBlocks.size() + 1));
+                    }else if (tag instanceof Image) {  // Ensure it's an Image object
+                        Image image = (Image) tag;
+                        String imagePath = image.getImageUri();  // Extract image path
+                        Log.d("onPause", "🖼 Saved Image: " + imagePath);
+                        contentBlocks.add(new Resource(pageId, "image", imagePath, contentBlocks.size() + 1));
                     }
-                }
-            } else if (view instanceof ImageView) {  // Handling Image Block
-                String imagePath = (String) view.getTag();
-                Log.d("Debug", "onPause()->Image Path: " + imagePath);
 
-                if (imagePath != null) {
-                    Log.d("Image", "imagePath: " + imagePath);
-                    contentBlocks.add(new Resource(pageId, "image", imagePath, contentBlocks.size() + 1));
-                    Log.d("onPause", "🖼 Saved Image: " + imagePath);
                 }
             }
         }
@@ -445,27 +443,21 @@ private void addTextBlockToUI(String textContent) {
 
     private void insertImage(Uri imageUri) {
         EditText focusedEditText = getCurrentFocusedEditText();
-        ViewGroup textBlock = null;
 
+        // Inflate the image block layout
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View imageBlock = inflater.inflate(R.layout.image_block, contentLayout, false);
+        ImageView imageView = imageBlock.findViewById(R.id.imageView);
 
-        // Create ImageView
-        ImageView imageView = new ImageView(this);
+        // Set image in ImageView
         imageView.setImageURI(imageUri);
 
-        imageView.setFocusable(true);
-        imageView.setFocusableInTouchMode(true);
-        imageView.requestFocus();
-
-
-        // 🔹 Calculate max height based on 10 lines of text
+        // Calculate max height based on 8 lines of text
         int maxHeight = (focusedEditText != null)
-                ? focusedEditText.getLineHeight() * 10  // 10 lines of text height
+                ? focusedEditText.getLineHeight() * 8  // 8 lines of text height
                 : 600; // Fallback max height
 
-        // 🔹 Set the ImageView scale type to maintain aspect ratio
-        imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-
-        // 🔹 Measure the image dimensions
+        // Adjust ImageView dimensions while maintaining aspect ratio
         imageView.post(() -> {
             Drawable drawable = imageView.getDrawable();
             if (drawable != null) {
@@ -475,32 +467,57 @@ private void addTextBlockToUI(String textContent) {
                 // Calculate new width to maintain aspect ratio
                 int newWidth = (int) (((float) originalWidth / originalHeight) * maxHeight);
 
-                // Apply final layout parameters
-                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                        newWidth,  // Width proportional to height
-                        maxHeight  // Max height limited to 10 lines
+                // Apply layout parameters for FrameLayout
+                FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, // Width fills parent
+                        maxHeight // Height limited to 8 lines
                 );
 
-                layoutParams.setMargins(0, 8, 0, 8); // Add minimal margins
+                layoutParams.setMargins(0, 8, 0, 8); // Minimal margins
                 imageView.setLayoutParams(layoutParams);
             }
         });
 
-        // Store image URI inside ImageView for later retrieval
-        imageView.setTag(imageUri.toString());
+        if (focusedEditText != null) {
+            int cursorPosition = focusedEditText.getSelectionStart();
+            String textBefore = focusedEditText.getText().toString().substring(0, cursorPosition);
+            String textAfter = focusedEditText.getText().toString().substring(cursorPosition);
 
-        if (textBlock != null) {
-            // Insert Image Below the Text Block's Parent (LinearLayout)
-            int index = contentLayout.indexOfChild(textBlock);
-            contentLayout.addView(imageView, index + 1);
+            // Remove current EditText and replace with split blocks
+            contentLayout.removeView(focusedEditText);
+
+            // Create new EditText for text before cursor
+            if (!textBefore.isEmpty()) {
+                EditText newEditTextBefore = createEditText();
+                newEditTextBefore.setText(textBefore);
+                contentLayout.addView(newEditTextBefore);
+            }
+
+            // Insert image block
+            contentLayout.addView(imageBlock);
+
+            // Create new EditText for text after cursor
+            if (!textAfter.isEmpty()) {
+                EditText newEditTextAfter = createEditText();
+                newEditTextAfter.setText(textAfter);
+                contentLayout.addView(newEditTextAfter);
+                newEditTextAfter.requestFocus(); // Move focus to new EditText
+            }
         } else {
             // If no text block exists, add the image at the bottom
-            contentLayout.addView(imageView);
+            contentLayout.addView(imageBlock);
         }
     }
 
-
-
+    // Helper function to create a new EditText
+    private EditText createEditText() {
+        EditText editText = new EditText(this);
+        editText.setLayoutParams(new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        editText.setTextSize(16);
+        editText.setPadding(8, 8, 8, 8);
+        return editText;
+    }
 
     //getCurrentFocusedEditText() done
     private EditText getCurrentFocusedEditText() {
