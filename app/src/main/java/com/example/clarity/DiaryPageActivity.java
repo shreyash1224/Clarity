@@ -50,6 +50,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import java.io.FileOutputStream;
+import java.util.Stack;
 
 public class DiaryPageActivity extends AppCompatActivity {
     SharedPreferences sharedPreferences;
@@ -59,6 +60,9 @@ public class DiaryPageActivity extends AppCompatActivity {
     private LinearLayout contentLayout;
     private static final int PICK_IMAGE_REQUEST = 1;
     private static final int REQUEST_CODE_STORAGE_PERMISSION = 100;
+    private Stack<Action> undoStack = new Stack<>();
+    private Stack<Action> redoStack = new Stack<>();
+
 
 
 
@@ -310,6 +314,12 @@ public class DiaryPageActivity extends AppCompatActivity {
 
         // Add the new text block to the layout
         contentLayout.addView(textBlock);
+
+        undoStack.push(new Action(Action.ActionType.ADD, textBlock, contentLayout.getChildCount() - 1));
+        redoStack.clear(); // Reset redo stack
+
+        newEditText.setFocusableInTouchMode(true);
+        newEditText.requestFocus();
     }
 
 
@@ -513,6 +523,10 @@ private void addTextBlockToUI(String textContent) {
             // If no text block exists, add the image at the bottom
             contentLayout.addView(imageBlock);
         }
+
+        // Store action for undo
+        undoStack.push(new Action(Action.ActionType.ADD, imageBlock, contentLayout.getChildCount() - 1));
+        redoStack.clear();
     }
 
     // Helper function to create a new EditText
@@ -629,6 +643,10 @@ private void addTextBlockToUI(String textContent) {
 
         // Add Task Block to Diary Page
         contentLayout.addView(taskView);
+
+        // Store action for undo
+        undoStack.push(new Action(Action.ActionType.ADD, taskView, contentLayout.getChildCount() - 1));
+        redoStack.clear();
     }
 
 
@@ -638,16 +656,21 @@ private void addTextBlockToUI(String textContent) {
 
 
     public void deleteResource(View view) {
-        // Get the resource container (assuming the button is inside a resource layout)
         ViewGroup parent = (ViewGroup) view.getParent();
-
         if (parent != null) {
             ViewGroup grandParent = (ViewGroup) parent.getParent();
             if (grandParent != null) {
-                grandParent.removeView(parent); // Removes the whole block
+                int position = ((LinearLayout) grandParent).indexOfChild(parent);
+
+                // Store action for undo
+                undoStack.push(new Action(Action.ActionType.DELETE, parent, position));
+                redoStack.clear();
+
+                grandParent.removeView(parent);
             }
         }
     }
+
 
     public void onResourcePageClick(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -741,6 +764,9 @@ private void addTextBlockToUI(String textContent) {
 
         // ✅ Add the Page Block to the Diary Page
         contentLayout.addView(pageView);
+
+        undoStack.push(new Action(Action.ActionType.ADD, pageView, contentLayout.getChildCount() - 1));
+        redoStack.clear();
     }
 
 
@@ -785,6 +811,37 @@ private void addTextBlockToUI(String textContent) {
         finish(); // Close current activity
     }
 
+
+
+    public void undo(View view) {
+        if (!undoStack.isEmpty()) {
+            Action lastAction = undoStack.pop();
+            LinearLayout contentLayout = findViewById(R.id.llDpaContentLayout);
+
+            if (lastAction.type == Action.ActionType.ADD) {
+                contentLayout.removeView(lastAction.view);
+            } else if (lastAction.type == Action.ActionType.DELETE) {
+                contentLayout.addView(lastAction.view, lastAction.position);
+            }
+
+            redoStack.push(lastAction);
+        }
+    }
+
+    public void redo(View view) {
+        if (!redoStack.isEmpty()) {
+            Action lastAction = redoStack.pop();
+            LinearLayout contentLayout = findViewById(R.id.llDpaContentLayout);
+
+            if (lastAction.type == Action.ActionType.ADD) {
+                contentLayout.addView(lastAction.view, lastAction.position);
+            } else if (lastAction.type == Action.ActionType.DELETE) {
+                contentLayout.removeView(lastAction.view);
+            }
+
+            undoStack.push(lastAction);
+        }
+    }
 
 
 
