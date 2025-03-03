@@ -19,15 +19,54 @@
             android:orientation="vertical"
             android:fitsSystemWindows="true">
 
+
             <!-- Top Toolbar -->
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/tbMaTopToolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:background="@color/brown_toolbar"
-                android:title="Clarity"
+                android:textAlignment="center"
                 android:titleTextColor="@color/white"
-                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
+                android:padding="6dp"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+                <ImageButton
+                    android:id="@+id/ibMenu"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:src="@android:drawable/ic_menu_sort_by_size"
+                    android:layout_gravity="start|center"
+
+                    app:tint="@color/white"
+                    />
+
+                <TextView
+                    android:id="@+id/tvToolbarTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Clarity"
+                    android:textSize="28sp"
+                    android:fontFamily="sans-serif-condensed-medium"
+                    android:textColor="@color/white"
+                    android:layout_gravity="start|center"
+                    android:padding="8dp"/>
+
+
+
+                <ImageButton
+                    android:id="@+id/ibSearch"
+                    android:layout_gravity="end"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:src="@android:drawable/ic_menu_search"
+                    app:tint="@color/white"
+                    android:onClick="searchPage"
+                    />
+
+            </androidx.appcompat.widget.Toolbar>
 
             <!-- ListView -->
             <ListView
@@ -86,6 +125,7 @@
         </LinearLayout>
 
 
+
         <!-- Floating Action Button -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fabMaAddPageButton"
@@ -99,14 +139,15 @@
             android:onClick="addPage"
             android:src="@drawable/ic_add"/>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
     <!-- Navigation Drawer -->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nvMaNavDrawer"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_gravity="start"
+        android:layout_gravity="start|center"
         android:background="@color/beige_light"
         app:headerLayout="@layout/nav_header"
         app:menu="@menu/drawer_menu"/>
+
+
 </androidx.drawerlayout.widget.DrawerLayout>
