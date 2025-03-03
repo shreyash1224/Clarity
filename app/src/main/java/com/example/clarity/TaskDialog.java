@@ -93,11 +93,7 @@ public class TaskDialog {
                 Calendar selectedTime = Calendar.getInstance();
                 selectedTime.set(year, month, dayOfMonth, hourOfDay, minute);
 
-                if (minTime != null && selectedTime.before(minTime)) {
-                    Toast.makeText(context, "Start time cannot be in the past!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
+                // ✅ Kept Constraint 2: Ensure end time is after start time
                 if (minEndTime != null && selectedTime.before(minEndTime)) {
                     Toast.makeText(context, "End time must be after start time!", Toast.LENGTH_SHORT).show();
                     return;
@@ -107,6 +103,7 @@ public class TaskDialog {
             }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show();
         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
     }
+
 
     private static String formatDateTime(Calendar calendar) {
         return String.format(Locale.getDefault(), "%04d-%02d-%02d %02d:%02d",

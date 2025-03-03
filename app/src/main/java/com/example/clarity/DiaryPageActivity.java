@@ -612,7 +612,6 @@ private void addTextBlockToUI(String textContent) {
         });
     }
 
-
     private void addTaskBlock(Task task) {
         LinearLayout contentLayout = findViewById(R.id.llDpaContentLayout);
 
@@ -639,17 +638,26 @@ private void addTextBlockToUI(String textContent) {
             dbHelper.updateTaskCompletion(task.getTaskId(), status);
         });
 
-
+        // Open TaskDialog with existing data on click
         taskView.setOnClickListener(v -> {
             Context context = v.getContext();
             Task selectedTask = (Task) v.getTag(); // Get existing task
 
             TaskDialog.showTaskDialog(context, (getTitle, start, end, isRecurring) -> {
-                // TODO: Update task in database and refresh UI
+                // Update task in database
+//                dbHelper.updateTask(selectedTask.getTaskId(), getTitle, start, end, String.valueOf(isRecurring));
+
+                // Refresh UI by updating task block
+                selectedTask.setTaskTitle(getTitle);
+                selectedTask.setStartTime(start);
+                selectedTask.setEndTime(end);
+                selectedTask.setRecurring(String.valueOf(isRecurring));
+
+                title.setText(getTitle);
+                time.setText(start + " - " + end);
+                recurring.setText("Recurring: " + isRecurring);
             }, selectedTask);
         });
-
-
 
         // Add Task Block to Diary Page
         contentLayout.addView(taskView);
@@ -658,6 +666,7 @@ private void addTextBlockToUI(String textContent) {
         undoStack.push(new Action(Action.ActionType.ADD, taskView, contentLayout.getChildCount() - 1));
         redoStack.clear();
     }
+
 
 
 //   Changing addTaskBlock() so it can load the taskBlock appropriately. Problem might be with onPause(). Problem was with onPause if-else there was two if conditions check Linear Layout availability.
