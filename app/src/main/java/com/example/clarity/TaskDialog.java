@@ -21,6 +21,10 @@ public class TaskDialog {
     }
 
     public static void showTaskDialog(Context context, TaskDialogListener listener) {
+        showTaskDialog(context, listener, null);
+    }
+
+    public static void showTaskDialog(Context context, TaskDialogListener listener, Task existingTask) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         View view = LayoutInflater.from(context).inflate(R.layout.task_dialog, null);
         builder.setView(view);
@@ -32,41 +36,35 @@ public class TaskDialog {
         Button buttonCancel = view.findViewById(R.id.buttonCancel);
         Button buttonSaveTask = view.findViewById(R.id.buttonSaveTask);
 
-        Calendar now = Calendar.getInstance();
-        Calendar todayEnd = (Calendar) now.clone();
-        todayEnd.set(Calendar.HOUR_OF_DAY, 23);
-        todayEnd.set(Calendar.MINUTE, 59);
+        final String[] startTime = new String[1];
+        final String[] endTime = new String[1];
 
-        // Default Start & End Times
-        final String[] startTime = {formatDateTime(now)};
-        final String[] endTime = {formatDateTime(todayEnd)};
+        if (existingTask != null) {
+            editTaskTitle.setText(existingTask.getTaskTitle());
+            startTime[0] = existingTask.getStartTime();
+            endTime[0] = existingTask.getEndTime();
+            checkRecurring.setChecked(existingTask.getRecurring().equalsIgnoreCase("true"));
+        } else {
+            Calendar now = Calendar.getInstance();
+            Calendar defaultEnd = (Calendar) now.clone();
+            defaultEnd.add(Calendar.HOUR, 1);
+
+            startTime[0] = formatDateTime(now);
+            endTime[0] = formatDateTime(defaultEnd);
+        }
 
         buttonStartTime.setText(startTime[0]);
         buttonEndTime.setText(endTime[0]);
 
-        buttonStartTime.setOnClickListener(v -> {
-            showDateTimePicker(context, now, null, (date) -> {
-                startTime[0] = date;
-                buttonStartTime.setText(date);
+        buttonStartTime.setOnClickListener(v -> showDateTimePicker(context, parseDateTime(startTime[0]), null, date -> {
+            startTime[0] = date;
+            buttonStartTime.setText(date);
+        }));
 
-                // Ensure End Time is after Start Time
-                Calendar selectedStart = parseDateTime(date);
-                Calendar selectedEnd = parseDateTime(endTime[0]);
-                if (!selectedEnd.after(selectedStart)) {
-                    selectedEnd = (Calendar) selectedStart.clone();
-                    selectedEnd.add(Calendar.HOUR, 1); // Default to 1 hour after Start Time
-                    endTime[0] = formatDateTime(selectedEnd);
-                    buttonEndTime.setText(endTime[0]);
-                }
-            });
-        });
-
-        buttonEndTime.setOnClickListener(v -> {
-            showDateTimePicker(context, now, parseDateTime(startTime[0]), (date) -> {
-                endTime[0] = date;
-                buttonEndTime.setText(date);
-            });
-        });
+        buttonEndTime.setOnClickListener(v -> showDateTimePicker(context, parseDateTime(startTime[0]), parseDateTime(startTime[0]), date -> {
+            endTime[0] = date;
+            buttonEndTime.setText(date);
+        }));
 
         AlertDialog dialog = builder.create();
 
@@ -95,13 +93,11 @@ public class TaskDialog {
                 Calendar selectedTime = Calendar.getInstance();
                 selectedTime.set(year, month, dayOfMonth, hourOfDay, minute);
 
-                // Ensure start time is not before current time
                 if (minTime != null && selectedTime.before(minTime)) {
                     Toast.makeText(context, "Start time cannot be in the past!", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                // Ensure end time is after start time
                 if (minEndTime != null && selectedTime.before(minEndTime)) {
                     Toast.makeText(context, "End time must be after start time!", Toast.LENGTH_SHORT).show();
                     return;

@@ -88,18 +88,6 @@
     </LinearLayout>
 
 
-    <!-- Floating Action Button -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabMaAddPageButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="80dp"
-        android:backgroundTint="@color/brown_fab"
-        android:contentDescription="Add New Page"
-        android:onClick="addPage"
-        android:src="@drawable/ic_add"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 <!-- Navigation Drawer -->

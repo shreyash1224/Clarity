@@ -640,6 +640,16 @@ private void addTextBlockToUI(String textContent) {
         });
 
 
+        taskView.setOnClickListener(v -> {
+            Context context = v.getContext();
+            Task selectedTask = (Task) v.getTag(); // Get existing task
+
+            TaskDialog.showTaskDialog(context, (getTitle, start, end, isRecurring) -> {
+                // TODO: Update task in database and refresh UI
+            }, selectedTask);
+        });
+
+
 
         // Add Task Block to Diary Page
         contentLayout.addView(taskView);
