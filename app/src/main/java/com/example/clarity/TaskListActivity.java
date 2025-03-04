@@ -1,5 +1,6 @@
 package com.example.clarity;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
@@ -17,6 +18,7 @@ import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.GravityCompat;
@@ -26,6 +28,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
 
+import java.util.Calendar;
 import java.util.List;
 
 public class TaskListActivity extends AppCompatActivity {
@@ -176,5 +179,63 @@ public class TaskListActivity extends AppCompatActivity {
             Toast.makeText(this, "Task not found!", Toast.LENGTH_SHORT).show();
         }
     }
+
+    public void sortTasks(View view) {
+        PopupMenu popupMenu = new PopupMenu(this, view);
+        popupMenu.getMenuInflater().inflate(R.menu.sort_menu, popupMenu.getMenu());
+
+        popupMenu.setOnMenuItemClickListener(item -> {
+            DiaryDatabaseHelper dbHelper = new DiaryDatabaseHelper(TaskListActivity.this);
+            List<Task> taskList;
+
+            if (item.getItemId() == R.id.sort_all) {
+                // Show all tasks
+                taskList = dbHelper.getAllTasks();
+                Toast.makeText(this, "Showing all tasks", Toast.LENGTH_SHORT).show();
+                updateTaskList(taskList);
+            } else if (item.getItemId() == R.id.sort_by_date) {
+                // Open Date Picker
+                showDatePicker();
+            } else {
+                return false;
+            }
+            return true;
+        });
+
+        popupMenu.show();
+    }
+    private void showDatePicker() {
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this, (view, selectedYear, selectedMonth, selectedDay) -> {
+            // Format selected date
+            String selectedDate = selectedYear + "-" + (selectedMonth + 1) + "-" + selectedDay;
+
+            // Fetch tasks that match the date range
+            DiaryDatabaseHelper dbHelper = new DiaryDatabaseHelper(TaskListActivity.this);
+            List<Task> filteredTasks = dbHelper.getTasksByDate(selectedDate);
+
+            if (filteredTasks.isEmpty()) {
+                Toast.makeText(this, "No tasks found for this date", Toast.LENGTH_SHORT).show();
+            }
+
+            // Update ListView with filtered tasks
+            updateTaskList(filteredTasks);
+
+        }, year, month, day);
+
+        datePickerDialog.show();
+
+
+    }
+
+    private void updateTaskList(List<Task> taskList) {
+        TaskAdapter adapter = new TaskAdapter(this, taskList);
+        listView.setAdapter(adapter);
+    }
+
 
 }

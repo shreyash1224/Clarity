@@ -49,6 +49,19 @@
                     android:textColor="@color/white"
                     android:layout_gravity="start|center"
                     android:padding="8dp"/>
+
+                <ImageButton
+                    android:padding="8dp"
+                    android:id="@+id/ibSort"
+                    android:layout_gravity="end"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:src="@android:drawable/ic_menu_more"
+                    app:tint="@color/white"
+                    android:onClick="sortTasks"
+
+                    />
             </androidx.appcompat.widget.Toolbar>
 
             <!-- ListView -->

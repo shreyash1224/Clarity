@@ -582,6 +582,61 @@ public long insertResource(int pageId, String resourceType, String resourceConte
     }
 
 
+    public List<Task> getTasksSortedByDate() {
+        return null;
+    }
+
+    public List<Task> getTasksByDate(String selectedDate) {
+        List<Task> taskList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Extract only the date part from startTime and endTime
+
+// Step 1: Get task IDs that match the selectedDate
+        Cursor idCursor = db.rawQuery(
+                "SELECT taskId FROM tasks WHERE startTime LIKE ? OR endTime LIKE ? OR (? BETWEEN startTime AND endTime)",
+                new String[]{selectedDate + "%", selectedDate + "%", selectedDate}
+        );
+
+        List<Integer> taskIds = new ArrayList<>();
+        if (idCursor.moveToFirst()) {
+            do {
+                int taskId = idCursor.getInt(0);
+                taskIds.add(taskId);
+                Log.d("DB_FETCH", "Matching Task ID: " + taskId);
+            } while (idCursor.moveToNext());
+        }
+        idCursor.close();
+
+// Step 2: Fetch full task details for the matching task IDs
+        for (int taskId : taskIds) {
+            Cursor taskCursor = db.rawQuery(
+                    "SELECT * FROM tasks WHERE taskId = ?",
+                    new String[]{String.valueOf(taskId)}
+            );
+
+            if (taskCursor.moveToFirst()) {
+                do {
+                    Task task = new Task(
+                            taskCursor.getInt(0), // Task ID
+                            taskCursor.getString(1), // Title
+                            taskCursor.getString(2), // Description
+                            taskCursor.getString(3), // Start Date
+                            taskCursor.getString(4), // End Date
+                            taskCursor.getString(5)  // Status
+                    );
+                    taskList.add(task);
+                } while (taskCursor.moveToNext());
+            }
+            taskCursor.close();
+        }
+
+        db.close();
+        return taskList;
+    }
+
+
+
 }
 
 
