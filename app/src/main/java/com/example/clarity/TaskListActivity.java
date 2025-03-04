@@ -161,7 +161,7 @@ public class TaskListActivity extends AppCompatActivity {
             Task task = holder.task; // Retrieve Task from ViewHolder
             int taskId = task.getTaskId(); // Get taskId from Task
             DiaryDatabaseHelper dbHelper = new DiaryDatabaseHelper(this);
-            int pageId = dbHelper.getPageIdByTaskId(Id);
+            int pageId = dbHelper.getPageIdByTaskId(taskId);
             Toast.makeText(this, "Test " + pageId, Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(TaskListActivity.this, DiaryPageActivity.class);
             intent.putExtra("pageId", pageId);
