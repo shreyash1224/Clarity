@@ -4,11 +4,14 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -39,8 +42,10 @@ public class TaskListActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_task_list);
+
+        EdgeToEdge.enable(this);
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.dlTlaMainPage), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -48,92 +53,91 @@ public class TaskListActivity extends AppCompatActivity {
         });
 
 
-        // ✅ Initialize Toolbar correctly
         Toolbar topToolbar = findViewById(R.id.tbTlaTopToolbar);
-        setSupportActionBar(topToolbar); // ✅ Fix variable name
+        setSupportActionBar(topToolbar);
+        getSupportActionBar().setTitle("");
 
         // ✅ Initialize DrawerLayout
         drawerLayout = findViewById(R.id.dlTlaMainPage);
 
-        // Navigation Drawer Toggle
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, topToolbar,
-                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawerLayout.addDrawerListener(toggle);
-        toggle.syncState();
+        // ✅ Initialize Navigation Drawer
+        ImageButton ibMenu = findViewById(R.id.ibMenu);
+        ibMenu.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
 
-        // Navigation View
         navigationView = findViewById(R.id.nvMaNavDrawer);
         View headerView = navigationView.getHeaderView(0);
 
-
-        // Get Username from SharedPreferences
+        // ✅ Get Username from SharedPreferences
         tvUserName = headerView.findViewById(R.id.tvUsername);
         tvUserId = headerView.findViewById(R.id.tvUserId);
-        // ✅ Fix: Check login status properly
         sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
         String username = sharedPreferences.getString("username", null);
         int userId = sharedPreferences.getInt("userId", -1);
 
         if (username == null || userId == -1) {
-            // User is not logged in, redirect to LoginActivity
             Intent intent = new Intent(TaskListActivity.this, LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
-            finish(); // Prevent going back to MainActivity
+            finish();
         }
 
-        Toast.makeText(this, username+" "+userId, Toast.LENGTH_LONG).show();
         tvUserName.setText(username);
         tvUserId.setText(String.valueOf(userId));
 
-        // Handle navigation item clicks
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                if (item.getItemId() == R.id.nav_profile) {
+        // ✅ Initialize ListView
+        listView = findViewById(R.id.lvTlalistView); // Replace with actual ListView ID
 
-                    Toast.makeText(TaskListActivity.this, "Profile Selected", Toast.LENGTH_SHORT).show();
-                } else if (item.getItemId() == R.id.nav_settings) {
-
-
-                    Toast.makeText(TaskListActivity.this, "Settings Selected", Toast.LENGTH_SHORT).show();
-                }
-                drawerLayout.closeDrawer(GravityCompat.START);
-                return true;
-            }
-        });
-        sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
-
-
-
-
-        //List View
-        listView = findViewById(R.id.lvTlalistView); // Initialize ListView
-
+        // ✅ Load Tasks from Database
         DiaryDatabaseHelper dbHelper = new DiaryDatabaseHelper(this);
-        List<Task> taskList = dbHelper.getAllTasks(); // Fetch all tasks
+        List<Task> taskList = dbHelper.getAllTasks();
 
-        if (taskList.isEmpty()) {
-            Toast.makeText(this, "No tasks available.", Toast.LENGTH_SHORT).show();
-        } else {
-            TaskAdapter taskAdapter = new TaskAdapter(this, taskList);
-            listView.setAdapter(taskAdapter); // Set adapter to ListView
-        }
+        // ✅ Set Adapter
+        TaskAdapter adapter = new TaskAdapter(this, taskList);
+        listView.setAdapter(adapter);
 
-
+        // ✅ Handle Navigation Clicks
+        navigationView.setNavigationItemSelectedListener(item -> {
+            if (item.getItemId() == R.id.nav_profile) {
+                Toast.makeText(TaskListActivity.this, "Profile Selected", Toast.LENGTH_SHORT).show();
+            } else if (item.getItemId() == R.id.nav_settings) {
+                Toast.makeText(TaskListActivity.this, "Settings Selected", Toast.LENGTH_SHORT).show();
+            }
+            drawerLayout.closeDrawer(GravityCompat.START);
+            return true;
+        });
     }
 
     @Override
     protected void onPause() {
         super.onPause();
 
+        if (listView == null) {
+            Log.e("TaskListActivity", "listView is null, skipping task update.");
+            return;
+        }
+
         DiaryDatabaseHelper dbHelper = new DiaryDatabaseHelper(this);
 
-        // Loop through all tasks and save their completion status
         for (int i = 0; i < listView.getCount(); i++) {
             Task task = (Task) listView.getItemAtPosition(i);
             dbHelper.updateTaskCompletion(task.getTaskId(), task.getCompletion());
         }
+    }
+
+
+    public void logout(View view) {
+        Log.d("TaskListActivity", "Logging out...");
+
+        // Ensure sharedPreferences is initialized
+        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.apply();
+
+        Intent intent = new Intent(TaskListActivity.this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
 

@@ -8,95 +8,101 @@
     android:fitsSystemWindows="true"
     android:background="@color/beige_background">
 
-<!-- Main Content Area -->
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
-
-    <LinearLayout
+    <!-- Main Content Area -->
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:fitsSystemWindows="true">
 
-        <!-- Top Toolbar -->
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/tbTlaTopToolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@color/brown_toolbar"
-            android:title="Clarity"
-            android:titleTextColor="@color/white"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
-
-        <!-- ListView -->
-        <ListView
-            android:id="@+id/lvTlalistView"
-            android:padding="8dp"
-
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:divider="@android:color/transparent"
-            android:dividerHeight="8dp"
-            android:background="@color/beige_light"
-
-            />
-
-        <!-- Bottom Toolbar -->
-        <!--            <androidx.appcompat.widget.Toolbar-->
-        <!--                android:id="@+id/tbMaBottomToolbar"-->
-        <!--                android:layout_width="match_parent"-->
-        <!--                android:layout_height="?attr/actionBarSize"-->
-        <!--                android:background="@color/brown_toolbar"-->
-        <!--                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>-->
         <LinearLayout
-            android:id="@+id/tbTlaBottomToolbar"
-            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@color/brown_toolbar"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            >
-            <ImageButton
-                android:id="@+id/ibTlaDpa"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:fitsSystemWindows="true">
 
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Resource Task"
+            <!-- Top Toolbar -->
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/tbTlaTopToolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@color/brown_toolbar"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+                <!-- Menu Button -->
+                <ImageButton
+                    android:id="@+id/ibMenu"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:src="@android:drawable/ic_menu_sort_by_size"
+                    android:layout_gravity="start|center"
+                    app:tint="@color/white"/>
+
+                <!-- Clarity Title -->
+                <TextView
+                    android:id="@+id/tvToolbarTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Clarity"
+                    android:textSize="28sp"
+                    android:fontFamily="sans-serif-condensed-medium"
+                    android:textColor="@color/white"
+                    android:layout_gravity="start|center"
+                    android:padding="8dp"/>
+            </androidx.appcompat.widget.Toolbar>
+
+            <!-- ListView -->
+            <ListView
+                android:id="@+id/lvTlalistView"
                 android:padding="8dp"
-                android:onClick="toMainActivity"
-                android:src="@drawable/ic_edit_text" />
-
-            <ImageButton
-                android:id="@+id/ibTlaTpa"
-
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
                 android:layout_weight="1"
-                android:layout_height="match_parent"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Resource Task"
-                android:padding="8dp"
-                android:onClick="toTaskListActivity"
-                android:src="@android:drawable/checkbox_on_background" />
+                android:divider="@android:color/transparent"
+                android:dividerHeight="8dp"
+                android:background="@color/beige_light"/>
 
+            <!-- Bottom Navigation -->
+            <LinearLayout
+                android:id="@+id/tbTlaBottomToolbar"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@color/brown_toolbar"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
+                <ImageButton
+                    android:id="@+id/ibTlaDpa"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Resource Task"
+                    android:padding="8dp"
+                    android:onClick="toMainActivity"
+                    android:src="@drawable/ic_edit_text"/>
+
+                <ImageButton
+                    android:id="@+id/ibTlaTpa"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Resource Task"
+                    android:padding="8dp"
+                    android:onClick="toTaskListActivity"
+                    android:src="@android:drawable/checkbox_on_background"/>
+            </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
-
-<!-- Navigation Drawer -->
-<com.google.android.material.navigation.NavigationView
-    android:id="@+id/nvMaNavDrawer"
-    android:layout_width="wrap_content"
-    android:layout_height="match_parent"
-    android:layout_gravity="start"
-    android:background="@color/beige_light"
-    app:headerLayout="@layout/nav_header"
-    app:menu="@menu/drawer_menu"/>
+    <!-- Navigation Drawer -->
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/nvMaNavDrawer"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="@color/beige_light"
+        app:headerLayout="@layout/nav_header"
+        app:menu="@menu/drawer_menu"/>
 </androidx.drawerlayout.widget.DrawerLayout>
