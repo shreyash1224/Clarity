@@ -467,6 +467,8 @@ private void addTextBlockToUI(String textContent) {
 
         // Set image in ImageView
         imageView.setImageURI(imageUri);
+        imageView.setOnClickListener(v -> openImageFullScreen(imageUri));
+
 
         // Calculate max height based on 8 lines of text
         int maxHeight = (focusedEditText != null)
@@ -864,6 +866,14 @@ private void addTextBlockToUI(String textContent) {
 
 
 
+
+    private void openImageFullScreen(Uri imageUri) {
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_VIEW);
+        intent.setDataAndType(imageUri, "image/*");
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        startActivity(intent);
+    }
 
 
 
