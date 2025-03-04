@@ -565,6 +565,22 @@ public long insertResource(int pageId, String resourceType, String resourceConte
         return taskList;
     }
 
+    public int getPageIdByTaskId(int taskId) {
+        int pageId = -1; // Default value if not found
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String query = "SELECT pageId FROM resources WHERE resourceContent = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(taskId)});
+
+        if (cursor.moveToFirst()) {
+            pageId = cursor.getInt(0); // Get pageId from the first column
+        }
+
+        cursor.close();
+        db.close();
+        return pageId;
+    }
+
 
 }
 

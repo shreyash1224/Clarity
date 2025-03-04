@@ -2,6 +2,7 @@ package com.example.clarity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -153,4 +154,23 @@ public class TaskListActivity extends AppCompatActivity {
         Intent intent = new Intent(TaskListActivity.this, SettingsActivity.class);
         startActivity(intent);
     }
+
+    public void test(View view) {
+        TaskAdapter.ViewHolder holder = (TaskAdapter.ViewHolder) view.getTag(); // Get ViewHolder
+        if (holder != null && holder.task != null) {
+            Task task = holder.task; // Retrieve Task from ViewHolder
+            int taskId = task.getTaskId(); // Get taskId from Task
+            DiaryDatabaseHelper dbHelper = new DiaryDatabaseHelper(this);
+            int pageId = dbHelper.getPageIdByTaskId(Id);
+            Toast.makeText(this, "Test " + pageId, Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(TaskListActivity.this, DiaryPageActivity.class);
+            intent.putExtra("pageId", pageId);
+            startActivity(intent);
+
+
+        } else {
+            Toast.makeText(this, "Task not found!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
 }

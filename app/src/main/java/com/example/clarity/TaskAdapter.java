@@ -53,12 +53,15 @@ public class TaskAdapter extends BaseAdapter {
             holder.taskRecurring = convertView.findViewById(R.id.taskRecurring);
             holder.taskCompletion = convertView.findViewById(R.id.taskCompletion);
             holder.deleteTaskResource = convertView.findViewById(R.id.deleteResource);
-            convertView.setTag(holder);
+            convertView.setTag(holder); // Store ViewHolder in the view
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
 
+        // Assign task to ViewHolder
         Task task = taskList.get(position);
+        holder.task = task; // ✅ Store task in ViewHolder
+
         holder.taskTitle.setText(task.getTaskTitle());
         holder.taskTime.setText(task.getStartTime() + " - " + task.getEndTime());
         holder.taskRecurring.setText("Recurring: " + (task.getRecurring().equals("Yes") ? "Yes" : "No"));
@@ -84,7 +87,9 @@ public class TaskAdapter extends BaseAdapter {
         TextView taskTitle, taskTime, taskRecurring;
         CheckBox taskCompletion;
         ImageButton deleteTaskResource;
+        Task task; // ✅ Store Task object inside ViewHolder
     }
+
 
     public interface OnTaskDeleteListener {
         void onTaskDelete(Task task);
