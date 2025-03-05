@@ -12,8 +12,12 @@ import android.util.Log;
 import android.util.Pair;
 
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class DiaryDatabaseHelper extends SQLiteOpenHelper {
 
@@ -589,6 +593,18 @@ public long insertResource(int pageId, String resourceType, String resourceConte
     public List<Task> getTasksByDate(String selectedDate) {
         List<Task> taskList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
+        Log.d("DB_DEBUG", "Selected Date: " + selectedDate);
+
+        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-M-d", Locale.getDefault());
+        SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        try {
+            Date date = inputFormat.parse(selectedDate);
+            selectedDate = outputFormat.format(date); // Converts "2025-3-5" -> "2025-03-05"
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+
 
         // Extract only the date part from startTime and endTime
 
@@ -597,6 +613,32 @@ public long insertResource(int pageId, String resourceType, String resourceConte
                 "SELECT taskId FROM tasks WHERE startTime LIKE ? OR endTime LIKE ? OR (? BETWEEN startTime AND endTime)",
                 new String[]{selectedDate + "%", selectedDate + "%", selectedDate}
         );
+
+        Log.d("DB_DEBUG", "Query: SELECT taskId FROM tasks WHERE startTime LIKE '" + selectedDate + "%' OR endTime LIKE '" + selectedDate + "%' OR ('" + selectedDate + "' BETWEEN startTime AND endTime)");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         List<Integer> taskIds = new ArrayList<>();
         if (idCursor.moveToFirst()) {

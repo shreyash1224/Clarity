@@ -216,6 +216,7 @@ public class TaskListActivity extends AppCompatActivity {
 
             // Fetch tasks that match the date range
             DiaryDatabaseHelper dbHelper = new DiaryDatabaseHelper(TaskListActivity.this);
+            Log.d("DB_DEBUG", "Calling getTasksByDate with date: " + selectedDate);
             List<Task> filteredTasks = dbHelper.getTasksByDate(selectedDate);
 
             if (filteredTasks.isEmpty()) {
