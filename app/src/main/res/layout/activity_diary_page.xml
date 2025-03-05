@@ -145,13 +145,13 @@
         <ImageButton
             android:id="@+id/ibDpaRedo"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="35dp"
+            android:layout_weight="1"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:padding="8dp"
-            android:src="@android:drawable/ic_menu_revert"
             android:onClick="redo"
-            />
+            android:padding="8dp"
+            android:rotationY="180"
+            android:src="@android:drawable/ic_menu_revert" />
 
 
 
