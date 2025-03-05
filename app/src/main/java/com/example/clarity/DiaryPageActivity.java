@@ -253,6 +253,8 @@ public class DiaryPageActivity extends AppCompatActivity {
                     new String[]{String.valueOf(pageId)});
 
             while (cursor.moveToNext()) {
+
+
                 String imagePath = cursor.getString(0);
                 if (imagePath != null) {
                     File imageFile = new File(imagePath);
@@ -270,6 +272,9 @@ public class DiaryPageActivity extends AppCompatActivity {
 
             // 3. Remove all references to this page inside other pages' page_blocks
             db.delete("resources", "resourceType = 'page' AND resourceContent = ?", new String[]{String.valueOf(pageId)});
+
+            // Delete tasks associated with the page
+            db.delete("resources", "pageId = ? AND resourceType = 'task'", new String[]{String.valueOf(pageId)});
 
             // 4. Delete the actual page
             int rowsAffected = db.delete("pages", "pageId = ?", new String[]{String.valueOf(pageId)});

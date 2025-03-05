@@ -39,11 +39,12 @@ public class SettingsActivity extends AppCompatActivity {
         try {
             db.beginTransaction();
 
+            int pageId = -1;
             // Step 1: Find all pages related to this user
             Cursor cursor = db.rawQuery("SELECT pageId FROM pages WHERE userId = ?", new String[]{String.valueOf(userId)});
             if (cursor.moveToFirst()) {
                 do {
-                    int pageId = cursor.getInt(0);
+                    pageId = cursor.getInt(0);
 
                     // Step 2: Delete tasks linked to these pages (if stored as resources)
                     db.delete("resources", "pageId = ?", new String[]{String.valueOf(pageId)});
@@ -53,6 +54,9 @@ public class SettingsActivity extends AppCompatActivity {
 
             // Step 3: Delete pages of this user
             db.delete("pages", "userId = ?", new String[]{String.valueOf(userId)});
+            // Step 2: Delete tasks linked to these pages
+            db.delete("resources", "pageId = ? AND resourceType = 'task'", new String[]{String.valueOf(pageId)});
+
 
             // Step 4: Delete user
             int deletedUser = db.delete("users", "userId = ?", new String[]{String.valueOf(userId)});
