@@ -89,6 +89,7 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE INDEX idx_pageId ON resources(pageId);");
 
         Log.d("Database", "All tables created successfully.");
+//The taskId is passed as resourceContent in the resources table.
     }
 
     @Override

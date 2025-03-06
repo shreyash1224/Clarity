@@ -120,4 +120,8 @@ public class ToolsActivity extends AppCompatActivity {
         Toast.makeText(this, "Clicked on Tools Activity.", Toast.LENGTH_SHORT).show();
     }
 
+    public void toSwotActivity(View view) {
+        Intent intent = new Intent(ToolsActivity.this, SwotActivity.class);
+        startActivity(intent);
+    }
 }

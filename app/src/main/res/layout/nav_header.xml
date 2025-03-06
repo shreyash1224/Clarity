@@ -49,6 +49,7 @@
         android:padding="10dp"
         android:layout_marginHorizontal="8dp"
         android:layout_marginTop="8dp"
+        android:layout_gravity="end"
         android:elevation="6dp"
         android:onClick="logout"/>
 </LinearLayout>
