@@ -709,7 +709,9 @@ private void addTextBlockToUI(String textContent) {
 
         // Fetch pages from the database
         DiaryDatabaseHelper dbHelper = new DiaryDatabaseHelper(this);
-        List<DiaryPage> pages = dbHelper.getAllDiaryPages();
+
+        int userId = sharedPreferences.getInt("userId", -1);
+        List<DiaryPage> pages = dbHelper.getAllDiaryPages(userId);
         List<String> pageTitles = new ArrayList<>();
         for (DiaryPage page : pages) {
             pageTitles.add(page.getPageId() + " - " + page.getPageTitle());
@@ -754,7 +756,8 @@ private void addTextBlockToUI(String textContent) {
 
         // Save the selected page as a resource
         DiaryDatabaseHelper dbHelper = new DiaryDatabaseHelper(this);
-        List<DiaryPage> pages = dbHelper.getAllDiaryPages();
+        int userId = sharedPreferences.getInt("userId", -1);
+        List<DiaryPage> pages = dbHelper.getAllDiaryPages(userId);
 
         for (DiaryPage page : pages) {
             if (page.getPageId() == pageId) {

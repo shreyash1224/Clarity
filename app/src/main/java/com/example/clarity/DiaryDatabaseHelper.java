@@ -521,10 +521,10 @@ public long insertResource(int pageId, String resourceType, String resourceConte
     }
 
 
-    public List<DiaryPage> getAllDiaryPages() {
+    public List<DiaryPage> getAllDiaryPages(int userId) {
         List<DiaryPage> pageList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT pageId, pageTitle FROM pages", null);
+        Cursor cursor = db.rawQuery("SELECT pageId, pageTitle FROM pages WHERE userId = ?", new String[]{String.valueOf(userId)});
 
         if (cursor.moveToFirst()) {
             do {
