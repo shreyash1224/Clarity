@@ -16,8 +16,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class DiaryDatabaseHelper extends SQLiteOpenHelper {
 
@@ -683,6 +685,64 @@ public long insertResource(int pageId, String resourceType, String resourceConte
 
         db.close();
         return taskList;
+    }
+
+
+    public int getSwotPageId(int userId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        int pageId = -1;
+
+        Cursor cursor = db.rawQuery("SELECT pageId FROM pages WHERE userId = ? AND pageTitle = 'SWOT' LIMIT 1",
+                new String[]{String.valueOf(userId)});
+
+        if (cursor.moveToFirst()) {
+            pageId = cursor.getInt(0);
+        }
+        cursor.close();
+        return pageId; // Returns -1 if no SWOT page exists
+    }
+
+
+    public Map<String, String> getSwotData(int userId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Map<String, String> swotData = new HashMap<>();
+
+        String query = "SELECT r.resourceType, r.resourceContent FROM resources r " +
+                "JOIN pages p ON r.pageId = p.pageId " +
+                "WHERE p.userId = ? AND p.pageTitle = 'SWOT'";
+
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
+
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                String type = cursor.getString(0); // "SWOT:Strength", etc.
+                String content = cursor.getString(1);
+                swotData.put(type, content);
+            }
+            cursor.close();
+        }
+
+        return swotData;
+    }
+
+
+    public void logSwotResources(int pageId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT resourceType, resourContent FROM resources WHERE pageId = ?", new String[]{String.valueOf(pageId)});
+
+        Log.d("DiaryDatabaseHelper", "Checking saved SWOT data for pageId: " + pageId);
+
+        if (cursor.moveToFirst()) {
+            do {
+                String resourceType = cursor.getString(0);
+                String content = cursor.getString(1);
+                Log.d("DiaryDatabaseHelper", "SWOT Resource -> Type: " + resourceType + ", Content: " + content);
+            } while (cursor.moveToNext());
+        } else {
+            Log.d("DiaryDatabaseHelper", "No SWOT data found for pageId: " + pageId);
+        }
+        cursor.close();
+        db.close();
     }
 
 
