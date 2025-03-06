@@ -92,7 +92,7 @@ public class TaskListActivity extends AppCompatActivity {
 
         // ✅ Load Tasks from Database
         DiaryDatabaseHelper dbHelper = new DiaryDatabaseHelper(this);
-        List<Task> taskList = dbHelper.getAllTasks();
+        List<Task> taskList = dbHelper.getAllTasks(userId);
 
         // ✅ Set Adapter
         TaskAdapter adapter = new TaskAdapter(this, taskList);
@@ -190,7 +190,9 @@ public class TaskListActivity extends AppCompatActivity {
 
             if (item.getItemId() == R.id.sort_all) {
                 // Show all tasks
-                taskList = dbHelper.getAllTasks();
+                int userId = sharedPreferences.getInt("userId", -1);
+
+                taskList = dbHelper.getAllTasks(userId);
                 Toast.makeText(this, "Showing all tasks", Toast.LENGTH_SHORT).show();
                 updateTaskList(taskList);
             } else if (item.getItemId() == R.id.sort_by_date) {

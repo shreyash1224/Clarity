@@ -539,12 +539,18 @@ public long insertResource(int pageId, String resourceType, String resourceConte
         return pageList;
     }
 
-    public List<Task> getAllTasks() {
+    public List<Task> getAllTasks(int userId) {
         List<Task> taskList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
 
-        String query = "SELECT taskId, taskTitle, startTime, endTime, recurring, completion FROM tasks ORDER BY taskId";
-        Cursor cursor = db.rawQuery(query, null);
+        String query = "SELECT t.taskId, t.taskTitle, t.startTime, t.endTime, t.recurring, t.completion " +
+                "FROM tasks t " +
+                "JOIN resources r ON r.resourceContent = t.taskId " +
+                "JOIN pages p ON p.pageId = r.pageId " +
+                "WHERE p.userId = ? " +
+                "ORDER BY t.taskId";
+
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
 
         if (cursor.moveToFirst()) {
             do {
@@ -568,6 +574,7 @@ public long insertResource(int pageId, String resourceType, String resourceConte
         db.close();
         return taskList;
     }
+
 
     public int getPageIdByTaskId(int taskId) {
         int pageId = -1; // Default value if not found
