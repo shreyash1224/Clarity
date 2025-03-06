@@ -268,4 +268,9 @@ public class MainActivity extends AppCompatActivity {
         return Integer.parseInt(idPart);
     }
 
+    public void toToolActivity(View view) {
+        Toast.makeText(this, "Clicked on Tools Activity.", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(MainActivity.this, ToolsActivity.class);
+        startActivity(intent);
+    }
 }

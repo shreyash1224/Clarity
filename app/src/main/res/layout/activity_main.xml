@@ -122,6 +122,19 @@
                     android:src="@android:drawable/checkbox_on_background" />
 
 
+                <ImageButton
+                    android:id="@+id/ibTopa"
+
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Resource Task"
+                    android:padding="8dp"
+                    android:onClick="toToolActivity"
+                    android:src="@android:drawable/ic_dialog_dialer" />
+
+
             </LinearLayout>
         </LinearLayout>
 

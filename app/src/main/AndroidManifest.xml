@@ -42,6 +42,7 @@
         </activity>
         <activity android:name=".TaskListActivity" />
         <activity android:name=".SettingsActivity" />
+        <activity android:name=".ToolsActivity"/>
     </application>
 
 </manifest>

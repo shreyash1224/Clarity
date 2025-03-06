@@ -2,13 +2,12 @@
 <androidx.drawerlayout.widget.DrawerLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/dlTlaMainPage"
+    android:id="@+id/dlToolsMainPage"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:background="@color/beige_background">
 
-    <!-- Main Content Area -->
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -22,15 +21,14 @@
 
             <!-- Top Toolbar -->
             <androidx.appcompat.widget.Toolbar
-                android:id="@+id/tbTlaTopToolbar"
+                android:id="@+id/tbToolsTopToolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:background="@color/brown_toolbar"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-                <!-- Menu Button -->
                 <ImageButton
-                    android:id="@+id/ibMenu"
+                    android:id="@+id/ibToolsMenu"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
@@ -38,43 +36,78 @@
                     android:layout_gravity="start|center"
                     app:tint="@color/white"/>
 
-                <!-- Clarity Title -->
                 <TextView
-                    android:id="@+id/tvToolbarTitle"
+                    android:id="@+id/tvToolsToolbarTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Clarity"
+                    android:text="Tools"
                     android:textSize="28sp"
                     android:fontFamily="sans-serif-condensed-medium"
                     android:textColor="@color/white"
                     android:layout_gravity="start|center"
                     android:padding="8dp"/>
-
-                <ImageButton
-                    android:padding="8dp"
-                    android:id="@+id/ibSort"
-                    android:layout_gravity="end"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
-                    android:src="@android:drawable/ic_menu_more"
-                    app:tint="@color/white"
-                    android:onClick="sortTasks"
-
-                    />
             </androidx.appcompat.widget.Toolbar>
 
-            <!-- ListView -->
-            <ListView
-                android:id="@+id/lvTlalistView"
-                android:padding="8dp"
+            <!-- Tools List -->
+            <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:divider="@android:color/transparent"
-                android:dividerHeight="8dp"
-                android:background="@color/beige_light"/>
+                android:padding="16dp"
+                android:background="@color/beige_light">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:onClick="toSwotActivity"
+                    >
+
+                    <!-- Tool 1 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="8dp">
+
+                        <ImageView
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:contentDescription="Tool Icon"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColorHint="@android:color/black"
+                            android:text="SWOT Aanlysis"
+                            android:textSize="18sp"
+                            android:layout_marginStart="12dp"/>
+                    </LinearLayout>
+
+                    <!-- Tool 2 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="8dp">
+
+                        <ImageView
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:contentDescription="Tool Icon"/>
+
+                        <TextView
+                            android:textColorHint="@android:color/black"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Expense Manager"
+                            android:textSize="18sp"
+                            android:layout_marginStart="12dp"/>
+                    </LinearLayout>
+
+                    <!-- Add more tools here -->
+                </LinearLayout>
+            </ScrollView>
             <!-- Bottom Navigation -->
             <LinearLayout
                 android:id="@+id/tbTlaBottomToolbar"
@@ -123,7 +156,7 @@
 
     <!-- Navigation Drawer -->
     <com.google.android.material.navigation.NavigationView
-        android:id="@+id/nvMaNavDrawer"
+        android:id="@+id/nvToolsNavDrawer"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"

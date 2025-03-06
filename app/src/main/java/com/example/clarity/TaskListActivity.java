@@ -157,6 +157,8 @@ public class TaskListActivity extends AppCompatActivity {
     }
 
 
+
+
     public void settingsActivity(MenuItem item) {
         Intent intent = new Intent(TaskListActivity.this, SettingsActivity.class);
         startActivity(intent);
@@ -241,5 +243,9 @@ public class TaskListActivity extends AppCompatActivity {
     }
 
 
-
+    public void toToolActivity(View view) {
+        Toast.makeText(this, "Clicked on Tools Activity.", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(TaskListActivity.this, ToolsActivity.class);
+        startActivity(intent);
+    }
 }
