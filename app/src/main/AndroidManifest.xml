@@ -18,6 +18,9 @@
         android:theme="@style/Theme.Clarity"
         tools:targetApi="31">
         <activity
+            android:name=".ForgotPasswordActivity"
+            android:exported="false" />
+        <activity
             android:name=".ExpenseManagerActivity"
             android:exported="false" />
         <activity

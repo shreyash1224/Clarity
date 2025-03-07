@@ -73,4 +73,23 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void onForgotPasswordClicked(View view) {
+        // Get the username from the EditText field
+        String username = etLaUsername.getText().toString().trim();
+
+        if (username.isEmpty()) {
+            Toast.makeText(this, "Please enter your username", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Create an intent to navigate to ForgotPasswordActivity
+        Intent intent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
+
+        // Pass the username as an extra in the intent
+        intent.putExtra("username", username);
+
+        // Start the ForgotPasswordActivity
+        startActivity(intent);
+    }
+
 }

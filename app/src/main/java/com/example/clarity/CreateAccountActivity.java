@@ -1,4 +1,5 @@
 package com.example.clarity;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -9,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class CreateAccountActivity extends AppCompatActivity {
 
-    EditText etCaaUsername, etCaaPassword, etCaaConfirmPassword;
+    EditText etCaaUsername, etCaaPassword, etCaaConfirmPassword, etCaaSecurityQuestion, etCaaSecurityAnswer;
     DiaryDatabaseHelper dbHelper;
 
     @Override
@@ -20,6 +21,8 @@ public class CreateAccountActivity extends AppCompatActivity {
         etCaaUsername = findViewById(R.id.etCaaUsername);
         etCaaPassword = findViewById(R.id.etCaaPassword);
         etCaaConfirmPassword = findViewById(R.id.etCaaConfirmPassword);
+        etCaaSecurityQuestion = findViewById(R.id.etCaaSecurityQuestion);
+        etCaaSecurityAnswer = findViewById(R.id.etCaaSecurityAnswer);
         dbHelper = new DiaryDatabaseHelper(this);
     }
 
@@ -28,10 +31,10 @@ public class CreateAccountActivity extends AppCompatActivity {
         String username = etCaaUsername.getText().toString().trim();
         String password = etCaaPassword.getText().toString().trim();
         String confirmPassword = etCaaConfirmPassword.getText().toString().trim();
+        String securityQuestion = etCaaSecurityQuestion.getText().toString().trim();
+        String securityAnswer = etCaaSecurityAnswer.getText().toString().trim();
 
-        Toast.makeText(this, username+" "+password+" "+confirmPassword, Toast.LENGTH_LONG).show();
-
-        if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+        if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || securityQuestion.isEmpty() || securityAnswer.isEmpty()) {
             Toast.makeText(this, "All fields are required", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -41,32 +44,13 @@ public class CreateAccountActivity extends AppCompatActivity {
             return;
         }
 
-        /*
-        if (dbHelper.usernameExists(username)) {
-            Toast.makeText(this, "Username already taken", Toast.LENGTH_SHORT).show();
-        } else {
-            long result = dbHelper.createUser(username, password);
-            if (result != -1) {
-                Toast.makeText(this, "Account created successfully", Toast.LENGTH_SHORT).show();
-
-                Intent intent = new Intent(CreateAccountActivity.this, LoginActivity.class);
-                startActivity(intent);
-                finish();
-            } else {
-                Toast.makeText(this, "Error creating account", Toast.LENGTH_SHORT).show();
-            }
-        }
-
-         */
-
-
         if (dbHelper.isUsernameTaken(username)) {
             Toast.makeText(this, "Username already taken. Please choose another.", Toast.LENGTH_SHORT).show();
         } else {
             if(password.length() < 6){
                 Toast.makeText(this, "Password must be at least 6 characters long", Toast.LENGTH_SHORT).show();
-            }else {
-                long result = dbHelper.addUser(username, password);
+            } else {
+                long result = dbHelper.addUser(username, password, securityQuestion, securityAnswer);
                 if (result != -1) {
                     Toast.makeText(this, "Account created successfully", Toast.LENGTH_SHORT).show();
 
@@ -78,12 +62,7 @@ public class CreateAccountActivity extends AppCompatActivity {
                 }
             }
         }
-
-
-
-
     }
-
 
     // Optional: Method to handle the 'Back to Login' button
     public void onBackToLoginClicked(View view) {

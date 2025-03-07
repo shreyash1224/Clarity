@@ -42,11 +42,12 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("PRAGMA foreign_keys = ON;"); // Enable foreign keys
 
         String userTable = "CREATE TABLE IF NOT EXISTS users("
-
                 + "userId INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + "userDate DATETIME DEFAULT (datetime('now', 'localtime')),"
+                + "userDate DATETIME DEFAULT (datetime('now', 'localtime')), "
                 + "userName TEXT NOT NULL CHECK (LENGTH(userName) > 0 AND LENGTH(userName) <= 50) UNIQUE, "
-                + "userPassword TEXT NOT NULL CHECK (LENGTH(userPassword) >= 6));";
+                + "userPassword TEXT NOT NULL CHECK (LENGTH(userPassword) >= 6), "
+                + "securityQuestion TEXT, "
+                + "securityAnswer TEXT);";
 
         db.execSQL(userTable);
 
@@ -124,22 +125,25 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS resources");
         onCreate(db);
     }
-    public long addUser(String username, String userPassword) {
+    public long addUser(String username, String userPassword, String securityQuestion, String securityAnswer) {
         int userId = getNextAvailableId("users", "userId");
 
-        Log.d("DatabaseHelper", "Adding user: userId=" + userId + ", username=" + username + ", userPassword=" + userPassword);
+        Log.d("DatabaseHelper", "Adding user: userId=" + userId + ", username=" + username + ", userPassword=" + userPassword
+                + ", securityQuestion=" + securityQuestion + ", securityAnswer=" + securityAnswer);
+
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("userId", userId);
         values.put("userPassword", userPassword);
         values.put("username", username);
-        long result =  db.insert("users", null, values);
+        values.put("securityQuestion", securityQuestion);
+        values.put("securityAnswer", securityAnswer);
+
+        long result = db.insert("users", null, values);
         db.close();
-        Log.d("Databasae","User Added. " +"Result: "+result);
+
+        Log.d("Database", "User Added. Result: " + result);
         return result;
-
-
-
     }
 
 
@@ -898,7 +902,66 @@ public long insertResource(int pageId, String resourceType, String resourceConte
     }
 
 
+    // Validate the security answer
+    public boolean validateSecurityAnswer(String username, String securityAnswer) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT securityAnswer FROM users WHERE username = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{username});
 
+        if (cursor.moveToFirst()) {
+            // Check if the column "securityAnswer" exists
+            int columnIndex = cursor.getColumnIndex("securityAnswer");
+
+            if (columnIndex != -1) {
+                // If the column exists, fetch the value
+                String storedAnswer = cursor.getString(columnIndex);
+                cursor.close();
+                return storedAnswer.equals(securityAnswer);
+            } else {
+                // Handle the case where the column is missing
+                cursor.close();
+                return false;
+            }
+        }
+
+        cursor.close();
+        return false;
+    }
+
+
+    // Update the password
+    public boolean updatePassword(String username, String newPassword) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("userPassword", newPassword);
+
+        int rowsAffected = db.update("users", values, "username = ?", new String[]{username});
+        return rowsAffected > 0;
+    }
+
+    public String getSecurityQuestion(String username) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT securityQuestion FROM users WHERE username = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{username});
+
+        // Check if the cursor has at least one row
+        if (cursor != null && cursor.moveToFirst()) {
+            int securityQuestionColumnIndex = cursor.getColumnIndex("securityQuestion");
+
+            // Check if the column index is valid
+            if (securityQuestionColumnIndex >= 0) {
+                String securityQuestion = cursor.getString(securityQuestionColumnIndex);
+                cursor.close();
+                return securityQuestion;
+            } else {
+                cursor.close();
+                return null; // Return null if the column doesn't exist
+            }
+        }
+
+        cursor.close();
+        return null; // Return null if no matching user is found
+    }
 
 }
 
