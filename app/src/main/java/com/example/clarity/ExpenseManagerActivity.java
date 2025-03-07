@@ -35,7 +35,6 @@ public class ExpenseManagerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_expense_manager);
 
-
         sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
         String username = sharedPreferences.getString("username", null);
         userId = sharedPreferences.getInt("userId", -1);
@@ -48,10 +47,7 @@ public class ExpenseManagerActivity extends AppCompatActivity {
         fabAddTransaction = findViewById(R.id.fabAddTransaction);
 
         // Load transactions from database
-        transactionList = dbHelper.getTransactionsForUser(userId);
-        transactionAdapter = new TransactionAdapter(transactionList);
-        rvTransactions.setLayoutManager(new LinearLayoutManager(this));
-        rvTransactions.setAdapter(transactionAdapter);
+        loadTransactions();
 
         // Set up FAB Click Listener
         fabAddTransaction.setOnClickListener(v -> addTransaction());
@@ -68,6 +64,16 @@ public class ExpenseManagerActivity extends AppCompatActivity {
         btnYear.setOnClickListener(v -> filterTransactions("Year"));
 
         updateTotalBalance();
+    }
+
+    private void loadTransactions() {
+        // Load transactions from the database for the current user
+        transactionList = dbHelper.getTransactionsForUser(userId);
+
+        // Set up the RecyclerView adapter with the loaded transactions
+        transactionAdapter = new TransactionAdapter(transactionList);
+        rvTransactions.setLayoutManager(new LinearLayoutManager(this));
+        rvTransactions.setAdapter(transactionAdapter);
     }
 
     private void addTransaction() {
@@ -100,17 +106,29 @@ public class ExpenseManagerActivity extends AppCompatActivity {
             }
 
             double amount = Double.parseDouble(amountStr);
-            if (isExpense) {
-                amount = -amount;
-            }
 
             Transaction newTransaction = new Transaction(0, userId, title, amount, category, date, isExpense);
             dbHelper.addTransaction(newTransaction, userId);
 
-            // Refresh transaction list
-            transactionList.add(newTransaction);
-            transactionAdapter.notifyItemInserted(transactionList.size() - 1);
+            // Debug: Check database count
+            List<Transaction> debugList = dbHelper.getTransactionsForUser(userId);
+            System.out.println("Total Transactions in DB: " + debugList.size());
+            for (Transaction t : debugList) {
+                System.out.println("Transaction: " + t.getTitle() + ", Amount: " + t.getAmount());
+            }
 
+            // Refresh RecyclerView
+            transactionList.clear();
+            transactionList.addAll(dbHelper.getTransactionsForUser(userId));
+            transactionAdapter.notifyDataSetChanged();
+
+            // Force UI update
+            runOnUiThread(() -> {
+                transactionAdapter.notifyDataSetChanged();
+                rvTransactions.setAdapter(null);
+                rvTransactions.setAdapter(transactionAdapter);
+            });
+            loadTransactions();
             updateTotalBalance();
             dialog.dismiss();
         });
@@ -119,13 +137,23 @@ public class ExpenseManagerActivity extends AppCompatActivity {
     }
 
     private void updateTotalBalance() {
+        // Reload the transactions from the database
         transactionList = dbHelper.getTransactionsForUser(userId);
-        double total = 0.0;
+
+        double totalBalance = 0.0;
         for (Transaction t : transactionList) {
-            total += t.getAmount();
+            // If the transaction is an expense, subtract it; otherwise, add it
+            if (t.isExpense()) {
+                totalBalance -= t.getAmount(); // Deduct expense
+            } else {
+                totalBalance += t.getAmount(); // Add income
+            }
         }
-        tvTotalBalance.setText("Total Balance: $" + String.format("%.2f", total));
+
+        // Update the total balance on the UI
+        tvTotalBalance.setText("Total Balance: $" + String.format("%.2f", totalBalance));
     }
+
 
     private void filterTransactions(String filterType) {
         // Placeholder for filtering logic
