@@ -171,16 +171,24 @@ public class MainActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                int pageId = pages.get(position).getPageId();
-                Intent intent = new Intent(MainActivity.this, DiaryPageActivity.class);
-                intent.putExtra("pageId", pageId);
-                startActivity(intent);
-                Toast.makeText(MainActivity.this, ""+pageId, Toast.LENGTH_SHORT).show();
+                DiaryPage selectedPage = pages.get(position);
+                int pageId = selectedPage.getPageId();
+                String pageTitle = selectedPage.getPageTitle(); // Get page title
 
-
+                // Prevent opening the SWOT page
+                if ("SWOT".equalsIgnoreCase(pageTitle)) {
+                    Toast.makeText(MainActivity.this, "SWOT page cannot be opened here", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(MainActivity.this, SwotActivity.class);
+                    startActivity(intent);
+                } else{
+                    // Open the selected diary page
+                    Intent intent = new Intent(MainActivity.this, DiaryPageActivity.class);
+                    intent.putExtra("pageId", pageId);
+                    startActivity(intent);
+                    Toast.makeText(MainActivity.this, "Opening page: " + pageId, Toast.LENGTH_SHORT).show();
+                }
             }
         });
-
     }
 
     @Override

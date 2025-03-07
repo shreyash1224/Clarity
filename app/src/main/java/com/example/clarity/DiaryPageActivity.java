@@ -806,23 +806,35 @@ private void addTextBlockToUI(String textContent) {
             Toast.makeText(view.getContext(), "Error: Page ID not set", Toast.LENGTH_SHORT).show();
             return;
         }
-        Log.d("loadPage","PageId: "+view.getTag());
+
+        Log.d("loadPage", "PageId: " + page.getPageId());
 
         try {
-            int pageId = page.getPageId(); // Convert tag to integer
+            int pageId = page.getPageId(); // Get page ID
+            String pageTitle = page.getPageTitle(); // Get page title
 
-            // Show a Toast message
-            Toast.makeText(view.getContext(), "Loading page: " + pageId, Toast.LENGTH_SHORT).show();
+            // Check if the page is a SWOT page
+            if ("SWOT".equalsIgnoreCase(pageTitle)) {
+                Toast.makeText(view.getContext(), "SWOT page cannot be loaded here", Toast.LENGTH_SHORT).show();
+                Intent  intent = new Intent(DiaryPageActivity.this, SwotActivity.class);
+                startActivity(intent);
+            }else {
 
-            // Create an Intent to start DiaryPageActivity
-            Intent intent = new Intent(view.getContext(), DiaryPageActivity.class);
-            intent.putExtra("pageId", pageId); // Pass the page ID
+                // Show a Toast message
+                Toast.makeText(view.getContext(), "Loading page: " + pageId, Toast.LENGTH_SHORT).show();
 
-            view.getContext().startActivity(intent);
+                // Create an Intent to start DiaryPageActivity
+                Intent intent = new Intent(view.getContext(), DiaryPageActivity.class);
+                intent.putExtra("pageId", pageId); // Pass the page ID
+
+                view.getContext().startActivity(intent);
+
+            }
 
 
-        } catch (NumberFormatException e) {
-            Toast.makeText(view.getContext(), "Invalid Page ID", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(view.getContext(), "Error loading page", Toast.LENGTH_SHORT).show();
+            Log.e("loadPage", "Error: ", e);
         }
     }
 

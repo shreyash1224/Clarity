@@ -60,7 +60,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:onClick="toSwotActivity"
                     >
 
                     <!-- Tool 1 -->
@@ -69,7 +68,8 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:onClick="toSwotActivity"
-                        android:padding="8dp">
+                        android:padding="8dp"
+                        >
 
                         <ImageView
                             android:layout_width="40dp"
@@ -90,6 +90,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
+                        android:onClick="toExpenseActivity"
                         android:padding="8dp">
 
                         <ImageView
