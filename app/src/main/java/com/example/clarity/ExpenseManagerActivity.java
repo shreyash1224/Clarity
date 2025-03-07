@@ -320,6 +320,7 @@ public class ExpenseManagerActivity extends AppCompatActivity {
         dbHelper.deleteTransaction(transactionId);
 
         loadTransactions();
+        updateTotalBalance();
 
     }
 
