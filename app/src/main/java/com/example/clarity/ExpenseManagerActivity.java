@@ -310,6 +310,17 @@ public class ExpenseManagerActivity extends AppCompatActivity {
     }
 
     public void deleteTransaction(View view) {
-        Toast.makeText(this, "Deleteing Transaction.", Toast.LENGTH_SHORT).show();
+        // Retrieve the transaction associated with the clicked delete button
+        Transaction transaction = (Transaction) view.getTag();
+        int transactionId = transaction.getId();
+
+        // Display a Toast with the transaction ID
+        Toast.makeText(view.getContext(), "Deleting Transaction: " + transactionId, Toast.LENGTH_SHORT).show();
+
+        dbHelper.deleteTransaction(transactionId);
+
+        loadTransactions();
+
     }
+
 }

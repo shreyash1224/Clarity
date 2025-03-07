@@ -6,6 +6,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +33,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         holder.tvTitle.setText(transaction.getTitle());
         holder.tvAmount.setText(String.format("$%.2f", transaction.getAmount()));
         holder.tvDate.setText(transaction.getDate());
+        holder.btnDelete.setTag(transaction);
 
         if (transaction.isExpense()) {
             holder.tvAmount.setTextColor(holder.itemView.getContext().getResources().getColor(android.R.color.holo_red_dark));
@@ -51,12 +55,14 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 
     public static class TransactionViewHolder extends RecyclerView.ViewHolder {
         TextView tvTitle, tvAmount, tvDate;
+        FloatingActionButton btnDelete;
 
         public TransactionViewHolder(@NonNull View itemView) {
             super(itemView);
             tvTitle = itemView.findViewById(R.id.tvTransactionDescription);
             tvAmount = itemView.findViewById(R.id.tvTransactionAmount);
             tvDate = itemView.findViewById(R.id.tvTransactionDate);
+            btnDelete = itemView.findViewById(R.id.btnDelete);
         }
     }
 }

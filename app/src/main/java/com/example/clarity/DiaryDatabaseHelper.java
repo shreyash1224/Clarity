@@ -861,6 +861,28 @@ public long insertResource(int pageId, String resourceType, String resourceConte
         return transactions;
     }
 
+    public void deleteTransaction(int transactionId) {
+        SQLiteDatabase db = this.getWritableDatabase();  // Get writable database instance
+
+        // Define the selection criteria (where clause)
+        String selection = "transactionId = ?";
+        String[] selectionArgs = { String.valueOf(transactionId) };
+
+        // Perform the deletion
+        int rowsDeleted = db.delete("transactions", selection, selectionArgs);
+
+        // Optionally, log the result
+        if (rowsDeleted > 0) {
+            Log.d("DatabaseHelper", "Transaction with ID " + transactionId + " deleted successfully.");
+        } else {
+            Log.d("DatabaseHelper", "No transaction found with ID " + transactionId);
+        }
+
+        // Close the database after the operation
+        db.close();
+    }
+
+
 }
 
 
