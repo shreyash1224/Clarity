@@ -309,4 +309,7 @@ public class ExpenseManagerActivity extends AppCompatActivity {
         return new String[]{startOfYear, endOfYear};
     }
 
+    public void deleteTransaction(View view) {
+        Toast.makeText(this, "Deleteing Transaction.", Toast.LENGTH_SHORT).show();
+    }
 }

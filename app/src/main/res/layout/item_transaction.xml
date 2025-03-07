@@ -1,38 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:layout_margin="2dp"
-    android:padding="8dp"
-    android:background="@android:color/white">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!-- Transaction Description -->
-    <TextView
-        android:id="@+id/tvTransactionDescription"
-        android:layout_width="0dp"
-        android:layout_weight="2"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Transaction Description"
-        android:textSize="16sp"
-        android:textStyle="bold" />
+        android:orientation="horizontal"
+        android:layout_margin="2dp"
+        android:padding="8dp"
+        android:background="@android:color/white">
 
-    <!-- Transaction Amount -->
-    <TextView
-        android:id="@+id/tvTransactionAmount"
-        android:layout_width="0dp"
-        android:layout_weight="1"
-        android:layout_height="wrap_content"
-        android:text="$0.00"
-        android:textSize="16sp" />
+        <!-- Transaction Description -->
+        <TextView
+            android:id="@+id/tvTransactionDescription"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:layout_height="wrap_content"
+            android:text="Transaction Description"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
-    <!-- Transaction Date -->
-    <TextView
-        android:id="@+id/tvTransactionDate"
-        android:layout_width="0dp"
-        android:layout_weight="1"
+        <!-- Transaction Amount -->
+        <TextView
+            android:id="@+id/tvTransactionAmount"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="$0.00"
+            android:textSize="16sp" />
+
+        <!-- Transaction Date -->
+        <TextView
+            android:id="@+id/tvTransactionDate"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="01/01/2025"
+            android:textSize="14sp"
+            android:textColor="@android:color/darker_gray" />
+    </LinearLayout>
+
+    <!-- Delete Button -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btnDelete"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="01/01/2025"
-        android:textSize="14sp"
-        android:textColor="@android:color/darker_gray" />
-</LinearLayout>
+        android:layout_marginBottom="8dp"
+        android:layout_gravity="top|end"
+        android:backgroundTint="@android:color/transparent"
+        android:src="@drawable/ic_delete_resource"
+        android:layout_marginTop="-18dp"
+        android:layout_marginEnd="-18dp"
+        app:elevation="0dp"
+        android:onClick="deleteTransaction"
+        app:pressedTranslationZ="0dp" />
+
+</FrameLayout>
