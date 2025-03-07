@@ -1,8 +1,10 @@
 package com.example.clarity;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Pair;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,6 +15,8 @@ import java.util.List;
 
 public class SwotActivity extends AppCompatActivity {
 
+    private SharedPreferences sharedPreferences;
+
     private static final String TAG = "SwotActivity";
     private int userId = 1;  // Replace with actual user ID
     private int pageId = -1; // Will be retrieved from DB
@@ -22,6 +26,9 @@ public class SwotActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_swot);
+        sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        userId = sharedPreferences.getInt("userId", -1);
+        Log.d("Swot",""+userId);
 
         dbHelper = new DiaryDatabaseHelper(this);
         pageId = dbHelper.getSwotPageId(userId);
@@ -75,12 +82,17 @@ public class SwotActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         saveSwotData();
-        dbHelper.logSwotResources(pageId);
+//        dbHelper.logSwotResources(pageId);
     }
 
     private void saveSwotData() {
+        // Check if there is an existing SWOT page for this user
+        pageId = dbHelper.getSwotPageId(userId);
+        Toast.makeText(this, ""+pageId, Toast.LENGTH_SHORT).show();
+
         if (pageId == -1) {
-            Log.e(TAG, "No pageId found, creating a new SWOT page.");
+            Log.e(TAG, "No SWOT page found for userId " + userId + ". Creating a new one.");
+            pageId = dbHelper.createSwotPage(userId);
         }
 
         List<Resource> resourceList = List.of(
@@ -90,9 +102,10 @@ public class SwotActivity extends AppCompatActivity {
                 createResource("Threat", 4)
         );
 
-        // Update the page in the database
+        // Update or create resources in the database
         pageId = dbHelper.updatePage(pageId, "SWOT", resourceList, userId);
     }
+
 
 
     private Resource createResource(String type, int order) {

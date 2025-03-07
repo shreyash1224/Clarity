@@ -692,15 +692,18 @@ public long insertResource(int pageId, String resourceType, String resourceConte
         SQLiteDatabase db = this.getReadableDatabase();
         int pageId = -1;
 
-        Cursor cursor = db.rawQuery("SELECT pageId FROM pages WHERE userId = ? AND pageTitle = 'SWOT' LIMIT 1",
-                new String[]{String.valueOf(userId)});
+        String query = "SELECT pageId FROM pages WHERE pageTitle = ? AND userId = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{"SWOT", String.valueOf(userId)});
 
         if (cursor.moveToFirst()) {
-            pageId = cursor.getInt(0);
+            pageId = cursor.getInt(0); // Get the first column (pageId)
         }
+
         cursor.close();
-        return pageId; // Returns -1 if no SWOT page exists
+
+        return pageId;
     }
+
 
 
     public Map<String, String> getSwotData(int userId) {
@@ -728,7 +731,7 @@ public long insertResource(int pageId, String resourceType, String resourceConte
 
     public void logSwotResources(int pageId) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT resourceType, resourContent FROM resources WHERE pageId = ?", new String[]{String.valueOf(pageId)});
+        Cursor cursor = db.rawQuery("SELECT resourceType, resourceContent FROM resources WHERE pageId = ?", new String[]{String.valueOf(pageId)});
 
         Log.d("DiaryDatabaseHelper", "Checking saved SWOT data for pageId: " + pageId);
 
@@ -743,6 +746,23 @@ public long insertResource(int pageId, String resourceType, String resourceConte
         }
         cursor.close();
         db.close();
+    }
+
+
+    public int createSwotPage(int userId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("pageTitle", "SWOT");
+        values.put("userId", userId);
+
+        long newPageId = db.insert("pages", null, values);
+        if (newPageId == -1) {
+            Log.e("DiaryDatabaseHelper", "Failed to create SWOT page for userId: " + userId);
+            return -1;
+        }
+
+        Log.d("DiaryDatabaseHelper", "Created SWOT page with pageId: " + newPageId);
+        return (int) newPageId;  // ❌ Don't close db here
     }
 
 

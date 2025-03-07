@@ -122,6 +122,8 @@ public class ToolsActivity extends AppCompatActivity {
 
     public void toSwotActivity(View view) {
         Intent intent = new Intent(ToolsActivity.this, SwotActivity.class);
+//        intent.putExtra("userId", tvUserId.getText().toString());
         startActivity(intent);
+
     }
 }
