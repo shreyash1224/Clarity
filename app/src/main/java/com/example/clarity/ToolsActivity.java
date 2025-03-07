@@ -129,5 +129,7 @@ public class ToolsActivity extends AppCompatActivity {
 
     public void toExpenseActivity(View view) {
         Toast.makeText(this, "To Expense Activity.", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(ToolsActivity.this, ExpenseManagerActivity.class);
+        startActivity(intent);
     }
 }

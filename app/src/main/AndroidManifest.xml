@@ -18,6 +18,9 @@
         android:theme="@style/Theme.Clarity"
         tools:targetApi="31">
         <activity
+            android:name=".ExpenseManagerActivity"
+            android:exported="false" />
+        <activity
             android:name=".SwotActivity"
             android:exported="false" />
         <activity
@@ -45,7 +48,6 @@
         <activity android:name=".TaskListActivity" />
         <activity android:name=".SettingsActivity" />
         <activity android:name=".ToolsActivity" />
-
     </application>
 
 </manifest>
