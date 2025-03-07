@@ -95,7 +95,7 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
                 + "title TEXT NOT NULL, "
                 + "amount REAL NOT NULL, "
                 + "category TEXT NOT NULL, "
-                + "date TEXT NOT NULL, "
+                + "date DATETIME NOT NULL, "
                 + "isExpense INTEGER NOT NULL CHECK (isExpense IN (0,1)), " // 0 for income, 1 for expense
                 + "FOREIGN KEY (userId) REFERENCES users(userId) ON DELETE CASCADE"
                 + ");";
@@ -839,9 +839,45 @@ public long insertResource(int pageId, String resourceType, String resourceConte
     }
 
 
+    public List<Transaction> getTransactionsForUserInDateRange(int userId, String startDate, String endDate) {
+        Log.d("Date", "Start Date: " + startDate);
+        Log.d("Date", "End Date: " + endDate);
+
+        List<Transaction> transactions = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        // Convert the date to include time for proper comparison
+        String startDateWithTime = startDate + " 00:00:00"; // Start of the day (midnight)
+        String endDateWithTime = endDate + " 23:59:59"; // End of the day (one second before midnight)
+
+// Update the query to include time in the date range
+        String query = "SELECT * FROM transactions WHERE userId = ? AND date BETWEEN ? AND ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId), startDateWithTime, endDateWithTime});
+
+        Log.d("SQL Query", "Executing query: " + query);
+        Log.d("SQL Params", "userId: " + userId + ", startDate: " + startDate + ", endDate: " + endDate);
 
 
+        if (cursor.moveToFirst()) {
+            do {
+                int transactionId = cursor.getInt(cursor.getColumnIndexOrThrow("transactionId"));
+                String title = cursor.getString(cursor.getColumnIndexOrThrow("title"));
+                double amount = cursor.getDouble(cursor.getColumnIndexOrThrow("amount"));
+                String category = cursor.getString(cursor.getColumnIndexOrThrow("category"));
+                String date = cursor.getString(cursor.getColumnIndexOrThrow("date"));
+                boolean isExpense = cursor.getInt(cursor.getColumnIndexOrThrow("isExpense")) == 1;
 
+                transactions.add(new Transaction(transactionId, userId, title, amount, category, date, isExpense));
+            } while (cursor.moveToNext());
+
+            Log.d("DB Fetch", "Transactions count: " + transactions.size());
+        } else {
+            Log.d("DB Fetch", "No transactions found.");
+        }
+
+        cursor.close();
+        db.close();
+        return transactions;
+    }
 
 }
 

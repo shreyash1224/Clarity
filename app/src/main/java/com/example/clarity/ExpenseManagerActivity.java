@@ -3,6 +3,7 @@ package com.example.clarity;
 import android.app.DatePickerDialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,9 +16,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class ExpenseManagerActivity extends AppCompatActivity {
 
@@ -58,7 +63,15 @@ public class ExpenseManagerActivity extends AppCompatActivity {
         Button btnMonth = findViewById(R.id.btnMonth);
         Button btnYear = findViewById(R.id.btnYear);
 
-        btnToday.setOnClickListener(v -> filterTransactions("Today"));
+        btnToday.setOnClickListener(v -> {
+            Toast.makeText(this, "Today", Toast.LENGTH_SHORT).show();
+            // Get the current date in the required format (e.g., "YYYY-MM-DD")
+            String currentDate = getCurrentDate();
+            Log.d("Date", "Passing Date: "+currentDate);
+
+            // Call loadTransactions() to filter by today's date
+            loadTransactions(currentDate, currentDate);
+        });
         btnWeek.setOnClickListener(v -> filterTransactions("Week"));
         btnMonth.setOnClickListener(v -> filterTransactions("Month"));
         btnYear.setOnClickListener(v -> filterTransactions("Year"));
@@ -71,6 +84,16 @@ public class ExpenseManagerActivity extends AppCompatActivity {
         transactionList = dbHelper.getTransactionsForUser(userId);
 
         // Set up the RecyclerView adapter with the loaded transactions
+        transactionAdapter = new TransactionAdapter(transactionList);
+        rvTransactions.setLayoutManager(new LinearLayoutManager(this));
+        rvTransactions.setAdapter(transactionAdapter);
+    }
+
+    private void loadTransactions(String startDate, String endDate) {
+        // Load transactions from the database for the current user within the specified date range
+        transactionList = dbHelper.getTransactionsForUserInDateRange(userId, startDate, endDate);
+
+        // Set up the RecyclerView adapter with the filtered transactions
         transactionAdapter = new TransactionAdapter(transactionList);
         rvTransactions.setLayoutManager(new LinearLayoutManager(this));
         rvTransactions.setAdapter(transactionAdapter);
@@ -93,6 +116,8 @@ public class ExpenseManagerActivity extends AppCompatActivity {
         etDate.setOnClickListener(v -> showDatePicker(etDate));
         btnCancel.setOnClickListener(v -> dialog.dismiss());
 
+
+
         btnSave.setOnClickListener(v -> {
             String title = etTitle.getText().toString().trim();
             String amountStr = etAmount.getText().toString().trim();
@@ -105,17 +130,17 @@ public class ExpenseManagerActivity extends AppCompatActivity {
                 return;
             }
 
+            // Convert date to the correct format (add time to it)
+            String formattedDate = convertToDateWithTime(date);
+            if (formattedDate == null) {
+                Toast.makeText(this, "Invalid date format", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             double amount = Double.parseDouble(amountStr);
 
-            Transaction newTransaction = new Transaction(0, userId, title, amount, category, date, isExpense);
+            Transaction newTransaction = new Transaction(0, userId, title, amount, category, formattedDate, isExpense);
             dbHelper.addTransaction(newTransaction, userId);
-
-            // Debug: Check database count
-            List<Transaction> debugList = dbHelper.getTransactionsForUser(userId);
-            System.out.println("Total Transactions in DB: " + debugList.size());
-            for (Transaction t : debugList) {
-                System.out.println("Transaction: " + t.getTitle() + ", Amount: " + t.getAmount());
-            }
 
             // Refresh RecyclerView
             transactionList.clear();
@@ -128,10 +153,13 @@ public class ExpenseManagerActivity extends AppCompatActivity {
                 rvTransactions.setAdapter(null);
                 rvTransactions.setAdapter(transactionAdapter);
             });
+
             loadTransactions();
             updateTotalBalance();
             dialog.dismiss();
         });
+
+
 
         dialog.show();
     }
@@ -175,6 +203,23 @@ public class ExpenseManagerActivity extends AppCompatActivity {
         datePickerDialog.show();
     }
 
+
+    private String getCurrentDate() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        return sdf.format(new Date());
+    }
+
+    private String convertToDateWithTime(String date) {
+        try {
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+            Date parsedDate = inputFormat.parse(date);
+            return outputFormat.format(parsedDate);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
 
 }
