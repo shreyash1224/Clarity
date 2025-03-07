@@ -92,4 +92,7 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void iconMessage(View view) {
+        Toast.makeText(this, "Let's make it clear.", Toast.LENGTH_SHORT).show();
+    }
 }
