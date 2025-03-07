@@ -26,5 +26,34 @@ public class Transaction {
     public double getAmount() { return amount; }
     public String getCategory() { return category; }
     public String getDate() { return date; }
-    public boolean isExpense() { return isExpense; }
+    public boolean isExpense() { return isExpense;    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setAmount(double amount) {
+        this.amount = amount;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public void setExpense(boolean isExpense) {
+        this.isExpense = isExpense;
+    }
+
 }
