@@ -35,4 +35,7 @@ public class Transaction {
 
     public boolean isExpense() { return isExpense; }
     public void setExpense(boolean expense) { isExpense = expense; }
+
+
+
 }

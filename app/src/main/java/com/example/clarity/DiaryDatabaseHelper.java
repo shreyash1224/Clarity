@@ -86,6 +86,20 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
         Log.d("Task","Task Table Created Successfully.");
 
 
+
+
+        String transactionsTable = "CREATE TABLE IF NOT EXISTS transactions (" +
+                "transactionId INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "title TEXT NOT NULL, " +
+                "amount REAL NOT NULL, " +
+                "category TEXT NOT NULL, " +
+                "date TEXT NOT NULL, " +
+                "isExpense INTEGER NOT NULL CHECK (isExpense IN (0,1))" +
+                ");";
+
+        db.execSQL(transactionsTable);
+        Log.d("Database", "Transactions Table Created Successfully.");
+
         // Add indexes to optimize foreign key searches
         db.execSQL("CREATE INDEX idx_userId ON pages(userId);");
         db.execSQL("CREATE INDEX idx_pageId ON resources(pageId);");
