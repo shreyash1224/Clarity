@@ -62,19 +62,60 @@ public class ExpenseManagerActivity extends AppCompatActivity {
         Button btnWeek = findViewById(R.id.btnWeek);
         Button btnMonth = findViewById(R.id.btnMonth);
         Button btnYear = findViewById(R.id.btnYear);
+        Button btnAll = findViewById(R.id.btnAll);
 
         btnToday.setOnClickListener(v -> {
             Toast.makeText(this, "Today", Toast.LENGTH_SHORT).show();
             // Get the current date in the required format (e.g., "YYYY-MM-DD")
             String currentDate = getCurrentDate();
-            Log.d("Date", "Passing Date: "+currentDate);
+            Log.d("Date", "Passing Date: " + currentDate);
 
             // Call loadTransactions() to filter by today's date
             loadTransactions(currentDate, currentDate);
         });
-        btnWeek.setOnClickListener(v -> filterTransactions("Week"));
-        btnMonth.setOnClickListener(v -> filterTransactions("Month"));
-        btnYear.setOnClickListener(v -> filterTransactions("Year"));
+
+        btnWeek.setOnClickListener(v -> {
+            Toast.makeText(this, "This Week", Toast.LENGTH_SHORT).show();
+            // Get the current date and calculate the start and end dates of the current week
+            String[] weekDates = getWeekDateRange();
+            String startOfWeek = weekDates[0]; // Start date of the week
+            String endOfWeek = weekDates[1];   // End date of the week
+            Log.d("Date", "Week Start: " + startOfWeek + ", Week End: " + endOfWeek);
+
+            // Call loadTransactions() to filter by this week's date range
+            loadTransactions(startOfWeek, endOfWeek);
+        });
+
+        btnMonth.setOnClickListener(v -> {
+            Toast.makeText(this, "This Month", Toast.LENGTH_SHORT).show();
+            // Get the current date and calculate the start and end dates of the current month
+            String[] monthDates = getMonthDateRange();
+            String startOfMonth = monthDates[0]; // Start date of the month
+            String endOfMonth = monthDates[1];   // End date of the month
+            Log.d("Date", "Month Start: " + startOfMonth + ", Month End: " + endOfMonth);
+
+            // Call loadTransactions() to filter by this month's date range
+            loadTransactions(startOfMonth, endOfMonth);
+        });
+
+        btnYear.setOnClickListener(v -> {
+            Toast.makeText(this, "This Year", Toast.LENGTH_SHORT).show();
+            // Get the current date and calculate the start and end dates of the current year
+            String[] yearDates = getYearDateRange();
+            String startOfYear = yearDates[0]; // Start date of the year
+            String endOfYear = yearDates[1];   // End date of the year
+            Log.d("Date", "Year Start: " + startOfYear + ", Year End: " + endOfYear);
+
+            // Call loadTransactions() to filter by this year's date range
+            loadTransactions(startOfYear, endOfYear);
+        });
+
+        btnAll.setOnClickListener(v -> {
+            loadTransactions();
+        });
+
+
+
 
         updateTotalBalance();
     }
@@ -221,5 +262,51 @@ public class ExpenseManagerActivity extends AppCompatActivity {
         }
     }
 
+
+    // Get the start and end dates of the current week
+    private String[] getWeekDateRange() {
+        Calendar calendar = Calendar.getInstance();
+
+        // Set the calendar to the first day of the week (Sunday, but it can be changed based on the locale)
+        calendar.set(Calendar.DAY_OF_WEEK, calendar.getFirstDayOfWeek());
+
+        // Get the start of the week (Sunday)
+        String startOfWeek = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calendar.getTime());
+
+        // Get the end of the week (Saturday)
+        calendar.add(Calendar.DAY_OF_WEEK, 6);  // Add 6 days to Sunday to get Saturday
+        String endOfWeek = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calendar.getTime());
+
+        return new String[]{startOfWeek, endOfWeek};
+    }
+
+
+
+    // Get the start and end dates of the current month
+    private String[] getMonthDateRange() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.DAY_OF_MONTH, 1); // Set to the first day of the month
+        String startOfMonth = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calendar.getTime());
+
+        calendar.add(Calendar.MONTH, 1); // Add one month
+        calendar.set(Calendar.DAY_OF_MONTH, 0); // Set to the last day of the previous month
+        String endOfMonth = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calendar.getTime());
+
+        return new String[]{startOfMonth, endOfMonth};
+    }
+
+    // Get the start and end dates of the current year
+    private String[] getYearDateRange() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.MONTH, Calendar.JANUARY); // Set to the first month of the year
+        calendar.set(Calendar.DAY_OF_YEAR, 1); // Set to the first day of the year
+        String startOfYear = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calendar.getTime());
+
+        calendar.add(Calendar.YEAR, 1); // Add one year
+        calendar.set(Calendar.DAY_OF_YEAR, 0); // Set to the last day of the previous year
+        String endOfYear = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calendar.getTime());
+
+        return new String[]{startOfYear, endOfYear};
+    }
 
 }

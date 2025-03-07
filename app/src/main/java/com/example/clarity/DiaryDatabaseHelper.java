@@ -745,24 +745,6 @@ public long insertResource(int pageId, String resourceType, String resourceConte
     }
 
 
-    public void logSwotResources(int pageId) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT resourceType, resourceContent FROM resources WHERE pageId = ?", new String[]{String.valueOf(pageId)});
-
-        Log.d("DiaryDatabaseHelper", "Checking saved SWOT data for pageId: " + pageId);
-
-        if (cursor.moveToFirst()) {
-            do {
-                String resourceType = cursor.getString(0);
-                String content = cursor.getString(1);
-                Log.d("DiaryDatabaseHelper", "SWOT Resource -> Type: " + resourceType + ", Content: " + content);
-            } while (cursor.moveToNext());
-        } else {
-            Log.d("DiaryDatabaseHelper", "No SWOT data found for pageId: " + pageId);
-        }
-        cursor.close();
-        db.close();
-    }
 
 
     public int createSwotPage(int userId) {

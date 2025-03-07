@@ -10,6 +10,9 @@
 
     <!-- Title -->
     <TextView
+        android:padding="10dp"
+        android:background="@color/brown_toolbar"
+        android:textColor="@color/white"
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -39,6 +42,7 @@
         android:paddingBottom="8dp">
 
         <Button
+            android:textSize="10dp"
             android:id="@+id/btnToday"
             android:layout_width="0dp"
             android:layout_weight="1"
@@ -46,6 +50,8 @@
             android:text="Today" />
 
         <Button
+            android:textSize="10dp"
+
             android:id="@+id/btnWeek"
             android:layout_width="0dp"
             android:layout_weight="1"
@@ -53,6 +59,8 @@
             android:text="Week" />
 
         <Button
+            android:textSize="10dp"
+
             android:id="@+id/btnMonth"
             android:layout_width="0dp"
             android:layout_weight="1"
@@ -60,11 +68,30 @@
             android:text="Month" />
 
         <Button
+            android:textSize="10dp"
             android:id="@+id/btnYear"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:text="Year" />
+
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingBottom="8dp">
+
+        <Button
+            android:id="@+id/btnAll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="All" />
+
     </LinearLayout>
 
     <!-- RecyclerView for Transactions -->
