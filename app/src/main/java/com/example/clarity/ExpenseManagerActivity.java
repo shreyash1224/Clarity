@@ -1,6 +1,7 @@
 package com.example.clarity;
 
 import android.app.DatePickerDialog;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -20,35 +21,40 @@ import java.util.List;
 
 public class ExpenseManagerActivity extends AppCompatActivity {
 
+    private SharedPreferences sharedPreferences;
     private TextView tvTotalBalance;
     private RecyclerView rvTransactions;
     private FloatingActionButton fabAddTransaction;
     private TransactionAdapter transactionAdapter;
     private List<Transaction> transactionList;
+    private DiaryDatabaseHelper dbHelper;
+    private int userId = 1; // Replace with actual logged-in user ID
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_expense_manager);
 
+
+        sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        String username = sharedPreferences.getString("username", null);
+        userId = sharedPreferences.getInt("userId", -1);
+
+        dbHelper = new DiaryDatabaseHelper(this);
+
         // Initialize UI Components
         tvTotalBalance = findViewById(R.id.tvTotalBalance);
         rvTransactions = findViewById(R.id.rvTransactions);
         fabAddTransaction = findViewById(R.id.fabAddTransaction);
 
-        // Initialize RecyclerView
-        transactionList = new ArrayList<>();
+        // Load transactions from database
+        transactionList = dbHelper.getTransactionsForUser(userId);
         transactionAdapter = new TransactionAdapter(transactionList);
         rvTransactions.setLayoutManager(new LinearLayoutManager(this));
         rvTransactions.setAdapter(transactionAdapter);
 
         // Set up FAB Click Listener
-        fabAddTransaction.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addTransaction();
-            }
-        });
+        fabAddTransaction.setOnClickListener(v -> addTransaction());
 
         // Date Filter Buttons
         Button btnToday = findViewById(R.id.btnToday);
@@ -60,16 +66,16 @@ public class ExpenseManagerActivity extends AppCompatActivity {
         btnWeek.setOnClickListener(v -> filterTransactions("Week"));
         btnMonth.setOnClickListener(v -> filterTransactions("Month"));
         btnYear.setOnClickListener(v -> filterTransactions("Year"));
+
+        updateTotalBalance();
     }
 
     private void addTransaction() {
-        // Create Dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_transaction, null);
         builder.setView(dialogView);
         AlertDialog dialog = builder.create();
 
-        // Initialize Dialog Views
         EditText etTitle = dialogView.findViewById(R.id.etTransactionTitle);
         EditText etAmount = dialogView.findViewById(R.id.etTransactionAmount);
         EditText etCategory = dialogView.findViewById(R.id.etTransactionCategory);
@@ -78,13 +84,9 @@ public class ExpenseManagerActivity extends AppCompatActivity {
         Button btnCancel = dialogView.findViewById(R.id.btnCancel);
         Button btnSave = dialogView.findViewById(R.id.btnSave);
 
-        // Date Picker
         etDate.setOnClickListener(v -> showDatePicker(etDate));
-
-        // Cancel Button
         btnCancel.setOnClickListener(v -> dialog.dismiss());
 
-        // Save Button
         btnSave.setOnClickListener(v -> {
             String title = etTitle.getText().toString().trim();
             String amountStr = etAmount.getText().toString().trim();
@@ -102,49 +104,33 @@ public class ExpenseManagerActivity extends AppCompatActivity {
                 amount = -amount;
             }
 
-            // Create Transaction Object
-            Transaction newTransaction = new Transaction(
-                    transactionList.size() + 1,
-                    title,
-                    amount,
-                    category,
-                    date,
-                    isExpense
-            );
+            Transaction newTransaction = new Transaction(0, userId, title, amount, category, date, isExpense);
+            dbHelper.addTransaction(newTransaction, userId);
 
-            // Add transaction and update UI
+            // Refresh transaction list
             transactionList.add(newTransaction);
             transactionAdapter.notifyItemInserted(transactionList.size() - 1);
-            updateTotalBalance();
 
-            // Close Dialog
+            updateTotalBalance();
             dialog.dismiss();
         });
 
-        // Show Dialog
         dialog.show();
     }
 
-
-
-
     private void updateTotalBalance() {
+        transactionList = dbHelper.getTransactionsForUser(userId);
         double total = 0.0;
         for (Transaction t : transactionList) {
-            total += t.getAmount(); // No need to negate, expense is already negative
+            total += t.getAmount();
         }
         tvTotalBalance.setText("Total Balance: $" + String.format("%.2f", total));
     }
 
-
-
-
     private void filterTransactions(String filterType) {
         // Placeholder for filtering logic
-        // For now, just log the selected filter
         System.out.println("Filtering transactions by: " + filterType);
     }
-
 
     private void showDatePicker(EditText etDate) {
         Calendar calendar = Calendar.getInstance();
@@ -162,6 +148,5 @@ public class ExpenseManagerActivity extends AppCompatActivity {
     }
 
 
+
 }
-
-

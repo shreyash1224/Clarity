@@ -88,21 +88,23 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
 
 
 
-        String transactionsTable = "CREATE TABLE IF NOT EXISTS transactions (" +
-                "transactionId INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "title TEXT NOT NULL, " +
-                "amount REAL NOT NULL, " +
-                "category TEXT NOT NULL, " +
-                "date TEXT NOT NULL, " +
-                "isExpense INTEGER NOT NULL CHECK (isExpense IN (0,1))" +
-                ");";
+        // Transactions Table
+        String transactions = "CREATE TABLE IF NOT EXISTS transactions ("
+                + "transactionId INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + "userId INTEGER NOT NULL, "
+                + "title TEXT NOT NULL, "
+                + "amount REAL NOT NULL, "
+                + "category TEXT NOT NULL, "
+                + "date TEXT NOT NULL, "
+                + "isExpense INTEGER NOT NULL CHECK (isExpense IN (0,1)), " // 0 for income, 1 for expense
+                + "FOREIGN KEY (userId) REFERENCES users(userId) ON DELETE CASCADE"
+                + ");";
+        db.execSQL(transactions);
 
-        db.execSQL(transactionsTable);
-        Log.d("Database", "Transactions Table Created Successfully.");
 
         // Add indexes to optimize foreign key searches
-        db.execSQL("CREATE INDEX idx_userId ON pages(userId);");
-        db.execSQL("CREATE INDEX idx_pageId ON resources(pageId);");
+        db.execSQL("CREATE INDEX IF NOT  EXISTS idx_userId ON pages(userId);");
+        db.execSQL("CREATE INDEX IF NOT  EXISTS idx_pageId ON resources(pageId);");
 
         Log.d("Database", "All tables created successfully.");
 //The taskId is passed as resourceContent in the resources table.
@@ -780,8 +782,69 @@ public long insertResource(int pageId, String resourceType, String resourceConte
     }
 
 
+//-----------------------------------------------------------------
+
+    public List<Transaction> getTransactionsForUser(int userId) {
+        List<Transaction> transactions = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String query = "SELECT * FROM transactions WHERE userId = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
+
+        if (cursor.moveToFirst()) {
+            do {
+                int transactionId = cursor.getInt(cursor.getColumnIndexOrThrow("transactionId"));
+                String title = cursor.getString(cursor.getColumnIndexOrThrow("title"));  // Fixed
+                double amount = cursor.getDouble(cursor.getColumnIndexOrThrow("amount")); // Fixed
+                String category = cursor.getString(cursor.getColumnIndexOrThrow("category")); // Fixed
+                String date = cursor.getString(cursor.getColumnIndexOrThrow("date")); // Fixed
+                boolean isExpense = cursor.getInt(cursor.getColumnIndexOrThrow("isExpense")) == 1;
+
+                transactions.add(new Transaction(transactionId, userId, title, amount, category, date, isExpense));
+            } while (cursor.moveToNext());
+
+            Log.d("DB Fetch", "Transactions count: " + transactions.size());
+
+        }
+
+        cursor.close();
+        db.close();
+        return transactions;
+    }
+
+    public boolean addTransaction(Transaction transaction, int userId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put("userId", userId);
+        values.put("title", transaction.getTitle());
+        values.put("amount", transaction.getAmount());
+        values.put("category", transaction.getCategory());
+        values.put("date", transaction.getDate());
+        values.put("isExpense", transaction.isExpense() ? 1 : 0);
+
+        // Log the values being inserted
+        Log.d("Database", "Attempting to insert transaction: " + values.toString());
+
+        long result = db.insert("transactions", null, values);
+
+        if (result == -1) {
+            Log.e("Database", "Transaction insert failed!");
+        } else {
+            Log.d("Database", "Transaction inserted successfully with ID: " + result);
+        }
+
+        db.close();
+        return result != -1;
+    }
+
+
+
+
+
 
 }
+
 
 
 

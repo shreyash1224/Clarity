@@ -6,11 +6,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import java.util.ArrayList;
 import java.util.List;
 
 public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.TransactionViewHolder> {
 
-    private List<Transaction> transactionList;
+    private List<Transaction> transactionList = new ArrayList<>();
 
     public TransactionAdapter(List<Transaction> transactionList) {
         this.transactionList = transactionList;
@@ -40,6 +41,12 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     @Override
     public int getItemCount() {
         return transactionList.size();
+    }
+
+    // **NEW METHOD**: Updates the transaction list dynamically
+    public void setTransactions(List<Transaction> transactions) {
+        this.transactionList = transactions;
+        notifyDataSetChanged();  // Refresh the RecyclerView
     }
 
     public static class TransactionViewHolder extends RecyclerView.ViewHolder {
