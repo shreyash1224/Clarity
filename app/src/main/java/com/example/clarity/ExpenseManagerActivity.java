@@ -125,7 +125,7 @@ public class ExpenseManagerActivity extends AppCompatActivity {
         transactionList = dbHelper.getTransactionsForUser(userId);
 
         // Set up the RecyclerView adapter with the loaded transactions
-        transactionAdapter = new TransactionAdapter(transactionList);
+        transactionAdapter = new TransactionAdapter(this,transactionList,dbHelper);
         rvTransactions.setLayoutManager(new LinearLayoutManager(this));
         rvTransactions.setAdapter(transactionAdapter);
     }
@@ -135,7 +135,7 @@ public class ExpenseManagerActivity extends AppCompatActivity {
         transactionList = dbHelper.getTransactionsForUserInDateRange(userId, startDate, endDate);
 
         // Set up the RecyclerView adapter with the filtered transactions
-        transactionAdapter = new TransactionAdapter(transactionList);
+        transactionAdapter = new TransactionAdapter(this, transactionList,dbHelper);
         rvTransactions.setLayoutManager(new LinearLayoutManager(this));
         rvTransactions.setAdapter(transactionAdapter);
     }
@@ -204,6 +204,11 @@ public class ExpenseManagerActivity extends AppCompatActivity {
 
         dialog.show();
     }
+
+
+
+
+
 
     private void updateTotalBalance() {
         // Reload the transactions from the database

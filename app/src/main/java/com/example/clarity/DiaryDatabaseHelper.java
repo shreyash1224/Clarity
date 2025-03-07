@@ -882,6 +882,23 @@ public long insertResource(int pageId, String resourceType, String resourceConte
         db.close();
     }
 
+    public void updateTransaction(Transaction transaction) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put("title", transaction.getTitle());
+        values.put("amount", transaction.getAmount());
+        values.put("category", transaction.getCategory());
+        values.put("date", transaction.getDate());
+        values.put("isExpense", transaction.isExpense() ? 1 : 0);
+
+        // Update the transaction in the database
+        db.update("transactions", values, "transactionId = ?", new String[]{String.valueOf(transaction.getId())});
+        db.close();
+    }
+
+
+
 
 }
 
