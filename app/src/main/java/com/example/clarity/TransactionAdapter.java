@@ -131,7 +131,8 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             String title = etTitle.getText().toString().trim();
             String amountStr = etAmount.getText().toString().trim();
             String category = etCategory.getText().toString().trim();
-            String date = etDate.getText().toString().trim();
+            String date = etDate.getText().toString().trim().split(" ")[0];
+            Log.d("DateDebug",""+date);
             boolean isExpense = switchExpense.isChecked();
 
             if (title.isEmpty() || amountStr.isEmpty() || category.isEmpty() || date.isEmpty()) {
@@ -140,11 +141,11 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             }
 
             // Convert date to the correct format (add time to it)
-            String formattedDate = convertToDateWithTime(date);
-            if (formattedDate == null) {
-                Toast.makeText(context, "Invalid date format", Toast.LENGTH_SHORT).show();
-                return;
-            }
+//            String formattedDate = convertToDateWithTime(date);
+//            if (formattedDate == null) {
+//                Toast.makeText(context, "Invalid date format", Toast.LENGTH_SHORT).show();
+//                return;
+//            }
 
             double amount = Double.parseDouble(amountStr);
 
@@ -152,7 +153,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             transaction.setTitle(title);
             transaction.setAmount(amount);
             transaction.setCategory(category);
-            transaction.setDate(formattedDate);
+            transaction.setDate(date);
             transaction.setExpense(isExpense);
 
             dbHelper.updateTransaction(transaction); // Ensure dbHelper is initialized
