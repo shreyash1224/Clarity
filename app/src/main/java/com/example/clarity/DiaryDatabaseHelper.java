@@ -779,7 +779,7 @@ public long insertResource(int pageId, String resourceType, String resourceConte
                 String title = cursor.getString(cursor.getColumnIndexOrThrow("title"));  // Fixed
                 double amount = cursor.getDouble(cursor.getColumnIndexOrThrow("amount")); // Fixed
                 String category = cursor.getString(cursor.getColumnIndexOrThrow("category")); // Fixed
-                String date = cursor.getString(cursor.getColumnIndexOrThrow("date")); // Fixed
+                String date = cursor.getString(cursor.getColumnIndexOrThrow("date")).split(" ")[0]; // Fixed
                 boolean isExpense = cursor.getInt(cursor.getColumnIndexOrThrow("isExpense")) == 1;
 
                 transactions.add(new Transaction(transactionId, userId, title, amount, category, date, isExpense));
@@ -845,7 +845,7 @@ public long insertResource(int pageId, String resourceType, String resourceConte
                 String title = cursor.getString(cursor.getColumnIndexOrThrow("title"));
                 double amount = cursor.getDouble(cursor.getColumnIndexOrThrow("amount"));
                 String category = cursor.getString(cursor.getColumnIndexOrThrow("category"));
-                String date = cursor.getString(cursor.getColumnIndexOrThrow("date"));
+                String date = cursor.getString(cursor.getColumnIndexOrThrow("date")).split(" ")[0];
                 boolean isExpense = cursor.getInt(cursor.getColumnIndexOrThrow("isExpense")) == 1;
 
                 transactions.add(new Transaction(transactionId, userId, title, amount, category, date, isExpense));

@@ -141,11 +141,11 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             }
 
             // Convert date to the correct format (add time to it)
-//            String formattedDate = convertToDateWithTime(date);
-//            if (formattedDate == null) {
-//                Toast.makeText(context, "Invalid date format", Toast.LENGTH_SHORT).show();
-//                return;
-//            }
+            String formattedDate = convertToDateWithTime(date);
+            if (formattedDate == null) {
+                Toast.makeText(context, "Invalid date format", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
             double amount = Double.parseDouble(amountStr);
 
@@ -153,7 +153,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             transaction.setTitle(title);
             transaction.setAmount(amount);
             transaction.setCategory(category);
-            transaction.setDate(date);
+            transaction.setDate(formattedDate);
             transaction.setExpense(isExpense);
 
             dbHelper.updateTransaction(transaction); // Ensure dbHelper is initialized
