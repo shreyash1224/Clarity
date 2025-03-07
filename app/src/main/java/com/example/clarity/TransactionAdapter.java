@@ -1,5 +1,6 @@
 package com.example.clarity;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,6 +41,11 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         } else {
             holder.tvAmount.setTextColor(holder.itemView.getContext().getResources().getColor(android.R.color.holo_green_dark));
         }
+
+        holder.itemView.setOnClickListener(v -> {
+            // Print "Hello" when an item is clicked
+            Log.d("RecyclerView", "Hello");
+        });
     }
 
     @Override
