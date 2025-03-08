@@ -963,6 +963,52 @@ public long insertResource(int pageId, String resourceType, String resourceConte
         return null; // Return null if no matching user is found
     }
 
+    public void updateTask(int taskId, String taskTitle, String startTime, String endTime, String completion) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put("taskTitle", taskTitle);
+        values.put("startTime", startTime);
+        values.put("endTime", endTime);
+        values.put("completion", completion);
+
+        int rowsAffected = db.update(
+                "tasks",
+                values,
+                "taskId = ?",
+                new String[]{String.valueOf(taskId)}
+        );
+
+        if (rowsAffected > 0) {
+            Log.d("Database", "Task updated successfully: " + taskId);
+        } else {
+            Log.d("Database", "Failed to update task: " + taskId);
+        }
+
+        db.close();
+    }
+
+
+    public void deleteTask(int taskId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        int rowsDeleted = db.delete(
+                "tasks",
+                "taskId = ?",
+                new String[]{String.valueOf(taskId)}
+        );
+
+        if (rowsDeleted > 0) {
+            Log.d("Database", "Task deleted successfully: " + taskId);
+        } else {
+            Log.d("Database", "Failed to delete task: " + taskId);
+        }
+
+        db.close();
+    }
+
+
+
 }
 
 

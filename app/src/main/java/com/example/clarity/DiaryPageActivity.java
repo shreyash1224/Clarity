@@ -40,6 +40,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -62,6 +63,8 @@ public class DiaryPageActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_STORAGE_PERMISSION = 100;
     private Stack<Action> undoStack = new Stack<>();
     private Stack<Action> redoStack = new Stack<>();
+    private Task pendingTask = null;
+    List<Task> pendingTasks = new ArrayList<>();
 
 
 
@@ -73,6 +76,8 @@ public class DiaryPageActivity extends AppCompatActivity {
 
 
         setContentView(R.layout.activity_diary_page);
+        TaskNotificationManager.createNotificationChannel(this);
+
 
         dbHelper = new DiaryDatabaseHelper(this);
         sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
@@ -158,6 +163,85 @@ public class DiaryPageActivity extends AppCompatActivity {
     }
 
     //onPause() done
+//    @Override
+//    protected void onPause() {
+//        super.onPause();
+//        debugResourcesTable("Database");
+//        Log.d("LIFECYCLE", "onPause() called");
+//
+//        String title = editTitle.getText().toString().trim();
+//        if (title.isEmpty()) {
+//            Log.e("onPause", "⚠️ Title is empty! Not saving to database.");
+//            return; // Prevent the app from attempting an update
+//        }
+//
+//        if (title.length() > 100) {
+//            Log.e("onPause", "⚠️ Title exceeds 100 characters! Not saving.");
+//            Toast.makeText(this, "Title should be 1-100 characters long", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
+//
+//        ArrayList<Resource> contentBlocks = new ArrayList<>();
+//        LinearLayout contentLayout = findViewById(R.id.llDpaContentLayout);
+//
+//        // Step 1: Retrieve resources from UI in correct order
+//        for (int i = 0; i < contentLayout.getChildCount(); i++) {
+//            View view = contentLayout.getChildAt(i);
+//
+//            Object tag = view.getTag();
+//            if (view instanceof LinearLayout) { // Handling Text & Task Blocks
+//                EditText editText = view.findViewById(R.id.etTextBlock);
+//
+//                if (editText != null) {  // Handling Text Block
+//                    String text = editText.getText().toString().trim();
+//                    if (!text.isEmpty()) {
+//                        contentBlocks.add(new Resource(pageId, "text", text, contentBlocks.size() + 1));
+//                        Log.d("onPause", "📌 Saved Text Block: " + text);
+//                    }
+//                }
+//            }
+//            else if (view instanceof FrameLayout) {
+//                // Handling Image Block (FrameLayout)
+//                Log.d("Image", "Adding image to database.");
+//
+//                Log.d("Image", tag.toString());
+//                if (tag instanceof Image) { // Ensure it's an Image object
+//                    Image image = (Image) tag;
+//                    String imagePath = image.getImageUri(); // Extract image path
+//                    Log.d("onPause", "🖼 Saved Image: " + imagePath);
+//                    contentBlocks.add(new Resource(pageId, "image", imagePath, contentBlocks.size() + 1));
+//                }else if(tag instanceof Task) {
+//                    Task task = (Task) tag;
+//                    contentBlocks.add(new Resource(pageId, "task", String.valueOf(task.getTaskId()), contentBlocks.size() + 1));
+//                    Log.d("onPause", "✅ Task Block Detected & Saved: " + task.getTaskTitle());
+//                }else if (tag instanceof DiaryPage) {
+//                    DiaryPage page = (DiaryPage) tag;
+//                    contentBlocks.add(new Resource(pageId, "page", String.valueOf(page.getPageId()), contentBlocks.size() + 1));
+//                }
+//            }
+//        }
+//
+//        int userId = sharedPreferences.getInt("userId", -1);
+//
+//        // Step 2: Save the ordered resources to the database
+//        if (!title.isEmpty() || !contentBlocks.isEmpty()) {
+//            if (pageId == -1) {
+//                pageId = dbHelper.updatePage(-1, title, contentBlocks, userId);
+//                Toast.makeText(this, "New Page Created", Toast.LENGTH_SHORT).show();
+//            } else {
+//                dbHelper.updatePage(pageId, title, contentBlocks, userId);
+//                Toast.makeText(this, "Page Updated", Toast.LENGTH_SHORT).show();
+//            }
+//        } else {
+//            Log.d("onPause", "⚠️ Nothing to save, skipping database update.");
+//        }
+//
+//        dbHelper.cleanUpTasks();
+//        debugResourcesTable("pageResource");
+//    }
+//
+//
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -167,7 +251,7 @@ public class DiaryPageActivity extends AppCompatActivity {
         String title = editTitle.getText().toString().trim();
         if (title.isEmpty()) {
             Log.e("onPause", "⚠️ Title is empty! Not saving to database.");
-            return; // Prevent the app from attempting an update
+            return;
         }
 
         if (title.length() > 100) {
@@ -184,10 +268,10 @@ public class DiaryPageActivity extends AppCompatActivity {
             View view = contentLayout.getChildAt(i);
 
             Object tag = view.getTag();
-            if (view instanceof LinearLayout) { // Handling Text & Task Blocks
+            if (view instanceof LinearLayout) {
                 EditText editText = view.findViewById(R.id.etTextBlock);
 
-                if (editText != null) {  // Handling Text Block
+                if (editText != null) {
                     String text = editText.getText().toString().trim();
                     if (!text.isEmpty()) {
                         contentBlocks.add(new Resource(pageId, "text", text, contentBlocks.size() + 1));
@@ -196,20 +280,30 @@ public class DiaryPageActivity extends AppCompatActivity {
                 }
             }
             else if (view instanceof FrameLayout) {
-                // Handling Image Block (FrameLayout)
-                Log.d("Image", "Adding image to database.");
-
-                Log.d("Image", tag.toString());
-                if (tag instanceof Image) { // Ensure it's an Image object
+                if (tag instanceof Image) {
                     Image image = (Image) tag;
-                    String imagePath = image.getImageUri(); // Extract image path
-                    Log.d("onPause", "🖼 Saved Image: " + imagePath);
+                    String imagePath = image.getImageUri();
                     contentBlocks.add(new Resource(pageId, "image", imagePath, contentBlocks.size() + 1));
-                }else if(tag instanceof Task) {
+                } else if (tag instanceof Task) {
                     Task task = (Task) tag;
                     contentBlocks.add(new Resource(pageId, "task", String.valueOf(task.getTaskId()), contentBlocks.size() + 1));
+
+                    // ✅ Trigger Notification if Task is Pending
+                    if (task.getCompletion().equals("Pending")) {
+                        if (PermissionManager.hasNotificationPermission(this)) {
+                            // ✅ Directly trigger notification if permission is already granted
+                            TaskNotificationManager.triggerNotification(this, task);
+                        } else {
+                            // ✅ Request permission if not granted (Notification will trigger later)
+                            pendingTask = task;
+                        }
+                    } else {
+                        // ✅ Cancel Notification if Task is Completed
+                        TaskNotificationManager.cancelNotification(this, task.getTaskId());
+                    }
+
                     Log.d("onPause", "✅ Task Block Detected & Saved: " + task.getTaskTitle());
-                }else if (tag instanceof DiaryPage) {
+                } else if (tag instanceof DiaryPage) {
                     DiaryPage page = (DiaryPage) tag;
                     contentBlocks.add(new Resource(pageId, "page", String.valueOf(page.getPageId()), contentBlocks.size() + 1));
                 }
@@ -227,15 +321,14 @@ public class DiaryPageActivity extends AppCompatActivity {
                 dbHelper.updatePage(pageId, title, contentBlocks, userId);
                 Toast.makeText(this, "Page Updated", Toast.LENGTH_SHORT).show();
             }
-        } else {
-            Log.d("onPause", "⚠️ Nothing to save, skipping database update.");
         }
 
         dbHelper.cleanUpTasks();
         debugResourcesTable("pageResource");
     }
 
-    //Todo: onPause() changed.
+
+
 
     //deletePage() done
     public void deletePage(View view) {
@@ -619,7 +712,9 @@ private void addTextBlockToUI(String textContent) {
         });
     }
 
+
     private void addTaskBlock(Task task) {
+        PermissionManager.requestNotificationPermission(this);
         LinearLayout contentLayout = findViewById(R.id.llDpaContentLayout);
 
         // Inflate Task Block XML properly
@@ -639,22 +734,24 @@ private void addTextBlockToUI(String textContent) {
         recurring.setText("Recurring: " + task.getRecurring());
         completion.setChecked(task.getCompletion().equals("Completed"));
 
-        // Update task completion status on checkbox change
+        // ✅ Handle Completion Checkbox
         completion.setOnCheckedChangeListener((buttonView, isChecked) -> {
             String status = isChecked ? "Completed" : "Pending";
             dbHelper.updateTaskCompletion(task.getTaskId(), status);
+
+
         });
 
-        // Open TaskDialog with existing data on click
+        // ✅ Handle Task Click - Edit Task
         taskView.setOnClickListener(v -> {
             Context context = v.getContext();
-            Task selectedTask = (Task) v.getTag(); // Get existing task
+            Task selectedTask = (Task) v.getTag();
 
             TaskDialog.showTaskDialog(context, (getTitle, start, end, isRecurring) -> {
                 // Update task in database
-//                dbHelper.updateTask(selectedTask.getTaskId(), getTitle, start, end, String.valueOf(isRecurring));
+                dbHelper.updateTask(selectedTask.getTaskId(), getTitle, start, end, String.valueOf(isRecurring));
 
-                // Refresh UI by updating task block
+                // Refresh UI
                 selectedTask.setTaskTitle(getTitle);
                 selectedTask.setStartTime(start);
                 selectedTask.setEndTime(end);
@@ -663,15 +760,41 @@ private void addTextBlockToUI(String textContent) {
                 title.setText(getTitle);
                 time.setText(start + " - " + end);
                 recurring.setText("Recurring: " + isRecurring);
+
+
             }, selectedTask);
         });
 
-        // Add Task Block to Diary Page
+        // ✅ Handle Undo/Redo with Same Task ID
         contentLayout.addView(taskView);
 
-        // Store action for undo
-        undoStack.push(new Action(Action.ActionType.ADD, taskView, contentLayout.getChildCount() - 1));
+        undoStack.push(new Action(Action.ActionType.ADD, taskView, contentLayout.getChildCount() - 1, new Action.UndoRedoHandler() {
+            @Override
+            public void undo() {
+                // ✅ Soft delete (Remove from UI only)
+                contentLayout.removeView(taskView);
+
+                // ✅ Cancel the same notification
+                TaskNotificationManager.cancelNotification(DiaryPageActivity.this, task.getTaskId());
+
+                // ✅ Temporarily mark task as "Deleted"
+                dbHelper.updateTaskCompletion(task.getTaskId(), "Deleted");
+            }
+
+            @Override
+            public void redo() {
+                // ✅ Restore the same task ID and content
+                contentLayout.addView(taskView);
+
+                // ✅ Update task status back to Pending
+                dbHelper.updateTaskCompletion(task.getTaskId(), "Pending");
+
+                // ✅ Reschedule the same notification
+            }
+        }));
+
         redoStack.clear();
+
     }
 
 
@@ -688,14 +811,35 @@ private void addTextBlockToUI(String textContent) {
             if (grandParent != null) {
                 int position = ((LinearLayout) grandParent).indexOfChild(parent);
 
-                // Store action for undo
-                undoStack.push(new Action(Action.ActionType.DELETE, parent, position));
-                redoStack.clear();
+                // Check if the block is a Task Block
+                Object tag = parent.getTag();
+                if (tag instanceof Task) {
+                    Task task = (Task) tag;
 
-                grandParent.removeView(parent);
+                    // ✅ Step 1: Delete Task from Database
+                    dbHelper.deleteTask(task.getTaskId());
+
+                    // ✅ Step 2: Cancel any Pending/Snoozed Notifications for this Task
+                    TaskNotificationManager.cancelNotification(this, task.getTaskId());
+
+                    // ✅ Step 3: Store action for undo
+                    undoStack.push(new Action(Action.ActionType.DELETE, parent, position));
+                    redoStack.clear();
+
+                    // ✅ Step 4: Remove UI Block
+                    grandParent.removeView(parent);
+
+                    Log.d("TaskDelete", "🗑️ Task deleted and notification canceled.");
+                } else {
+                    // If it's not a Task Block, simply remove it.
+                    undoStack.push(new Action(Action.ActionType.DELETE, parent, position));
+                    redoStack.clear();
+                    grandParent.removeView(parent);
+                }
             }
         }
     }
+
 
 
     public void onResourcePageClick(View view) {
@@ -895,6 +1039,26 @@ private void addTextBlockToUI(String textContent) {
         startActivity(intent);
     }
 
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == PermissionManager.NOTIFICATION_PERMISSION_CODE) {
+            if (PermissionManager.hasNotificationPermission(this)) {
+                Log.d("Notification", "✅ Notification permission granted.");
+
+                // ✅ Trigger all pending notifications
+//                for (Task task : pendingTasks) {  // Change from pendingTask to pendingTasks
+//                    if (task.getCompletion().equals("Pending")) {
+//                        TaskNotificationManager.triggerNotification(this, task);
+//                    }
+//                }
+            }else {
+                Log.d("Notification", "❌ Notification permission denied.");
+            }
+        }
+    }
 
 
 }
