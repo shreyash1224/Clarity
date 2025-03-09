@@ -132,4 +132,9 @@ public class ToolsActivity extends AppCompatActivity {
         Intent intent = new Intent(ToolsActivity.this, ExpenseManagerActivity.class);
         startActivity(intent);
     }
+
+    public void profileActivity(MenuItem item) {
+        Intent intent = new Intent(ToolsActivity.this, ProfileActivity.class);
+        startActivity(intent);
+    }
 }

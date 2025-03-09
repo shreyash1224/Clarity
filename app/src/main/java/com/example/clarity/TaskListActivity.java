@@ -248,4 +248,9 @@ public class TaskListActivity extends AppCompatActivity {
         Intent intent = new Intent(TaskListActivity.this, ToolsActivity.class);
         startActivity(intent);
     }
+
+    public void profileActivity(MenuItem item) {
+        Intent intent = new Intent(TaskListActivity.this, ProfileActivity.class);
+        startActivity(intent);
+    }
 }

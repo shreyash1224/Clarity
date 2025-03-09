@@ -281,4 +281,10 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(MainActivity.this, ToolsActivity.class);
         startActivity(intent);
     }
+
+
+    public void profileActivity(MenuItem item) {
+        Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+        startActivity(intent);
+    }
 }

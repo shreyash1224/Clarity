@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp"
+
+    android:background="@android:color/white">
+
+    <!-- Page Title -->
+    <TextView
+        android:id="@+id/profileTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Profile"
+        android:textSize="30dp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:paddingBottom="16dp"
+        android:padding="12dp"
+        android:layout_marginTop="20dp"
+        android:elevation="4dp" />
+
+    <!-- Profile Picture Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:paddingBottom="24dp">
+
+        <ImageView
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/profilePicture"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:contentDescription="Profile Picture"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_done" />
+
+<!--        <Button-->
+<!--            android:id="@+id/editProfilePicture"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Edit"-->
+<!--            android:textColor="@android:color/black"-->
+<!--            android:backgroundTint="@android:color/darker_gray"-->
+<!--            android:contentDescription="Edit Profile Picture" />-->
+    </LinearLayout>
+
+    <!-- Name Section -->
+    <TextView
+        android:id="@+id/nameLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Name"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp" />
+
+    <EditText
+        android:id="@+id/nameField"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter your name"
+        android:inputType="textPersonName"
+        android:layout_marginBottom="16dp"
+        android:padding="12dp"
+        android:background="@drawable/edit_text_bg"
+        android:contentDescription="Name Input Field" />
+
+    <!-- Email Section -->
+    <TextView
+        android:id="@+id/emailLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Email"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp" />
+
+    <EditText
+        android:id="@+id/emailField"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter your email"
+        android:inputType="textEmailAddress"
+        android:layout_marginBottom="16dp"
+        android:padding="12dp"
+        android:background="@drawable/edit_text_bg"
+        android:contentDescription="Email Input Field" />
+
+    <!-- Phone Number Section -->
+    <TextView
+        android:id="@+id/phoneLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Phone Number"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp" />
+
+    <EditText
+        android:id="@+id/phoneField"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter your phone number"
+        android:inputType="phone"
+        android:layout_marginBottom="16dp"
+        android:padding="12dp"
+        android:background="@drawable/edit_text_bg"
+        android:contentDescription="Phone Number Input Field" />
+
+    <!-- Username Section -->
+    <TextView
+        android:id="@+id/usernameLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Username"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:id="@+id/usernameField"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Your Username"
+        android:textColor="@android:color/darker_gray"
+        android:layout_marginBottom="16dp"
+        android:padding="12dp"
+        android:background="@drawable/edit_text_bg"
+        android:contentDescription="Username Field" />
+
+    <!-- UserID Section -->
+    <TextView
+        android:id="@+id/userIdLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="User ID"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:id="@+id/userIdField"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Your User ID"
+        android:textColor="@android:color/darker_gray"
+        android:layout_marginBottom="24dp"
+        android:padding="12dp"
+        android:background="@drawable/edit_text_bg"
+        android:contentDescription="User ID Field" />
+
+    <!-- Save Button -->
+    <Button
+        android:id="@+id/saveButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Save"
+        android:textColor="@android:color/white"
+        android:backgroundTint="@color/colorPrimary"
+        android:contentDescription="Save Profile Button" />
+</LinearLayout>

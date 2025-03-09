@@ -46,8 +46,13 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
                 + "userDate DATETIME DEFAULT (datetime('now', 'localtime')), "
                 + "userName TEXT NOT NULL CHECK (LENGTH(userName) > 0 AND LENGTH(userName) <= 50) UNIQUE, "
                 + "userPassword TEXT NOT NULL CHECK (LENGTH(userPassword) >= 6), "
-                + "securityQuestion TEXT, "
-                + "securityAnswer TEXT);";
+                + "securityQuestion TEXT NOT NULL, "
+                + "securityAnswer TEXT NOT NULL, "
+                + "email TEXT, "
+                + "name TEXT, "
+                + "phoneNumber TEXT, "
+                + "profilePicture TEXT" // Store profile picture URI here
+                + ");";
 
         db.execSQL(userTable);
 
@@ -1007,6 +1012,48 @@ public long insertResource(int pageId, String resourceType, String resourceConte
         db.close();
     }
 
+
+    public boolean updateUserProfile(int userId, String name, String email, String phone, String profilePictureUri) {
+        Log.d("Profile", "Update Profile called for User ID: " + userId);
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("name", name);
+        values.put("email", email);
+        values.put("phoneNumber", phone);
+
+        // Check if the profile picture URI is provided
+        if (profilePictureUri != null && !profilePictureUri.isEmpty()) {
+            values.put("profilePicture", profilePictureUri);
+        }
+
+        // Update the user profile
+        int rows = db.update("users", values, "userId=?", new String[]{String.valueOf(userId)});
+        db.close();
+
+        if (rows > 0) {
+            Log.d("Database", "Profile updated successfully for User ID: " + userId);
+            return true;
+        } else {
+            Log.d("Database", "Failed to update profile for User ID: " + userId);
+            return false;
+        }
+    }
+
+    public Cursor getUserProfile(int userId) {
+        Log.d("Profile", "Fetching profile for User ID: " + userId);
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT userId, userName, email, phoneNumber, profilePicture, name FROM users WHERE userId=?";
+
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
+
+        if (cursor != null && cursor.moveToFirst()) {
+            return cursor;
+        } else {
+            return null;
+        }
+    }
 
 
 }
