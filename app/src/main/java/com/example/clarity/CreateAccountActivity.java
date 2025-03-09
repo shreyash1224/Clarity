@@ -3,6 +3,7 @@ package com.example.clarity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -23,16 +24,19 @@ public class CreateAccountActivity extends AppCompatActivity {
         etCaaConfirmPassword = findViewById(R.id.etCaaConfirmPassword);
         etCaaSecurityQuestion = findViewById(R.id.etCaaSecurityQuestion);
         etCaaSecurityAnswer = findViewById(R.id.etCaaSecurityAnswer);
+        Button btnCaaCreateAccount = findViewById(R.id.btnCaaCreateAccount);
         dbHelper = new DiaryDatabaseHelper(this);
     }
 
     // This method is called when the user clicks the 'Create Account' button
-    public void onCreateAccountClicked(View view) {
+    public void createAccount(View view) {
         String username = etCaaUsername.getText().toString().trim();
         String password = etCaaPassword.getText().toString().trim();
         String confirmPassword = etCaaConfirmPassword.getText().toString().trim();
         String securityQuestion = etCaaSecurityQuestion.getText().toString().trim();
         String securityAnswer = etCaaSecurityAnswer.getText().toString().trim();
+
+
 
         if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || securityQuestion.isEmpty() || securityAnswer.isEmpty()) {
             Toast.makeText(this, "All fields are required", Toast.LENGTH_SHORT).show();

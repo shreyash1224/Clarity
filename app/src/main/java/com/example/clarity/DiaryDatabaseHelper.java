@@ -61,6 +61,7 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
                 + "pageTitle TEXT NOT NULL CHECK (LENGTH(pageTitle) > 0 AND LENGTH(pageTitle) <= 100), "
                 + "pageDate DATETIME DEFAULT (datetime('now', 'localtime')), "
                 + "userId INTEGER NOT NULL, "
+                + "pageStatus TEXT NOT NULL DEFAULT 'active', "
                 + "FOREIGN KEY (userId) REFERENCES users(userId) ON DELETE CASCADE);";
 
         db.execSQL(pageTable);
@@ -106,6 +107,17 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
                 + "FOREIGN KEY (userId) REFERENCES users(userId) ON DELETE CASCADE"
                 + ");";
         db.execSQL(transactions);
+
+
+        db.execSQL("CREATE TABLE trash_bin (" +
+                "trashId INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "pageId INTEGER NOT NULL," +
+                "pageTitle TEXT NOT NULL," +
+                "pageDate DATETIME NOT NULL," +
+                "userId INTEGER NOT NULL," +
+                "deletedAt DATETIME DEFAULT CURRENT_TIMESTAMP," +
+                "FOREIGN KEY(pageId) REFERENCES pages(pageId) ON DELETE CASCADE," +
+                "FOREIGN KEY(userId) REFERENCES users(userId) ON DELETE CASCADE)");
 
 
         // Add indexes to optimize foreign key searches

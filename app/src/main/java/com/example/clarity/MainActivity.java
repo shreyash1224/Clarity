@@ -339,4 +339,9 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
         startActivity(intent);
     }
+
+    public void trashActivity(MenuItem item) {
+        Intent intent = new Intent(MainActivity.this, TrashActivity.class);
+        startActivity(intent);
+    }
 }

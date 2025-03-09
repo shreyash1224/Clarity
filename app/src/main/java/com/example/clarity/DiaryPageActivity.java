@@ -341,39 +341,29 @@ public class DiaryPageActivity extends AppCompatActivity {
         try {
             db.beginTransaction();
 
-            // 1. Get image file paths before deleting resources
+            // 1. Move associated images to trash (physically delete them)
             Cursor cursor = db.rawQuery("SELECT resourceContent FROM resources WHERE pageId = ? AND resourceType = 'image'",
                     new String[]{String.valueOf(pageId)});
 
             while (cursor.moveToNext()) {
-
-
                 String imagePath = cursor.getString(0);
                 if (imagePath != null) {
                     File imageFile = new File(imagePath);
-                    if (imageFile.exists() && imageFile.delete()) {
-                        Log.d("DiaryPageActivity", "Deleted image file: " + imagePath);
-                    } else {
-                        Log.e("DiaryPageActivity", "Failed to delete image file: " + imagePath);
+                    if (imageFile.exists()) {
+                        imageFile.delete();
                     }
                 }
             }
             cursor.close();
 
-            // 2. Delete resources linked to the page
-            db.delete("resources", "pageId = ?", new String[]{String.valueOf(pageId)});
+            // 2. Update the page status to 'trashed'
+            ContentValues values = new ContentValues();
+            values.put("pageStatus", "trashed");
 
-            // 3. Remove all references to this page inside other pages' page_blocks
-            db.delete("resources", "resourceType = 'page' AND resourceContent = ?", new String[]{String.valueOf(pageId)});
-
-            // Delete tasks associated with the page
-            db.delete("resources", "pageId = ? AND resourceType = 'task'", new String[]{String.valueOf(pageId)});
-
-            // 4. Delete the actual page
-            int rowsAffected = db.delete("pages", "pageId = ?", new String[]{String.valueOf(pageId)});
+            int rowsAffected = db.update("pages", values, "pageId = ?", new String[]{String.valueOf(pageId)});
 
             if (rowsAffected > 0) {
-                Toast.makeText(this, "Page Deleted", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Page moved to Trash", Toast.LENGTH_LONG).show();
                 finish();
             } else {
                 Toast.makeText(this, "Page not found!", Toast.LENGTH_SHORT).show();
@@ -381,8 +371,8 @@ public class DiaryPageActivity extends AppCompatActivity {
 
             db.setTransactionSuccessful();
         } catch (SQLiteException e) {
-            Log.e("DiaryPageActivity", "Error deleting page: " + e.getMessage());
-            Toast.makeText(this, "Error deleting page!", Toast.LENGTH_SHORT).show();
+            Log.e("DiaryPageActivity", "Error moving page to trash: " + e.getMessage());
+            Toast.makeText(this, "Error moving page to Trash!", Toast.LENGTH_SHORT).show();
         } finally {
             db.endTransaction();
             db.close();
@@ -1059,6 +1049,7 @@ private void addTextBlockToUI(String textContent) {
             }
         }
     }
+
 
 
 }

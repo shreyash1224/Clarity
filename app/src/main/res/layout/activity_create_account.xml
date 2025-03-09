@@ -9,11 +9,11 @@
     android:padding="24dp"
     android:gravity="center"
     android:background="@color/white"
-    tools:context=".ForgotPasswordActivity">
+    tools:context=".CreateAccountActivity">
 
     <!-- Title -->
     <TextView
-        android:id="@+id/tvFpaForgotPassword"
+        android:id="@+id/tvCaaCreateAccount"
         android:textSize="30dp"
         android:textStyle="bold"
         android:text="Create Account"
@@ -103,13 +103,15 @@
 
     <!-- Reset Password Button -->
     <Button
-        android:id="@+id/bFpaResetPassword"
+        android:id="@+id/btnCaaCreateAccount"
         style="@style/ButtonStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Reset Password"
-        android:onClick="onResetPasswordClicked"
-        android:layout_marginTop="32dp"/>
+        android:text="Create Account"
+        android:layout_marginTop="32dp"
+        android:onClick="createAccount"/>
+
+
 
     <!-- Back to Login -->
     <TextView

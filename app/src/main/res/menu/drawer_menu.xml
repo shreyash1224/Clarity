@@ -15,6 +15,14 @@
         android:onClick="settingsActivity"
         />
 
+    <item
+        android:id="@+id/nav_trash_bin"
+        android:title="Trash Bin"
+        android:icon="@android:drawable/ic_menu_delete"
+        android:onClick="trashActivity"
+        />
+
+
 </menu>
 
 
