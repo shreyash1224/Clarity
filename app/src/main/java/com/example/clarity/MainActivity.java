@@ -2,7 +2,11 @@ package com.example.clarity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -33,8 +37,13 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -42,6 +51,9 @@ public class MainActivity extends AppCompatActivity {
     private NavigationView navigationView;
     private TextView tvUserName;
     private TextView tvUserId;
+
+    CircleImageView profileImage;
+
     private SharedPreferences sharedPreferences;
     private DrawerLayout drawerLayout;
 
@@ -75,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(topToolbar);
         getSupportActionBar().setTitle("");  // Removes the title text
 
-
         // Initialize DrawerLayout and NavigationView
         drawerLayout = findViewById(R.id.dlMaMainPage);
         navigationView = findViewById(R.id.nvMaNavDrawer);
@@ -84,21 +95,19 @@ public class MainActivity extends AppCompatActivity {
         ImageButton ibMenu = findViewById(R.id.ibMenu);
         ibMenu.setOnClickListener(view -> {
             if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                drawerLayout.closeDrawer(GravityCompat.START);  // Close drawer if open
+                drawerLayout.closeDrawer(GravityCompat.START);
             } else {
-                drawerLayout.openDrawer(GravityCompat.START);  // Open drawer if closed
+                drawerLayout.openDrawer(GravityCompat.START);
             }
         });
 
-        // Navigation Header Setup
+        // ✅ Navigation Header Setup (Correct Way)
         View headerView = navigationView.getHeaderView(0);
         tvUserName = headerView.findViewById(R.id.tvUsername);
         tvUserId = headerView.findViewById(R.id.tvUserId);
+        profileImage = headerView.findViewById(R.id.ciProfilePicture);
 
-
-
-
-
+        // ✅ Fetch user details from SharedPreferences
         sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
         String username = sharedPreferences.getString("username", null);
         int userId = sharedPreferences.getInt("userId", -1);
@@ -110,11 +119,58 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
 
-        Toast.makeText(this, username + " " + userId, Toast.LENGTH_LONG).show();
+        // ✅ Set username and userId in Nav Header
         tvUserName.setText(username);
         tvUserId.setText(String.valueOf(userId));
 
-        // Handle navigation item clicks
+        // ✅ Fetch Profile Picture from Database
+        DiaryDatabaseHelper dbHelper = new DiaryDatabaseHelper(this);
+        Cursor cursor = dbHelper.getUserProfilePicture(userId);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            int columnIndex = cursor.getColumnIndex("profilePicture");
+
+            if (columnIndex != -1) {
+                String profilePicturePath = cursor.getString(columnIndex);
+                Log.e("ProfilePicture", "Retrieved Profile Picture Path: " + profilePicturePath);
+
+                if (profilePicturePath != null && !profilePicturePath.isEmpty()) {
+                    if (profilePicturePath.startsWith("content://")) {
+                        // ✅ It's a content URI, use ContentResolver
+                        Log.e("ProfilePicture", "Profile picture is a content URI.");
+                        try {
+                            InputStream inputStream = getContentResolver().openInputStream(Uri.parse(profilePicturePath));
+                            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                            profileImage.setImageBitmap(bitmap);
+                            Log.e("ProfilePicture", "Profile picture loaded from content URI.");
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                            Log.e("ProfilePicture", "Failed to load profile picture from URI.");
+                            profileImage.setImageResource(R.drawable.ic_done); // Fallback image
+                        }
+                    } else {
+                        // ✅ It's a direct file path, use BitmapFactory
+                        Log.e("ProfilePicture", "Profile picture is a file path.");
+                        File imgFile = new File(profilePicturePath);
+
+                        if (imgFile.exists()) {
+                            Bitmap bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                            profileImage.setImageBitmap(bitmap);
+                            Log.e("ProfilePicture", "Profile picture loaded from file.");
+                        } else {
+                            Log.e("ProfilePicture", "Profile picture file does not exist at: " + profilePicturePath);
+                            profileImage.setImageResource(R.drawable.ic_done); // Fallback image
+                        }
+                    }
+                } else {
+                    Log.e("ProfilePicture", "Profile picture path is null or empty.");
+                    profileImage.setImageResource(R.drawable.ic_done); // Fallback image
+                }
+            }
+            cursor.close();
+        }
+
+        // ✅ Handle navigation item clicks
         navigationView.setNavigationItemSelectedListener(item -> {
             if (item.getItemId() == R.id.nav_profile) {
                 Toast.makeText(MainActivity.this, "Profile Selected", Toast.LENGTH_SHORT).show();
@@ -127,10 +183,6 @@ public class MainActivity extends AppCompatActivity {
 
         listView = findViewById(R.id.lvMalistView);
     }
-
-
-
-
 
     //Logging out.
     public void logout(View view) {

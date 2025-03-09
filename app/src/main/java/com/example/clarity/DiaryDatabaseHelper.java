@@ -1056,6 +1056,15 @@ public long insertResource(int pageId, String resourceType, String resourceConte
     }
 
 
+    public Cursor getUserProfilePicture(int userId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT profilePicture FROM users WHERE userId = ?";
+        return db.rawQuery(query, new String[]{String.valueOf(userId)});
+    }
+
+
+
+
 }
 
 
