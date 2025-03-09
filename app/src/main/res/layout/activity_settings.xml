@@ -3,8 +3,35 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="20dp"
+    android:background="@android:color/white">
 
+    <!-- Page Title -->
+    <TextView
+        android:id="@+id/deleteUserTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Delete User"
+        android:textSize="30dp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:paddingBottom="16dp"
+        android:padding="12dp"
+        android:layout_marginTop="20dp"
+        android:elevation="4dp" />
+
+    <!-- Warning Text -->
+    <TextView
+        android:id="@+id/warningText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Are you sure you want to delete your account? This action cannot be undone."
+        android:textSize="16sp"
+        android:textColor="@android:color/darker_gray"
+        android:paddingBottom="24dp"
+        android:gravity="center" />
+
+    <!-- Delete Button -->
     <Button
         android:id="@+id/btnDeleteUser"
         android:layout_width="match_parent"
@@ -13,5 +40,6 @@
         android:backgroundTint="@android:color/holo_red_light"
         android:textColor="@android:color/white"
         android:onClick="deleteUser"
-        />
+        android:layout_marginBottom="24dp"
+        android:contentDescription="Delete User Button" />
 </LinearLayout>

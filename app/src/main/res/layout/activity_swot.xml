@@ -8,13 +8,21 @@
 
     <!-- Title -->
     <TextView
+        android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="SWOT"
-        android:textSize="24sp"
+        android:text="SWOT Analysis"
+        android:textSize="26sp"
         android:textStyle="bold"
+        android:textColor="@color/brown_text"
+        android:letterSpacing="0.05"
         android:layout_gravity="center"
-        android:paddingBottom="16dp"/>
+        android:paddingBottom="16dp"
+        android:shadowColor="@color/brown_toolbar"
+        android:shadowDx="2"
+        android:shadowDy="2"
+        android:shadowRadius="4"/>
+
 
     <!-- SWOT Quadrants -->
     <GridLayout
@@ -27,6 +35,7 @@
 
         <!-- Strength -->
         <FrameLayout
+            android:layout_margin="2dp"
             android:id="@+id/fragment_strength"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -36,6 +45,8 @@
 
         <!-- Weakness -->
         <FrameLayout
+            android:layout_margin="2dp"
+
             android:id="@+id/fragment_weakness"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -45,6 +56,8 @@
 
         <!-- Opportunity -->
         <FrameLayout
+            android:layout_margin="2dp"
+
             android:id="@+id/fragment_opportunity"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -54,6 +67,8 @@
 
         <!-- Threat -->
         <FrameLayout
+            android:layout_margin="2dp"
+
             android:id="@+id/fragment_threat"
             android:layout_width="0dp"
             android:layout_height="0dp"

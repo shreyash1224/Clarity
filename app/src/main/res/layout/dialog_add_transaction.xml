@@ -3,14 +3,30 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="20dp"
+    android:background="@color/beige_background"
+    android:elevation="8dp"
+    android:clipToPadding="false"
+    android:clipChildren="false">
 
     <!-- Transaction Title -->
     <EditText
         android:id="@+id/etTransactionTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Transaction Title" />
+        android:hint="Transaction Title"
+        android:textSize="16sp"
+        android:background="@android:color/transparent"
+        android:paddingBottom="8dp"
+        android:textColor="@color/brown_text"
+        android:inputType="textCapSentences"/>
+
+    <!-- Underline -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/button_brown"
+        android:layout_marginBottom="12dp" />
 
     <!-- Amount -->
     <EditText
@@ -18,14 +34,35 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Amount"
-        android:inputType="numberDecimal" />
+        android:textSize="16sp"
+        android:background="@android:color/transparent"
+        android:paddingBottom="8dp"
+        android:textColor="@color/brown_text"
+        android:inputType="numberDecimal"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/button_brown"
+        android:layout_marginBottom="12dp" />
 
     <!-- Category -->
     <EditText
         android:id="@+id/etTransactionCategory"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Category" />
+        android:hint="Category"
+        android:textSize="16sp"
+        android:background="@android:color/transparent"
+        android:paddingBottom="8dp"
+        android:textColor="@color/brown_text"
+        android:inputType="textCapSentences"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/button_brown"
+        android:layout_marginBottom="12dp" />
 
     <!-- Date -->
     <EditText
@@ -34,35 +71,74 @@
         android:layout_height="wrap_content"
         android:hint="Date (YYYY-MM-DD)"
         android:focusable="false"
-        android:clickable="true" />
+        android:clickable="true"
+        android:background="@android:color/transparent"
+        android:paddingBottom="8dp"
+        android:textSize="16sp"
+        android:textColor="@color/brown_text"
+        android:drawableEnd="@drawable/ic_calendar_resource"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/button_brown"
+        android:layout_marginBottom="12dp" />
 
     <!-- Expense or Income Toggle -->
-    <Switch
-        android:id="@+id/switchExpense"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Expense" />
+        android:orientation="horizontal"
+        android:gravity="start|center_vertical"
+        android:paddingBottom="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Transaction Type:"
+            android:textSize="14sp"
+            android:textColor="@color/brown_text"/>
+
+        <Switch
+            android:id="@+id/switchExpense"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Expense"
+            android:textColor="@color/brown_text"
+            android:layout_marginStart="12dp"
+            android:thumbTint="@color/button_brown"
+           />
+    </LinearLayout>
 
     <!-- Buttons -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="end"
-        android:paddingTop="16dp">
+        android:gravity="end">
 
+        <!-- Cancel Button -->
         <Button
             android:id="@+id/btnCancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Cancel" />
+            android:text="Cancel"
+            android:textColor="@color/error_red"
+            android:background="@android:color/transparent"
+            android:padding="12dp"
+            android:textAllCaps="false"/>
 
+        <!-- Save Button -->
         <Button
             android:id="@+id/btnSave"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Save"
-            android:layout_marginStart="8dp"/>
+            android:textColor="@color/beige_background"
+            android:backgroundTint="@color/button_brown"
+            android:padding="12dp"
+            android:textAllCaps="false"
+            android:layout_marginStart="12dp"/>
     </LinearLayout>
 
 </LinearLayout>

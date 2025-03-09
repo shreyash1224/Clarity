@@ -2,24 +2,27 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/createAccountActivity"
+    android:id="@+id/forgotPasswordActivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="24dp"
     android:gravity="center"
-    android:background="@color/beige_background"
-    tools:context=".CreateAccountActivity">
+    android:background="@color/white"
+    tools:context=".ForgotPasswordActivity">
 
     <!-- Title -->
     <TextView
-        android:id="@+id/tvCaaCreateAccount"
-        android:textSize="40dp"
+        android:id="@+id/tvFpaForgotPassword"
+        android:textSize="30dp"
+        android:textStyle="bold"
+        android:text="Create Account"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Create Account"
         android:layout_gravity="center"
-        android:paddingBottom="20dp"/>
+        android:paddingBottom="20dp"
+        android:textColor="@color/brown_text"
+        android:letterSpacing="0.05"/>
 
     <!-- Username Input -->
     <EditText
@@ -28,35 +31,32 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Enter Username"
+        android:background="@drawable/edittext_background"
+        android:drawableStart="@drawable/ic_user"
+        android:drawablePadding="12dp"
+        android:paddingStart="12dp"
+        android:paddingTop="10dp"
         android:layout_marginBottom="16dp"/>
 
-    <!-- Password Input -->
-    <EditText
-        android:id="@+id/etCaaPassword"
-        style="@style/EditTextStyle"
+    <!-- Security Question -->
+    <TextView
+        android:id="@+id/tvFpaSecurityQuestion"
+        android:textSize="16sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter Password"
-        android:inputType="textPassword"
-        android:layout_marginBottom="16dp"/>
-
-    <!-- Confirm Password Input -->
-    <EditText
-        android:id="@+id/etCaaConfirmPassword"
-        style="@style/EditTextStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textPassword"
-        android:hint="Confirm Password"
-        android:layout_marginBottom="16dp"/>
-
-    <!-- Security Question Input -->
+        android:text="Security Question: What is your pet's name?"
+        android:textColor="@color/brown_text"
+        android:lineSpacingExtra="4dp"
+        android:layout_marginBottom="8dp"/>
     <EditText
         android:id="@+id/etCaaSecurityQuestion"
         style="@style/EditTextStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter Security Question"
+        android:hint="Enter Question"
+        android:background="@drawable/edittext_background"
+        android:paddingStart="12dp"
+        android:paddingTop="10dp"
         android:layout_marginBottom="16dp"/>
 
     <!-- Security Answer Input -->
@@ -65,31 +65,61 @@
         style="@style/EditTextStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter Security Answer"
+        android:hint="Enter Answer"
+        android:background="@drawable/edittext_background"
+        android:paddingStart="12dp"
+        android:paddingTop="10dp"
         android:layout_marginBottom="16dp"/>
 
+    <!-- New Password Input -->
+    <EditText
+        android:id="@+id/etCaaNewPassword"
+        style="@style/EditTextStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter New Password"
+        android:background="@drawable/edittext_background"
+        android:drawableStart="@drawable/ic_password"
+        android:drawablePadding="12dp"
+        android:paddingStart="12dp"
+        android:paddingTop="10dp"
+        android:inputType="textPassword"
+        android:layout_marginBottom="16dp"/>
 
+    <!-- Confirm New Password Input -->
+    <EditText
+        android:id="@+id/etCaaConfirmPassword"
+        style="@style/EditTextStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/edittext_background"
+        android:drawableStart="@drawable/ic_confirm"
+        android:drawablePadding="12dp"
+        android:hint="Confirm New Password"
+        android:inputType="textPassword"
+        android:paddingStart="12dp"
+        android:paddingTop="10dp" />
 
-    <!-- Create Account Button -->
+    <!-- Reset Password Button -->
     <Button
-        android:id="@+id/bCaaCreateAccount"
+        android:id="@+id/bFpaResetPassword"
         style="@style/ButtonStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Create Account"
-        android:onClick="onCreateAccountClicked"
+        android:text="Reset Password"
+        android:onClick="onResetPasswordClicked"
         android:layout_marginTop="32dp"/>
 
     <!-- Back to Login -->
     <TextView
-        android:id="@+id/tvCaaBackToLogin"
+        android:id="@+id/tvFpaBackToLogin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Already have an account? Log in"
+        android:text="← Back to Login"
         android:textColor="@color/brown_text"
         android:textSize="14sp"
         android:layout_marginTop="16dp"
         android:gravity="center"
         android:onClick="onBackToLoginClicked"/>
-
 </LinearLayout>

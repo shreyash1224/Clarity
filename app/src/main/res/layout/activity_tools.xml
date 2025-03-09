@@ -31,9 +31,10 @@
                     android:id="@+id/ibToolsMenu"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
-                    android:src="@android:drawable/ic_menu_sort_by_size"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_menu"
                     android:layout_gravity="start|center"
+                    android:padding="8dp"
                     app:tint="@color/white"/>
 
                 <TextView
@@ -49,67 +50,90 @@
             </androidx.appcompat.widget.Toolbar>
 
             <!-- Tools List -->
+            <!-- Tools List -->
             <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:padding="16dp"
-                android:background="@color/beige_light">
+                android:background="@color/white">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    >
+                    android:orientation="vertical">
 
                     <!-- Tool 1 -->
-                    <LinearLayout
+                    <androidx.cardview.widget.CardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:onClick="toSwotActivity"
-                        android:padding="8dp"
-                        >
+                        android:layout_marginBottom="12dp"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="4dp"
+                        android:backgroundTint="@color/beige_light"
+                        android:onClick="toSwotActivity">
 
-                        <ImageView
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:contentDescription="Tool Icon"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:textColorHint="@android:color/black"
-                            android:text="SWOT Aanlysis"
-                            android:textSize="18sp"
-                            android:layout_marginStart="12dp"/>
-                    </LinearLayout>
+                            android:orientation="horizontal"
+                            android:padding="12dp">
+
+                            <ImageView
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:src="@drawable/ic_swot"
+                                android:contentDescription="SWOT Icon"
+                                />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="SWOT Analysis"
+                                android:textSize="18sp"
+                                android:textColor="@color/brown_text"
+                                android:layout_marginStart="12dp"/>
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
 
                     <!-- Tool 2 -->
-                    <LinearLayout
+                    <androidx.cardview.widget.CardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:onClick="toExpenseActivity"
-                        android:padding="8dp">
+                        android:layout_marginBottom="12dp"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="4dp"
+                        android:backgroundTint="@color/beige_light"
+                        android:onClick="toExpenseActivity">
 
-                        <ImageView
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:contentDescription="Tool Icon"/>
-
-                        <TextView
-                            android:textColorHint="@android:color/black"
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Expense Manager"
-                            android:textSize="18sp"
-                            android:layout_marginStart="12dp"/>
-                    </LinearLayout>
+                            android:orientation="horizontal"
+                            android:padding="12dp">
 
-                    <!-- Add more tools here -->
+                            <ImageView
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:src="@drawable/ic_expense"
+                                android:contentDescription="Expense Icon"
+                                />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Expense Manager"
+                                android:textSize="18sp"
+                                android:textColor="@color/brown_text"
+                                android:layout_marginStart="12dp"/>
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
                 </LinearLayout>
             </ScrollView>
+
+
+
             <!-- Bottom Navigation -->
             <LinearLayout
                 android:id="@+id/tbTlaBottomToolbar"
@@ -125,10 +149,10 @@
                     android:layout_weight="1"
                     android:layout_height="match_parent"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Resource Task"
+                    android:contentDescription="Diary"
                     android:padding="8dp"
                     android:onClick="toMainActivity"
-                    android:src="@drawable/ic_edit_text"/>
+                    android:src="@drawable/ic_diary"/>
 
                 <ImageButton
                     android:id="@+id/ibTlaTpa"
@@ -136,22 +160,21 @@
                     android:layout_weight="1"
                     android:layout_height="match_parent"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Resource Task"
+                    android:contentDescription="Tasks"
                     android:padding="8dp"
                     android:onClick="toTaskListActivity"
-                    android:src="@android:drawable/checkbox_on_background"/>
+                    android:src="@drawable/ic_tasks"/>
 
                 <ImageButton
                     android:id="@+id/ibTopa"
-
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="match_parent"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Resource Task"
+                    android:contentDescription="Tools"
                     android:padding="8dp"
                     android:onClick="toToolActivity"
-                    android:src="@android:drawable/ic_dialog_dialer" />
+                    android:src="@drawable/ic_tools"/>
             </LinearLayout>
         </LinearLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>

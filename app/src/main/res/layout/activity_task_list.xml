@@ -28,17 +28,16 @@
                 android:background="@color/brown_toolbar"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-                <!-- Menu Button -->
                 <ImageButton
                     android:id="@+id/ibMenu"
+                    android:padding="8dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
-                    android:src="@android:drawable/ic_menu_sort_by_size"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_menu"
                     android:layout_gravity="start|center"
                     app:tint="@color/white"/>
 
-                <!-- Clarity Title -->
                 <TextView
                     android:id="@+id/tvToolbarTitle"
                     android:layout_width="wrap_content"
@@ -51,17 +50,15 @@
                     android:padding="8dp"/>
 
                 <ImageButton
-                    android:padding="8dp"
                     android:id="@+id/ibSort"
-                    android:layout_gravity="end"
+                    android:padding="8dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
-                    android:src="@android:drawable/ic_menu_more"
-                    app:tint="@color/white"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_sort"
+                    android:layout_gravity="end"
                     android:onClick="sortTasks"
-
-                    />
+                    app:tint="@color/white"/>
             </androidx.appcompat.widget.Toolbar>
 
             <!-- ListView -->
@@ -73,7 +70,7 @@
                 android:layout_weight="1"
                 android:divider="@android:color/transparent"
                 android:dividerHeight="8dp"
-                android:background="@color/beige_light"/>
+                android:background="@color/white"/>
 
             <!-- Bottom Navigation -->
             <LinearLayout
@@ -90,10 +87,10 @@
                     android:layout_weight="1"
                     android:layout_height="match_parent"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Resource Task"
+                    android:contentDescription="Diary"
                     android:padding="8dp"
                     android:onClick="toMainActivity"
-                    android:src="@drawable/ic_edit_text"/>
+                    android:src="@drawable/ic_diary"/>
 
                 <ImageButton
                     android:id="@+id/ibTlaTpa"
@@ -101,22 +98,21 @@
                     android:layout_weight="1"
                     android:layout_height="match_parent"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Resource Task"
+                    android:contentDescription="Tasks"
                     android:padding="8dp"
                     android:onClick="toTaskListActivity"
-                    android:src="@android:drawable/checkbox_on_background"/>
+                    android:src="@drawable/ic_tasks"/>
 
                 <ImageButton
                     android:id="@+id/ibTopa"
-
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="match_parent"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Resource Task"
+                    android:contentDescription="Tools"
                     android:padding="8dp"
                     android:onClick="toToolActivity"
-                    android:src="@android:drawable/ic_dialog_dialer" />
+                    android:src="@drawable/ic_tools"/>
             </LinearLayout>
         </LinearLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>

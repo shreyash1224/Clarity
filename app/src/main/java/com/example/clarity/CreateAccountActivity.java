@@ -19,7 +19,7 @@ public class CreateAccountActivity extends AppCompatActivity {
         setContentView(R.layout.activity_create_account);
 
         etCaaUsername = findViewById(R.id.etCaaUsername);
-        etCaaPassword = findViewById(R.id.etCaaPassword);
+        etCaaPassword = findViewById(R.id.etCaaNewPassword);
         etCaaConfirmPassword = findViewById(R.id.etCaaConfirmPassword);
         etCaaSecurityQuestion = findViewById(R.id.etCaaSecurityQuestion);
         etCaaSecurityAnswer = findViewById(R.id.etCaaSecurityAnswer);

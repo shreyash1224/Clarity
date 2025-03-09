@@ -4,52 +4,56 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="16dp"
-    android:background="@color/beige_light"> <!-- Set background to beige -->
+
+    android:background="@color/white"> <!-- Set background to beige -->
 
     <!-- Main Content Layout -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:paddingBottom="56dp"> <!-- Ensures content is not blocked by the delete button -->
+        android:background="@color/white"
+        android:paddingBottom="56dp"> <!-- Smooth rounded corners -->
 
+
+        <!-- Page Title -->
         <EditText
             android:id="@+id/etDpaTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Title"
-            android:background="@android:color/transparent"
+            android:background="@drawable/edittext_background"
             android:textColor="@color/brown_toolbar"
             android:textSize="20sp"
-            android:padding="8dp"
+            android:padding="12dp"
             android:textStyle="bold"
+            android:maxLines="2"
+            android:layout_marginBottom="4dp"
+            android:lineSpacingExtra="4dp"
+            android:elevation="2dp"/>
 
-            />
-
+        <!-- Content Scrollable Area -->
         <ScrollView
             android:layout_width="match_parent"
+            android:background="@drawable/edittext_background"
             android:layout_height="0dp"
             android:layout_weight="1"
-
-            android:fillViewport="true">
+            android:fillViewport="true"
+            android:paddingTop="2dp">
 
             <LinearLayout
                 android:id="@+id/llDpaContentLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:showDividers="middle"
                 android:divider="?android:attr/dividerHorizontal"
-                android:dividerPadding="8dp">
-            </LinearLayout>
-
-
+                android:dividerPadding="12dp"
+                android:background="@color/beige_light"
+                android:padding="8dp" />
         </ScrollView>
-
     </LinearLayout>
 
-    <!-- Floating Action Button (Overlays on top of the content) -->
+    <!-- Floating Delete Button -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabDpaDeleteButton"
         android:layout_width="wrap_content"
@@ -58,20 +62,13 @@
         android:layout_marginBottom="80dp"
         android:layout_marginRight="16dp"
         android:contentDescription="Delete Page"
-        android:backgroundTint="@color/brown_fab"
+        app:elevation="6dp"
         android:src="@drawable/ic_delete"
-        android:onClick="deletePage" />
+        android:backgroundTint="@color/error_red"
+        android:onClick="deletePage"
+        app:maxImageSize="40dp"/>
 
-
-
-    <Button
-        android:id="@+id/btnRedo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:text="Redo"/>
-
-    <!-- Bottom Toolbar -->
+    <!-- Bottom Toolbar (Fixed) -->
     <LinearLayout
         android:id="@+id/tbDpaBottomToolbar"
         android:layout_width="match_parent"
@@ -80,82 +77,83 @@
         android:gravity="start"
         android:background="@color/brown_toolbar"
         android:padding="8dp"
-        android:layout_gravity="bottom">
+        android:layout_gravity="bottom"
+        android:elevation="4dp">
 
-
+        <!-- Undo Button -->
         <ImageButton
             android:id="@+id/ibDpaUndo"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="35dp"
+            android:layout_height="40dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="8dp"
-            android:src="@android:drawable/ic_menu_revert"
+            android:src="@drawable/ic_undo"
             android:onClick="undo"
-            />
+            app:tint="@color/white" />
 
-
+        <!-- Add Text Resource -->
         <ImageButton
             android:id="@+id/ibDpaAddTextButton"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Resource Text"
             android:onClick="onResourceTextClick"
             android:padding="8dp"
-            android:src="@android:drawable/stat_notify_chat" />
+            android:src="@drawable/ic_text"
+            app:tint="@color/white"/>
 
-
+        <!-- Add Image Resource -->
         <ImageButton
             android:id="@+id/ibDpaAddImageButton"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="35dp"
+            android:layout_height="40dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Resource Image"
             android:onClick="onResourceImageClick"
             android:padding="8dp"
-            android:src="@drawable/ic_images" />
+            android:src="@drawable/ic_images"
+            app:tint="@color/white"/>
 
+        <!-- Add Task Resource -->
         <ImageButton
             android:id="@+id/ibDpaAddTaskButton"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="35dp"
+            android:layout_height="40dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Resource Task"
             android:onClick="onResourceTaskClick"
             android:padding="8dp"
-            android:src="@android:drawable/checkbox_on_background" />
+            android:src="@drawable/ic_task"
+            app:tint="@color/white"/>
 
-
+        <!-- Add Page Resource -->
         <ImageButton
             android:id="@+id/ibDpaAddPageButton"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="35dp"
+            android:layout_height="40dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Resource Task"
+            android:contentDescription="Resource Page"
             android:onClick="onResourcePageClick"
             android:padding="8dp"
-            android:src="@drawable/ic_edit_text" />
+            android:src="@drawable/ic_page"
+            app:tint="@color/white"/>
 
-
+        <!-- Redo Button -->
         <ImageButton
             android:id="@+id/ibDpaRedo"
             android:layout_width="0dp"
-            android:layout_height="35dp"
             android:layout_weight="1"
+            android:layout_height="40dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:onClick="redo"
             android:padding="8dp"
-            android:rotationY="180"
-            android:src="@android:drawable/ic_menu_revert" />
-
-
-
-
+            android:src="@drawable/ic_redo"
+            app:tint="@color/white"/>
     </LinearLayout>
-
 </FrameLayout>

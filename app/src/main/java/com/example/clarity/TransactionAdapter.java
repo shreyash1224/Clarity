@@ -52,9 +52,9 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     @Override
     public void onBindViewHolder(@NonNull TransactionViewHolder holder, int position) {
         Transaction transaction = transactionList.get(position);
-        holder.tvTitle.setText(transaction.getTitle());
+        holder. tvTitle.setText(transaction.getTitle());
         holder.tvAmount.setText(String.format("$%.2f", transaction.getAmount()));
-        holder.tvDate.setText(transaction.getDate());
+//        holder.tvDate.setText(transaction.getDate());
         holder.btnDelete.setTag(transaction);
 
         if (transaction.isExpense()) {
@@ -92,7 +92,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             super(itemView);
             tvTitle = itemView.findViewById(R.id.tvTransactionDescription);
             tvAmount = itemView.findViewById(R.id.tvTransactionAmount);
-            tvDate = itemView.findViewById(R.id.tvTransactionDate);
+//            tvDate = itemView.findViewById(R.id.tvTransactionDate);
             btnDelete = itemView.findViewById(R.id.btnDelete);
         }
     }
