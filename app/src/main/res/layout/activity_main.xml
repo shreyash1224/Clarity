@@ -27,6 +27,7 @@
                 android:background="@color/brown_toolbar"
                 android:elevation="4dp"
                 android:paddingHorizontal="16dp"
+                android:layout_marginBottom="4dp"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
                 <ImageButton
@@ -65,8 +66,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:divider="@color/brown_light"
-                android:dividerHeight="1dp"
+                android:layout_margin="4dp"
+                android:divider="@color/white"
+                android:dividerHeight="4dp"
                 android:background="@color/white"/>
 
             <!-- Bottom Navigation Bar -->
