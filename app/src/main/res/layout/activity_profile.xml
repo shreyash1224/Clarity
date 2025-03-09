@@ -26,19 +26,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:padding="8dp"
         android:gravity="center"
         android:paddingBottom="24dp">
 
-        <ImageView
-            android:layout_gravity="center_horizontal"
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/profilePicture"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:src="@drawable/ic_done"
             android:contentDescription="Profile Picture"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_done" />
+            android:layout_gravity="center_horizontal"/>
 
-<!--        <Button-->
+
+        <!--        <Button-->
 <!--            android:id="@+id/editProfilePicture"-->
 <!--            android:layout_width="wrap_content"-->
 <!--            android:layout_height="wrap_content"-->

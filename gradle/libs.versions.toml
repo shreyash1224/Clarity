@@ -1,4 +1,5 @@
 [versions]
+circleimageview = "3.1.0"
 agp = "8.8.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -11,6 +12,8 @@ navigationFragment = "2.6.0"
 navigationUi = "2.6.0"
 
 [libraries]
+circleimageview = { group = "de.hdodenhof", name = "circleimageview", version.ref = "circleimageview" }
+
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }

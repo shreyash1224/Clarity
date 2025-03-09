@@ -134,6 +134,8 @@ public class ProfileActivity extends AppCompatActivity {
 
         if (success) {
             Toast.makeText(this, "Profile updated successfully", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
         } else {
             Toast.makeText(this, "Failed to update profile", Toast.LENGTH_SHORT).show();
         }
