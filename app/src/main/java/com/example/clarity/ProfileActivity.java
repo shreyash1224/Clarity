@@ -40,6 +40,8 @@ public class ProfileActivity extends AppCompatActivity {
 
     private Uri imageUri = null;
 
+    // ✅ Check permission before opening the gallery
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,8 +72,6 @@ public class ProfileActivity extends AppCompatActivity {
         profilePicture.setOnClickListener(v -> checkPermissionAndOpenGallery());
         saveButton.setOnClickListener(v -> saveProfileData());
     }
-
-    // ✅ Check permission before opening the gallery
     private void checkPermissionAndOpenGallery() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             // For Android 13+ (API 33+)

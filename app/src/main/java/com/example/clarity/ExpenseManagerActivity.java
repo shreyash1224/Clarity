@@ -229,10 +229,6 @@ public class ExpenseManagerActivity extends AppCompatActivity {
     }
 
 
-    private void filterTransactions(String filterType) {
-        // Placeholder for filtering logic
-        System.out.println("Filtering transactions by: " + filterType);
-    }
 
     private void showDatePicker(EditText etDate) {
         Calendar calendar = Calendar.getInstance();

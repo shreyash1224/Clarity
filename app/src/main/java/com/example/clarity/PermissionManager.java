@@ -41,13 +41,4 @@ public class PermissionManager {
     }
 
     // ✅ Handle permission result in the calling Activity
-    public static void handlePermissionResult(int requestCode, @NonNull int[] grantResults, Runnable onGranted, Runnable onDenied) {
-        if (requestCode == NOTIFICATION_PERMISSION_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                onGranted.run();
-            } else {
-                onDenied.run();
-            }
-        }
-    }
 }

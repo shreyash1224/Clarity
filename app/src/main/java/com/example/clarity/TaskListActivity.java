@@ -320,4 +320,9 @@ public class TaskListActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void ReportActivity(View view) {
+        Intent intent = new Intent(TaskListActivity.this, ReportsActivity.class);
+        startActivity(intent);
+    }
+
 }

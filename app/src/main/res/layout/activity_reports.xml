@@ -1,0 +1,53 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@color/beige_background"
+    tools:context=".ReportsActivity">
+
+    <!-- Task Report Section -->
+    <TextView
+        android:id="@+id/totalTasks"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Total Tasks: 0"
+        android:textColor="@color/brown_text"
+        android:textSize="18sp"
+        android:paddingBottom="8dp"/>
+
+    <com.github.mikephil.charting.charts.BarChart
+        android:id="@+id/tasksChart"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"/>
+
+    <!-- Expense Report Section -->
+    <TextView
+        android:id="@+id/totalExpenses"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Total Expenses: $0.00"
+        android:textColor="@color/brown_text"
+        android:textSize="18sp"
+        android:paddingTop="16dp"
+        android:paddingBottom="8dp"/>
+
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/expenseChart"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"/>
+
+    <!-- Page Report Section -->
+    <TextView
+        android:id="@+id/totalPages"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Total Pages: 0"
+        android:textColor="@color/brown_text"
+        android:textSize="18sp"
+        android:paddingTop="16dp"
+        android:paddingBottom="8dp"/>
+
+</LinearLayout>

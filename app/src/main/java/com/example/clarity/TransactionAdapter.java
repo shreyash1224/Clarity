@@ -78,11 +78,6 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         return transactionList.size();
     }
 
-    // **NEW METHOD**: Updates the transaction list dynamically
-    public void setTransactions(List<Transaction> transactions) {
-        this.transactionList = transactions;
-        notifyDataSetChanged();  // Refresh the RecyclerView
-    }
 
     public static class TransactionViewHolder extends RecyclerView.ViewHolder {
         TextView tvTitle, tvAmount, tvDate;

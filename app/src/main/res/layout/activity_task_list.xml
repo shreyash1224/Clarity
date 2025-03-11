@@ -82,6 +82,16 @@
                 android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
                 <ImageButton
+                    android:id="@+id/ibRpa"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_report"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    app:tint="@color/white"
+                    android:onClick="ReportActivity"/>
+
+                <ImageButton
                     android:id="@+id/ibTlaDpa"
                     android:layout_width="0dp"
                     android:layout_weight="1"

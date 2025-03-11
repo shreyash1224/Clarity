@@ -109,16 +109,6 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(transactions);
 
 
-        db.execSQL("CREATE TABLE trash_bin (" +
-                "trashId INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "pageId INTEGER NOT NULL," +
-                "pageTitle TEXT NOT NULL," +
-                "pageDate DATETIME NOT NULL," +
-                "userId INTEGER NOT NULL," +
-                "deletedAt DATETIME DEFAULT CURRENT_TIMESTAMP," +
-                "FOREIGN KEY(pageId) REFERENCES pages(pageId) ON DELETE CASCADE," +
-                "FOREIGN KEY(userId) REFERENCES users(userId) ON DELETE CASCADE)");
-
 
         // Add indexes to optimize foreign key searches
         db.execSQL("CREATE INDEX IF NOT  EXISTS idx_userId ON pages(userId);");
@@ -270,7 +260,7 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
 
         // Query to get all pages for the user
-        String pageQuery = "SELECT pageId, pageTitle, pageDate FROM pages WHERE userId = ? ORDER BY pageDate DESC";
+        String pageQuery = "SELECT pageId, pageTitle, pageDate FROM pages WHERE userId = ? AND pageStatus = 'active' ORDER BY pageDate DESC";
         Cursor pageCursor = db.rawQuery(pageQuery, new String[]{String.valueOf(userId)});
 
         Log.d("DiaryDatabaseHelper", "Fetching pages for userId: " + userId);
@@ -587,7 +577,7 @@ public long insertResource(int pageId, String resourceType, String resourceConte
                 "FROM tasks t " +
                 "JOIN resources r ON r.resourceContent = t.taskId " +
                 "JOIN pages p ON p.pageId = r.pageId " +
-                "WHERE p.userId = ? " +
+                "WHERE p.userId = ? and p.pageStatus = 'active' " +
                 "ORDER BY t.taskId";
 
         Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
@@ -633,9 +623,6 @@ public long insertResource(int pageId, String resourceType, String resourceConte
     }
 
 
-    public List<Task> getTasksSortedByDate() {
-        return null;
-    }
 
     public List<Task> getTasksByDate(String selectedDate) {
         List<Task> taskList = new ArrayList<>();
@@ -743,27 +730,7 @@ public long insertResource(int pageId, String resourceType, String resourceConte
 
 
 
-    public Map<String, String> getSwotData(int userId) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Map<String, String> swotData = new HashMap<>();
 
-        String query = "SELECT r.resourceType, r.resourceContent FROM resources r " +
-                "JOIN pages p ON r.pageId = p.pageId " +
-                "WHERE p.userId = ? AND p.pageTitle = 'SWOT'";
-
-        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
-
-        if (cursor != null) {
-            while (cursor.moveToNext()) {
-                String type = cursor.getString(0); // "SWOT:Strength", etc.
-                String content = cursor.getString(1);
-                swotData.put(type, content);
-            }
-            cursor.close();
-        }
-
-        return swotData;
-    }
 
 
 
@@ -1074,6 +1041,25 @@ public long insertResource(int pageId, String resourceType, String resourceConte
         return db.rawQuery(query, new String[]{String.valueOf(userId)});
     }
 
+
+    public Cursor getAllTasks() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT * FROM tasks", null);
+    }
+
+    public Cursor getAllTransactions() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT * FROM transactions", null);
+    }
+
+    public int getPageCount() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM pages", null);
+        if (cursor.moveToFirst()) {
+            return cursor.getInt(0);
+        }
+        return 0;
+    }
 
 
 

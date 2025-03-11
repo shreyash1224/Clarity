@@ -162,85 +162,6 @@ public class DiaryPageActivity extends AppCompatActivity {
         }
     }
 
-    //onPause() done
-//    @Override
-//    protected void onPause() {
-//        super.onPause();
-//        debugResourcesTable("Database");
-//        Log.d("LIFECYCLE", "onPause() called");
-//
-//        String title = editTitle.getText().toString().trim();
-//        if (title.isEmpty()) {
-//            Log.e("onPause", "⚠️ Title is empty! Not saving to database.");
-//            return; // Prevent the app from attempting an update
-//        }
-//
-//        if (title.length() > 100) {
-//            Log.e("onPause", "⚠️ Title exceeds 100 characters! Not saving.");
-//            Toast.makeText(this, "Title should be 1-100 characters long", Toast.LENGTH_SHORT).show();
-//            return;
-//        }
-//
-//        ArrayList<Resource> contentBlocks = new ArrayList<>();
-//        LinearLayout contentLayout = findViewById(R.id.llDpaContentLayout);
-//
-//        // Step 1: Retrieve resources from UI in correct order
-//        for (int i = 0; i < contentLayout.getChildCount(); i++) {
-//            View view = contentLayout.getChildAt(i);
-//
-//            Object tag = view.getTag();
-//            if (view instanceof LinearLayout) { // Handling Text & Task Blocks
-//                EditText editText = view.findViewById(R.id.etTextBlock);
-//
-//                if (editText != null) {  // Handling Text Block
-//                    String text = editText.getText().toString().trim();
-//                    if (!text.isEmpty()) {
-//                        contentBlocks.add(new Resource(pageId, "text", text, contentBlocks.size() + 1));
-//                        Log.d("onPause", "📌 Saved Text Block: " + text);
-//                    }
-//                }
-//            }
-//            else if (view instanceof FrameLayout) {
-//                // Handling Image Block (FrameLayout)
-//                Log.d("Image", "Adding image to database.");
-//
-//                Log.d("Image", tag.toString());
-//                if (tag instanceof Image) { // Ensure it's an Image object
-//                    Image image = (Image) tag;
-//                    String imagePath = image.getImageUri(); // Extract image path
-//                    Log.d("onPause", "🖼 Saved Image: " + imagePath);
-//                    contentBlocks.add(new Resource(pageId, "image", imagePath, contentBlocks.size() + 1));
-//                }else if(tag instanceof Task) {
-//                    Task task = (Task) tag;
-//                    contentBlocks.add(new Resource(pageId, "task", String.valueOf(task.getTaskId()), contentBlocks.size() + 1));
-//                    Log.d("onPause", "✅ Task Block Detected & Saved: " + task.getTaskTitle());
-//                }else if (tag instanceof DiaryPage) {
-//                    DiaryPage page = (DiaryPage) tag;
-//                    contentBlocks.add(new Resource(pageId, "page", String.valueOf(page.getPageId()), contentBlocks.size() + 1));
-//                }
-//            }
-//        }
-//
-//        int userId = sharedPreferences.getInt("userId", -1);
-//
-//        // Step 2: Save the ordered resources to the database
-//        if (!title.isEmpty() || !contentBlocks.isEmpty()) {
-//            if (pageId == -1) {
-//                pageId = dbHelper.updatePage(-1, title, contentBlocks, userId);
-//                Toast.makeText(this, "New Page Created", Toast.LENGTH_SHORT).show();
-//            } else {
-//                dbHelper.updatePage(pageId, title, contentBlocks, userId);
-//                Toast.makeText(this, "Page Updated", Toast.LENGTH_SHORT).show();
-//            }
-//        } else {
-//            Log.d("onPause", "⚠️ Nothing to save, skipping database update.");
-//        }
-//
-//        dbHelper.cleanUpTasks();
-//        debugResourcesTable("pageResource");
-//    }
-//
-//
 
     @Override
     protected void onPause() {
@@ -326,6 +247,7 @@ public class DiaryPageActivity extends AppCompatActivity {
         dbHelper.cleanUpTasks();
         debugResourcesTable("pageResource");
     }
+
 
 
 
@@ -516,29 +438,6 @@ private void addTextBlockToUI(String textContent) {
         }
     }
 
-
-    //saveImageToInternalStorage() done
-    private String saveImageToInternalStorage(Uri imageUri) {
-        try {
-            Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
-
-            File directory = new File(getFilesDir(), "diary_images");
-            if (!directory.exists()) {
-                directory.mkdirs();
-            }
-
-            String fileName = "IMG_" + System.currentTimeMillis() + ".jpg";
-            File file = new File(directory, fileName);
-            FileOutputStream fos = new FileOutputStream(file);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-            fos.close();
-
-            return file.getAbsolutePath();
-        } catch (IOException e) {
-            Log.e("DiaryPageActivity", "Error saving image: " + e.getMessage());
-            return null;
-        }
-    }
 
 
     private void insertImage(Uri imageUri) {

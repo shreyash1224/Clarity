@@ -201,4 +201,9 @@ public class ToolsActivity extends AppCompatActivity {
         Intent intent = new Intent(ToolsActivity.this, TrashActivity.class);
         startActivity(intent);
     }
+
+    public void ReportActivity(View view) {
+        Intent intent = new Intent(ToolsActivity.this, ReportsActivity.class);
+        startActivity(intent);
+    }
 }

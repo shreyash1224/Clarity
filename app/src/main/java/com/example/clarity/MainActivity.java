@@ -344,4 +344,9 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(MainActivity.this, TrashActivity.class);
         startActivity(intent);
     }
+
+    public void ReportActivity(View view) {
+        Intent intent = new Intent(MainActivity.this, ReportsActivity.class);
+        startActivity(intent);
+    }
 }
