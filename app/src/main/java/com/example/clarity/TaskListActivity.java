@@ -206,16 +206,7 @@ public class TaskListActivity extends AppCompatActivity {
 
 
 
-    public void toMainActivity(View view) {
 
-        Intent intent = new Intent(TaskListActivity.this, MainActivity.class);
-        startActivity(intent);
-    }
-
-    public void toTaskListActivity(View view) {
-        Toast.makeText(this, "Already in task list activity...", Toast.LENGTH_SHORT).show();
-
-    }
 
 
 
@@ -304,12 +295,6 @@ public class TaskListActivity extends AppCompatActivity {
     }
 
 
-    public void toToolActivity(View view) {
-        Toast.makeText(this, "Clicked on Tools Activity.", Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(TaskListActivity.this, ToolsActivity.class);
-        startActivity(intent);
-    }
-
     public void profileActivity(MenuItem item) {
         Intent intent = new Intent(TaskListActivity.this, ProfileActivity.class);
         startActivity(intent);
@@ -320,9 +305,26 @@ public class TaskListActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void toToolActivity(View view) {
+        Toast.makeText(this, "Clicked on Tools Activity.", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(TaskListActivity.this, ToolsActivity.class);
+        startActivity(intent);
+    }
+
     public void ReportActivity(View view) {
         Intent intent = new Intent(TaskListActivity.this, ReportsActivity.class);
         startActivity(intent);
+    }
+
+    public void toMainActivity(View view) {
+
+        Intent intent = new Intent(TaskListActivity.this, MainActivity.class);
+        startActivity(intent);
+    }
+
+    public void toTaskListActivity(View view) {
+        Toast.makeText(this, "Already in task list activity...", Toast.LENGTH_SHORT).show();
+
     }
 
 }

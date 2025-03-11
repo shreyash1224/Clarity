@@ -158,8 +158,41 @@ public class ToolsActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
+    public void toToolActivity(View view) {
+        Toast.makeText(this, "Clicked on Tools Activity.", Toast.LENGTH_SHORT).show();
+    }
+
+    public void toSwotActivity(View view) {
+        Intent intent = new Intent(ToolsActivity.this, SwotActivity.class);
+//        intent.putExtra("userId", tvUserId.getText().toString());
+        startActivity(intent);
+
+    }
+
     public void settingsActivity(MenuItem item) {
         Intent intent = new Intent(ToolsActivity.this, SettingsActivity.class);
+        startActivity(intent);
+    }
+
+    public void profileActivity(MenuItem item) {
+        Intent intent = new Intent(ToolsActivity.this, ProfileActivity.class);
+        startActivity(intent);
+    }
+
+    public void trashActivity(MenuItem item) {
+        Intent intent = new Intent(ToolsActivity.this, TrashActivity.class);
+        startActivity(intent);
+    }
+
+    /////////////////////////////////////////////////////////////////////
+    public void ReportActivity(View view) {
+        Intent intent = new Intent(ToolsActivity.this, ReportsActivity.class);
+        startActivity(intent);
+    }
+
+    public void toExpenseActivity(View view) {
+        Toast.makeText(this, "To Expense Activity.", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(ToolsActivity.this, ExpenseManagerActivity.class);
         startActivity(intent);
     }
 
@@ -174,36 +207,5 @@ public class ToolsActivity extends AppCompatActivity {
         startActivity(intent);
 
 
-    }
-
-    public void toToolActivity(View view) {
-        Toast.makeText(this, "Clicked on Tools Activity.", Toast.LENGTH_SHORT).show();
-    }
-
-    public void toSwotActivity(View view) {
-        Intent intent = new Intent(ToolsActivity.this, SwotActivity.class);
-//        intent.putExtra("userId", tvUserId.getText().toString());
-        startActivity(intent);
-
-    }
-
-    public void toExpenseActivity(View view) {
-        Toast.makeText(this, "To Expense Activity.", Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(ToolsActivity.this, ExpenseManagerActivity.class);
-        startActivity(intent);
-    }
-
-    public void profileActivity(MenuItem item) {
-        Intent intent = new Intent(ToolsActivity.this, ProfileActivity.class);
-        startActivity(intent);
-    }
-    public void trashActivity(MenuItem item) {
-        Intent intent = new Intent(ToolsActivity.this, TrashActivity.class);
-        startActivity(intent);
-    }
-
-    public void ReportActivity(View view) {
-        Intent intent = new Intent(ToolsActivity.this, ReportsActivity.class);
-        startActivity(intent);
     }
 }

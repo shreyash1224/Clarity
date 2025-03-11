@@ -76,7 +76,7 @@
                 android:id="@+id/tbMaBottomToolbar"
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="?attr/actionBarSize"
                 android:background="@color/brown_toolbar"
                 android:elevation="8dp">
 

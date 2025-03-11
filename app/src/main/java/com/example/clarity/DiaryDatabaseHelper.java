@@ -12,6 +12,9 @@ import android.util.Log;
 import android.util.Pair;
 
 
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.PieEntry;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -1041,25 +1044,59 @@ public long insertResource(int pageId, String resourceType, String resourceConte
         return db.rawQuery(query, new String[]{String.valueOf(userId)});
     }
 
-
-    public Cursor getAllTasks() {
+    public ArrayList<PieEntry> getPieChartData(int userId) {
+        ArrayList<PieEntry> entries = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery("SELECT * FROM tasks", null);
-    }
 
-    public Cursor getAllTransactions() {
-        SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery("SELECT * FROM transactions", null);
-    }
+        Cursor cursor = db.rawQuery(
+                "SELECT category, SUM(amount) AS total FROM transactions WHERE userId = ? GROUP BY category",
+                new String[]{String.valueOf(userId)}
+        );
 
-    public int getPageCount() {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM pages", null);
-        if (cursor.moveToFirst()) {
-            return cursor.getInt(0);
+        if (cursor != null) {
+            int categoryIndex = cursor.getColumnIndex("category");
+            int totalIndex = cursor.getColumnIndex("total");
+
+            while (cursor.moveToNext()) {
+                if (categoryIndex != -1 && totalIndex != -1) {
+                    String category = cursor.getString(categoryIndex);
+                    float total = cursor.getFloat(totalIndex);
+                    entries.add(new PieEntry(total, category));
+                }
+            }
+            cursor.close();
         }
-        return 0;
+        return entries;
     }
+
+
+    public ArrayList<BarEntry> getBarChartData(int userId) {
+        ArrayList<BarEntry> entries = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(
+                "SELECT strftime('%m', date) AS month, SUM(amount) AS total FROM transactions WHERE userId = ? GROUP BY month",
+                new String[]{String.valueOf(userId)}
+        );
+
+        if (cursor != null) {
+            int monthIndex = cursor.getColumnIndex("month");
+            int totalIndex = cursor.getColumnIndex("total");
+
+            while (cursor.moveToNext()) {
+                if (monthIndex != -1 && totalIndex != -1) {
+                    int month = Integer.parseInt(cursor.getString(monthIndex));
+                    float total = cursor.getFloat(totalIndex);
+                    entries.add(new BarEntry(month, total));
+                }
+            }
+            cursor.close();
+        }
+
+        return entries;
+    }
+
+
 
 
 
