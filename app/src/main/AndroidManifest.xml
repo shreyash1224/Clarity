@@ -2,11 +2,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Permissions -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> <!-- ✅ Handles reboot case -->
 
     <application
         android:allowBackup="true"
@@ -18,19 +22,52 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Clarity"
         tools:targetApi="31">
-        <activity
-            android:name=".ReportsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".TrashActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ProfileActivity"
-            android:exported="false" />
 
-        <receiver android:name=".NotificationActionReceiver" />
-        <receiver
-            android:name=".TrashAutoCleaner"
+        <!-- Activities -->
+        <activity android:name=".ReportsActivity" android:exported="false" />
+        <activity android:name=".TrashActivity" android:exported="false" />
+        <activity android:name=".ProfileActivity" android:exported="false" />
+        <activity android:name=".ForgotPasswordActivity" android:exported="false" />
+        <activity android:name=".ExpenseManagerActivity" android:exported="false" />
+        <activity android:name=".SwotActivity" android:exported="false" />
+        <activity android:name=".FullScreenImageActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Clarity" />
+        <activity android:name=".DiaryPageActivity" android:exported="false" />
+        <activity android:name=".LoginActivity" android:exported="false" />
+        <activity android:name=".CreateAccountActivity" android:exported="false" />
+        <activity android:name=".TaskListActivity" android:exported="false" />
+        <activity android:name=".SettingsActivity" android:exported="false" />
+        <activity android:name=".ToolsActivity" android:exported="false" />
+
+        <!-- Main Launcher Activity -->
+        <activity android:name=".MainActivity" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Notification Receiver -->
+        <receiver android:name=".NotificationActionReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="DONE" />
+                <action android:name="SNOOZE" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Alarm Receiver for Notifications -->
+        <receiver android:name=".NotificationReceiver"
+            android:exported="false"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Trash Cleaner -->
+        <receiver android:name=".TrashAutoCleaner"
             android:enabled="true"
             android:exported="false">
             <intent-filter>
@@ -40,40 +77,5 @@
             </intent-filter>
         </receiver>
 
-        <activity
-            android:name=".ForgotPasswordActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ExpenseManagerActivity"
-            android:exported="false" />
-        <activity
-            android:name=".SwotActivity"
-            android:exported="false" />
-        <activity
-            android:name=".FullScreenImageActivity"
-            android:exported="false"
-            android:theme="@style/Theme.Clarity" /> <!-- Diary Page Activity -->
-        <activity
-            android:name=".DiaryPageActivity"
-            android:exported="false" /> <!-- Login Activity -->
-        <activity
-            android:name=".LoginActivity"
-            android:exported="false" /> <!-- Create Account Activity -->
-        <activity
-            android:name=".CreateAccountActivity"
-            android:exported="false" /> <!-- Main Activity -->
-        <activity
-            android:name=".MainActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".TaskListActivity" />
-        <activity android:name=".SettingsActivity" />
-        <activity android:name=".ToolsActivity" />
     </application>
-
 </manifest>

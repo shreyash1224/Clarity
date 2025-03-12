@@ -213,7 +213,7 @@ public class DiaryPageActivity extends AppCompatActivity {
                     if (task.getCompletion().equals("Pending")) {
                         if (PermissionManager.hasNotificationPermission(this)) {
                             // ✅ Directly trigger notification if permission is already granted
-                            TaskNotificationManager.triggerNotification(this, task);
+                            TaskNotificationManager.scheduleTaskNotification(this, task);
                         } else {
                             // ✅ Request permission if not granted (Notification will trigger later)
                             pendingTask = task;
