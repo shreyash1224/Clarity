@@ -7,12 +7,15 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import androidx.core.app.NotificationManagerCompat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class TaskNotificationManager {
 
@@ -23,7 +26,8 @@ public class TaskNotificationManager {
      * Schedules a notification for the given task at its end time.
      */
     public static void scheduleTaskNotification(Context context, Task task) {
-        long triggerTime = getTaskEndTimeInMillis(task);
+        long triggerTime = getTaskEndTimeInMillis(task) - (20 * 1000); // 20 seconds before task end
+
         if (triggerTime <= System.currentTimeMillis()) {
             Log.w("Notification", "⏳ Task end time has already passed. Skipping notification.");
             return;
@@ -35,11 +39,24 @@ public class TaskNotificationManager {
         intent.putExtra("taskId", task.getTaskId());
         intent.putExtra("snoozeCount", 0);
 
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+        // ✅ Create a fresh PendingIntent instance
+        final PendingIntent pendingIntent = PendingIntent.getBroadcast(
                 context, task.getTaskId(), intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
+        // ✅ Cancel any existing notification before scheduling a new one
+        alarmManager.cancel(pendingIntent);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        sdf.setTimeZone(TimeZone.getTimeZone("Asia/Kolkata"));
+        String formattedTime = sdf.format(new Date(triggerTime));
+        Log.d("Notification", "⏰ Notification will trigger at (IST): " + formattedTime);
+
+        // ✅ Delay the scheduling slightly to prevent race conditions
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
+        }, 500);
     }
 
     /**
@@ -47,7 +64,7 @@ public class TaskNotificationManager {
      */
     public static void snoozeNotification(Context context, Task task, int snoozeCount) {
         if (snoozeCount >= MAX_SNOOZE_COUNT) {
-            Log.d("Notification", "🚫 Max snooze limit reached. No more snoozes.");
+            Log.d("Notification", "🚫 Maximum snooze limit reached for Task ID: " + task.getTaskId());
             return;
         }
 
@@ -57,14 +74,17 @@ public class TaskNotificationManager {
         snoozeIntent.putExtra("taskId", task.getTaskId());
         snoozeIntent.putExtra("snoozeCount", snoozeCount + 1);
 
-        int uniqueSnoozeRequestCode = task.getTaskId() * 10 + snoozeCount;
+        // Use a unique request code to prevent conflicts
+        int uniqueSnoozeRequestCode = task.getTaskId() * 100 + snoozeCount;
 
         PendingIntent pendingIntent = PendingIntent.getBroadcast(
                 context, uniqueSnoozeRequestCode, snoozeIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
+        // Cancel existing snooze notification before setting a new one
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        long triggerTime = System.currentTimeMillis() + 5 * 1000; // 5 seconds later
+        alarmManager.cancel(pendingIntent);
 
+        long triggerTime = System.currentTimeMillis() + 5 * 1000; // 5 seconds later
         alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
     }
 
@@ -118,12 +138,4 @@ public class TaskNotificationManager {
         }
         return System.currentTimeMillis();
     }
-
-
-    public static void cancelNotificationAfterSnooze(Context context, int taskId) {
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
-        notificationManager.cancel(taskId);
-        Log.d("Notification", "🛑 Notification canceled for taskId: " + taskId);
-    }
-
 }

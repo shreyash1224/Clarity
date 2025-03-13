@@ -950,7 +950,7 @@ public long insertResource(int pageId, String resourceType, String resourceConte
         return null; // Return null if no matching user is found
     }
 
-    public void updateTask(int taskId, String taskTitle, String startTime, String endTime, String completion) {
+    public void updateTask(int taskId, String taskTitle, String startTime, String endTime, String completion, Context context) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -968,12 +968,20 @@ public long insertResource(int pageId, String resourceType, String resourceConte
 
         if (rowsAffected > 0) {
             Log.d("Database", "Task updated successfully: " + taskId);
+
+            // Cancel existing notifications for this task
+            TaskNotificationManager.cancelNotification(context, taskId);
+
+            // Schedule a new notification with the updated time
+            TaskNotificationManager.scheduleTaskNotification(context,             getTaskById(taskId)
+            );
         } else {
             Log.d("Database", "Failed to update task: " + taskId);
         }
 
         db.close();
     }
+
 
 
     public void deleteTask(int taskId) {

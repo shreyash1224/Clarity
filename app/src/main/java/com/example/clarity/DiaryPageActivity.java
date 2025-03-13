@@ -219,9 +219,14 @@ public class DiaryPageActivity extends AppCompatActivity {
                             pendingTask = task;
                         }
                     } else {
-                        // ✅ Cancel Notification if Task is Completed
-                        TaskNotificationManager.cancelNotification(this, task.getTaskId());
+                        // 🛑 Only cancel the notification if the task was previously "Pending" and is now "Completed"
+                        Task oldTask = dbHelper.getTaskById(task.getTaskId());
+                        if (oldTask != null && oldTask.getCompletion().equals("Pending") && task.getCompletion().equals("Completed")) {
+                            TaskNotificationManager.cancelNotification(this, task.getTaskId());
+                            Log.d("onPause", "❌ Task completed, notification canceled: " + task.getTaskTitle());
+                        }
                     }
+
 
                     Log.d("onPause", "✅ Task Block Detected & Saved: " + task.getTaskTitle());
                 } else if (tag instanceof DiaryPage) {
@@ -638,7 +643,7 @@ private void addTextBlockToUI(String textContent) {
 
             TaskDialog.showTaskDialog(context, (getTitle, start, end, isRecurring) -> {
                 // Update task in database
-                dbHelper.updateTask(selectedTask.getTaskId(), getTitle, start, end, String.valueOf(isRecurring));
+                dbHelper.updateTask(selectedTask.getTaskId(), getTitle, start, end, String.valueOf(isRecurring), this);
 
                 // Refresh UI
                 selectedTask.setTaskTitle(getTitle);

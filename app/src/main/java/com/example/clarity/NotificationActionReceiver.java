@@ -33,10 +33,10 @@ public class NotificationActionReceiver extends BroadcastReceiver {
             case "SNOOZE":
                 Log.d("Notification", "⏳ 'Snooze' clicked. Snooze count: " + snoozeCount);
 
-                if (snoozeCount >= TaskNotificationManager.MAX_SNOOZE_COUNT) {
-                    Log.d("Notification", "🚫 Max snooze limit reached. No more snoozes.");
-                    return;
-                }
+//                if (snoozeCount >= TaskNotificationManager.MAX_SNOOZE_COUNT) {
+//                    Log.d("Notification", "🚫 Max snooze limit reached. No more snoozes.");
+//                    return;
+//                }
 
                 // ❌ Cancel the current notification first
                 TaskNotificationManager.cancelNotification(context, taskId);

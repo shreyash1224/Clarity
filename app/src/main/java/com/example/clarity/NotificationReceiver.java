@@ -47,7 +47,7 @@ public class NotificationReceiver extends BroadcastReceiver {
 
         // ✅ Create "Snooze" action (if within limit)
         NotificationCompat.Action snoozeAction = null;
-        if (snoozeCount < TaskNotificationManager.MAX_SNOOZE_COUNT) {
+//        if (snoozeCount < TaskNotificationManager.MAX_SNOOZE_COUNT) {
             Intent snoozeIntent = new Intent(context, NotificationActionReceiver.class);
             snoozeIntent.setAction("SNOOZE");
             snoozeIntent.putExtra("taskId", taskId);
@@ -58,7 +58,7 @@ public class NotificationReceiver extends BroadcastReceiver {
                     context, uniqueSnoozeRequestCode, snoozeIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
             snoozeAction = new NotificationCompat.Action(R.drawable.ic_snooze, "Snooze", snoozePendingIntent);
-        }
+//        }
 
         // ✅ Build and show the notification
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "task_channel")
