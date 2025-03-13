@@ -167,14 +167,6 @@ public class DiaryDatabaseHelper extends SQLiteOpenHelper {
         return authenticated;
     }
 
-    public boolean isUsernameTaken(String username) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM users WHERE username = ?", new String[]{username});
-        boolean exists = cursor.getCount() > 0;
-        cursor.close();
-        db.close();
-        return exists;
-    }
 
 
     //updatePage() done
@@ -1104,6 +1096,30 @@ public long insertResource(int pageId, String resourceType, String resourceConte
         return entries;
     }
 
+
+    public boolean isUsernameTaken(String username) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM users WHERE userName = ?", new String[]{username});
+        boolean exists = cursor.getCount() > 0;
+        cursor.close();
+        return exists;
+    }
+
+    public boolean checkSecurityAnswer(String username, String securityAnswer) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM users WHERE userName = ? AND securityAnswer = ?", new String[]{username, securityAnswer});
+        boolean correct = cursor.getCount() > 0;
+        cursor.close();
+        return correct;
+    }
+
+    public boolean updateUserPassword(String username, String newPassword) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("userPassword", newPassword);
+        int rowsAffected = db.update("users", values, "userName=?", new String[]{username});
+        return rowsAffected > 0;
+    }
 
 
 

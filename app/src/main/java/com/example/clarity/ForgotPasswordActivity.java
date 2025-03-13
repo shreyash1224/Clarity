@@ -1,7 +1,7 @@
 package com.example.clarity;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -9,113 +9,95 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.regex.Pattern;
+
 public class ForgotPasswordActivity extends AppCompatActivity {
 
-    // Declare variables for the EditText views, TextView for the question, and the database helper
-    EditText etForgotUsername, etForgotSecurityAnswer, etForgotNewPassword, etForgotConfirmNewPassword;
+    EditText etFpaUsername, etFpaSecurityAnswer, etFpaNewPassword, etFpaConfirmPassword;
     TextView tvFpaSecurityQuestion;
-
     DiaryDatabaseHelper dbHelper;
-
+    String storedSecurityQuestion = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forgot_password);
-
-        // Initialize the EditText fields and the TextView for the security question
-        etForgotUsername = findViewById(R.id.etFpaUsername);
-        etForgotSecurityAnswer = findViewById(R.id.etFpaSecurityAnswer);
-        etForgotNewPassword = findViewById(R.id.etFpaNewPassword);
-        etForgotConfirmNewPassword = findViewById(R.id.etFpaConfirmNewPassword);
-        tvFpaSecurityQuestion = findViewById(R.id.tvFpaSecurityQuestion);
-
         dbHelper = new DiaryDatabaseHelper(this);
 
-        // Retrieve the username passed from LoginActivity
-        String username = getIntent().getStringExtra("username");
 
-        if (username != null && !username.isEmpty()) {
-            etForgotUsername.setText(username);  // Display the username in the EditText field
-            fetchSecurityQuestion(username);  // Fetch and display the security question
+        etFpaUsername = findViewById(R.id.etFpaUsername);
+        etFpaSecurityAnswer = findViewById(R.id.etFpaSecurityAnswer);
+        etFpaNewPassword = findViewById(R.id.etFpaNewPassword);
+        etFpaConfirmPassword = findViewById(R.id.etFpaConfirmNewPassword);
+        tvFpaSecurityQuestion = findViewById(R.id.tvFpaSecurityQuestion);
+        String receivedUsername = getIntent().getStringExtra("username");
+        if (receivedUsername != null && !receivedUsername.isEmpty()) {
+            etFpaUsername.setText(receivedUsername);  // Autofill username
+            fetchSecurityQuestion(receivedUsername); // Fetch security question
         }
+
+        dbHelper = new DiaryDatabaseHelper(this);
     }
 
-    // Method to fetch and display the security question for the entered username
     private void fetchSecurityQuestion(String username) {
-        String securityQuestion = dbHelper.getSecurityQuestion(username);
+        if (!dbHelper.isUsernameTaken(username)) {
+            etFpaUsername.setError("Username does not exist");
+            return;
+        }
 
-        // Set the security question to the TextView
-        if (securityQuestion != null) {
-            tvFpaSecurityQuestion.setText("Security Question: " + securityQuestion);
+        storedSecurityQuestion = dbHelper.getSecurityQuestion(username);
+        if (storedSecurityQuestion != null && !storedSecurityQuestion.isEmpty()) {
+            tvFpaSecurityQuestion.setText("Security Question: " + storedSecurityQuestion);
         } else {
-            tvFpaSecurityQuestion.setText("Security Question: Not found");
+            tvFpaSecurityQuestion.setText("Security Question not found.");
         }
     }
 
-
-    // This method is called when the user clicks the 'Reset Password' button
     public void onResetPasswordClicked(View view) {
-        String username = etForgotUsername.getText().toString().trim();
-        String securityAnswer = etForgotSecurityAnswer.getText().toString().trim();
-        String newPassword = etForgotNewPassword.getText().toString().trim();
-        String confirmPassword = etForgotConfirmNewPassword.getText().toString().trim();
+        String username = etFpaUsername.getText().toString().trim();
+        String securityAnswer = etFpaSecurityAnswer.getText().toString().trim();
+        String newPassword = etFpaNewPassword.getText().toString().trim();
+        String confirmPassword = etFpaConfirmPassword.getText().toString().trim();
 
-        // Validate the input fields
-        if (username.isEmpty() || securityAnswer.isEmpty() || newPassword.isEmpty() || confirmPassword.isEmpty()) {
-            Toast.makeText(this, "All fields are required", Toast.LENGTH_SHORT).show();
+        if (username.isEmpty()) {
+            etFpaUsername.setError("Username is required");
             return;
         }
 
-        // Check if the passwords match
+        if (!dbHelper.isUsernameTaken(username)) {
+            etFpaUsername.setError("Username does not exist");
+            return;
+        }
+
+        if (!dbHelper.checkSecurityAnswer(username, securityAnswer)) {
+            etFpaSecurityAnswer.setError("Incorrect security answer");
+            return;
+        }
+
+        if (!isValidPassword(newPassword)) {
+            etFpaNewPassword.setError("Password must be at least 6 chars with an uppercase, a number, and a special char");
+            return;
+        }
+
         if (!newPassword.equals(confirmPassword)) {
-            Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show();
+            etFpaConfirmPassword.setError("Passwords do not match");
             return;
         }
 
-        // Ensure password is at least 6 characters
-        if (newPassword.length() < 6) {
-            Toast.makeText(this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Validate the security answer using the database helper
-        boolean isValid = dbHelper.validateSecurityAnswer(username, securityAnswer);
-
-        if (isValid) {
-            // If the security answer is correct, update the password
-            boolean result = dbHelper.updatePassword(username, newPassword);
-
-            if (result) {
-                // Show success message and finish the activity
-                Toast.makeText(this, "Password reset successfully", Toast.LENGTH_SHORT).show();
-                finish(); // Close the activity and go back to login screen
-            } else {
-                // Show error message if updating the password fails
-                Toast.makeText(this, "Error resetting password", Toast.LENGTH_SHORT).show();
-            }
+        boolean updateSuccess = dbHelper.updateUserPassword(username, newPassword);
+        if (updateSuccess) {
+            Toast.makeText(this, "Password reset successfully", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(ForgotPasswordActivity.this, LoginActivity.class));
+            finish();
         } else {
-            // Show error message if the security answer is incorrect
-            Toast.makeText(this, "Incorrect security answer", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Error resetting password", Toast.LENGTH_SHORT).show();
         }
     }
 
-    // This method is called when the user clicks the 'Back to Login' button
-    public void onBackToLoginClicked(View view) {
-        // Finish the current activity and go back to the login screen
-        finish();
-    }
-
-    // Method to fetch and display the security question for the entered username
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        // Fetch the security question when the activity is resumed (after username is entered)
-        String username = etForgotUsername.getText().toString().trim();
-        if (!username.isEmpty()) {
-            fetchSecurityQuestion(username);
-        }
+    private boolean isValidPassword(String password) {
+        Pattern PASSWORD_PATTERN = Pattern.compile(
+                "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!]).{6,}$"
+        );
+        return PASSWORD_PATTERN.matcher(password).matches();
     }
 }
