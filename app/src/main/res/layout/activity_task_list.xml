@@ -42,7 +42,7 @@
                     android:id="@+id/tvToolbarTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Clarity"
+                    android:text="Tasks"
                     android:textSize="28sp"
                     android:fontFamily="sans-serif-condensed-medium"
                     android:textColor="@color/white"
