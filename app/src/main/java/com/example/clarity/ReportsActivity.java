@@ -31,6 +31,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ReportsActivity extends AppCompatActivity {
 
@@ -40,7 +41,7 @@ public class ReportsActivity extends AppCompatActivity {
     private ImageView profileImage;
     private SharedPreferences sharedPreferences;
     private PieChart pieChart;
-    private BarChart barChart;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +54,9 @@ public class ReportsActivity extends AppCompatActivity {
         tvUserId = navigationView.getHeaderView(0).findViewById(R.id.tvUserId);
         profileImage = navigationView.getHeaderView(0).findViewById(R.id.ciProfilePicture);
         pieChart = findViewById(R.id.expenseChart);
-        barChart = findViewById(R.id.tasksChart);
+
+        // Replace barChart with a new PieChart for tasks
+        PieChart tasksPieChart = findViewById(R.id.tasksChart);
 
         Toolbar topToolbar = findViewById(R.id.tbReportTopToolbar);
         setSupportActionBar(topToolbar);
@@ -77,53 +80,30 @@ public class ReportsActivity extends AppCompatActivity {
         tvUserId.setText(String.valueOf(userId));
 
         DiaryDatabaseHelper dbHelper = new DiaryDatabaseHelper(this);
-        Cursor cursor = dbHelper.getUserProfilePicture(userId);
 
-        if (cursor != null && cursor.moveToFirst()) {
-            int columnIndex = cursor.getColumnIndex("profilePicture");
-
-            if (columnIndex != -1) {
-                String profilePicturePath = cursor.getString(columnIndex);
-
-                if (profilePicturePath != null && !profilePicturePath.isEmpty()) {
-                    Uri imageUri;
-
-                    if (profilePicturePath.startsWith("content://")) {
-                        imageUri = Uri.parse(profilePicturePath);
-                    } else {
-                        imageUri = FileProvider.getUriForFile(
-                                this,
-                                "com.example.clarity.fileprovider",
-                                new File(profilePicturePath)
-                        );
-                    }
-
-                    try {
-                        InputStream inputStream = getContentResolver().openInputStream(imageUri);
-                        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                        profileImage.setImageBitmap(bitmap);
-                    } catch (FileNotFoundException e) {
-                        profileImage.setImageResource(R.drawable.ic_done);
-                    }
-                } else {
-                    profileImage.setImageResource(R.drawable.ic_done);
-                }
-            }
-            cursor.close();
-        }
-
-        navigationView.setNavigationItemSelectedListener(item -> {
-            if (item.getItemId() == R.id.nav_profile) {
-                startActivity(new Intent(ReportsActivity.this, ProfileActivity.class));
-            } else if (item.getItemId() == R.id.nav_settings) {
-                startActivity(new Intent(ReportsActivity.this, SettingsActivity.class));
-            }
-            drawerLayout.closeDrawer(GravityCompat.START);
-            return true;
-        });
-
+        // Update Charts
         loadPieChart(dbHelper, userId);
-        loadBarChart(dbHelper, userId);
+        loadTasksPieChart(dbHelper, userId, tasksPieChart); // Updated function call
+        loadExpenseCategoryText(dbHelper, userId);
+        loadExpenseVsSavingsPieChart(dbHelper, userId);
+        loadSummaryInfo(dbHelper, userId);
+    }
+
+    // Updated loadTasksPieChart function
+    private void loadTasksPieChart(DiaryDatabaseHelper dbHelper, int userId, PieChart tasksPieChart) {
+        int pendingTasks = dbHelper.getPendingTasks(userId);
+        int completedTasks = dbHelper.getCompletedTasks(userId);
+
+        ArrayList<PieEntry> entries = new ArrayList<>();
+        entries.add(new PieEntry(pendingTasks, "Pending"));
+        entries.add(new PieEntry(completedTasks, "Completed"));
+
+        PieDataSet pieDataSet = new PieDataSet(entries, "Task Status");
+        pieDataSet.setColors(ColorTemplate.COLORFUL_COLORS);
+        PieData pieData = new PieData(pieDataSet);
+
+        tasksPieChart.setData(pieData);
+        tasksPieChart.invalidate();
     }
 
     private void loadPieChart(DiaryDatabaseHelper dbHelper, int userId) {
@@ -135,14 +115,14 @@ public class ReportsActivity extends AppCompatActivity {
         pieChart.invalidate();
     }
 
-    private void loadBarChart(DiaryDatabaseHelper dbHelper, int userId) {
-        ArrayList<BarEntry> entries = dbHelper.getBarChartData(userId);
-        BarDataSet barDataSet = new BarDataSet(entries, "Monthly Expenses");
-        barDataSet.setColors(ColorTemplate.COLORFUL_COLORS);
-        BarData barData = new BarData(barDataSet);
-        barChart.setData(barData);
-        barChart.invalidate();
-    }
+//    private void loadBarChart(DiaryDatabaseHelper dbHelper, int userId) {
+//        ArrayList<BarEntry> entries = dbHelper.getBarChartData(userId);
+//        BarDataSet barDataSet = new BarDataSet(entries, "Monthly Expenses");
+//        barDataSet.setColors(ColorTemplate.COLORFUL_COLORS);
+//        BarData barData = new BarData(barDataSet);
+//        barChart.setData(barData);
+//        barChart.invalidate();
+//    }
 
 
 
@@ -206,5 +186,68 @@ public class ReportsActivity extends AppCompatActivity {
 
 
     }
-    
+
+
+    //
+
+    private void loadExpenseCategoryText(DiaryDatabaseHelper dbHelper, int userId) {
+        List<String> topCategories = dbHelper.getTopExpenseCategories(userId);
+        TextView tvCategory1 = findViewById(R.id.tvTopExpense1);
+        TextView tvCategory2 = findViewById(R.id.tvTopExpense2);
+        TextView tvCategory3 = findViewById(R.id.tvTopExpense3);
+
+
+        if (topCategories.size() > 0) tvCategory1.setText(topCategories.get(0));
+        if (topCategories.size() > 1) tvCategory2.setText(topCategories.get(1));
+        if (topCategories.size() > 2) tvCategory3.setText(topCategories.get(2));
+    }
+
+    private void loadExpenseVsSavingsPieChart(DiaryDatabaseHelper dbHelper, int userId) {
+        float expenses = dbHelper.getTotalExpenses(userId);
+        float savings = dbHelper.getTotalSavings(userId);
+
+        ArrayList<PieEntry> entries = new ArrayList<>();
+        entries.add(new PieEntry(expenses, "Expenses"));
+        entries.add(new PieEntry(savings, "Savings"));
+
+        PieDataSet pieDataSet = new PieDataSet(entries, "Total Transactions");
+        pieDataSet.setColors(ColorTemplate.MATERIAL_COLORS);
+        PieData pieData = new PieData(pieDataSet);
+        pieChart.setData(pieData);
+        pieChart.invalidate();
+    }
+
+    private void loadTasksPieChart(DiaryDatabaseHelper dbHelper, int userId) {
+        int pendingTasks = dbHelper.getPendingTasks(userId);
+        int completedTasks = dbHelper.getCompletedTasks(userId);
+
+        ArrayList<PieEntry> entries = new ArrayList<>();
+        entries.add(new PieEntry(pendingTasks, "Pending"));
+        entries.add(new PieEntry(completedTasks, "Completed"));
+
+        PieDataSet pieDataSet = new PieDataSet(entries, "Total Tasks");
+        pieDataSet.setColors(ColorTemplate.COLORFUL_COLORS);
+        PieData pieData = new PieData(pieDataSet);
+        pieChart.setData(pieData);
+        pieChart.invalidate();
+
+    }
+
+    private void loadSummaryInfo(DiaryDatabaseHelper dbHelper, int userId) {
+        TextView tvTotalImages = findViewById(R.id.totalImages);
+        TextView tvTotalTasks = findViewById(R.id.totalTasksInfo);
+        TextView tvTotalTextBlocks = findViewById(R.id.totalTextBlocks);
+        TextView tvTotalPages = findViewById(R.id.totalPages);
+        TextView totalTasks = findViewById(R.id.totalTasks);
+
+
+        tvTotalImages.setText("Total Images: " + dbHelper.getTotalImages(userId));
+        tvTotalTasks.setText("Total Tasks: " + dbHelper.getTotalTasks(userId));
+        totalTasks.setText("Total Tasks: " + dbHelper.getTotalTasks(userId));
+
+        tvTotalTextBlocks.setText("Total Text Blocks: " + dbHelper.getTotalTextBlocks(userId));
+        tvTotalPages.setText("Total Pages: " + dbHelper.getTotalPages(userId));
+    }
+
+
 }

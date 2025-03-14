@@ -63,8 +63,35 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <!-- Placeholder for Graph/Charts -->
+                    <!-- Top Expense Categories -->
+                    <TextView
+                        android:id="@+id/tvTopExpense1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Top Expense 1: N/A"
+                        android:textColor="@color/brown_text"
+                        android:textSize="18sp"
+                        android:paddingBottom="4dp"/>
 
+                    <TextView
+                        android:id="@+id/tvTopExpense2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Top Expense 2: N/A"
+                        android:textColor="@color/brown_text"
+                        android:textSize="18sp"
+                        android:paddingBottom="4dp"/>
+
+                    <TextView
+                        android:id="@+id/tvTopExpense3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Top Expense 3: N/A"
+                        android:textColor="@color/brown_text"
+                        android:textSize="18sp"
+                        android:paddingBottom="8dp"/>
+
+                    <!-- Task Status Report -->
                     <TextView
                         android:id="@+id/totalTasks"
                         android:layout_width="match_parent"
@@ -74,7 +101,7 @@
                         android:textSize="18sp"
                         android:paddingBottom="8dp"/>
 
-                    <com.github.mikephil.charting.charts.BarChart
+                    <com.github.mikephil.charting.charts.PieChart
                         android:id="@+id/tasksChart"
                         android:layout_width="match_parent"
                         android:layout_height="200dp"/>
@@ -84,7 +111,7 @@
                         android:id="@+id/totalExpenses"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Total Expenses: $0.00"
+                        android:text="Total Transactions"
                         android:textColor="@color/brown_text"
                         android:textSize="18sp"
                         android:paddingTop="16dp"
@@ -95,7 +122,35 @@
                         android:layout_width="match_parent"
                         android:layout_height="200dp"/>
 
-                    <!-- Page Report Section -->
+                    <!-- Summary Information -->
+                    <TextView
+                        android:id="@+id/totalImages"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Total Images: 0"
+                        android:textColor="@color/brown_text"
+                        android:textSize="18sp"
+                        android:paddingTop="16dp"
+                        android:paddingBottom="8dp"/>
+
+                    <TextView
+                        android:id="@+id/totalTasksInfo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Total Tasks: 0"
+                        android:textColor="@color/brown_text"
+                        android:textSize="18sp"
+                        android:paddingBottom="8dp"/>
+
+                    <TextView
+                        android:id="@+id/totalTextBlocks"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Total Text Blocks: 0"
+                        android:textColor="@color/brown_text"
+                        android:textSize="18sp"
+                        android:paddingBottom="8dp"/>
+
                     <TextView
                         android:id="@+id/totalPages"
                         android:layout_width="match_parent"
@@ -103,9 +158,9 @@
                         android:text="Total Pages: 0"
                         android:textColor="@color/brown_text"
                         android:textSize="18sp"
-                        android:paddingTop="16dp"
                         android:paddingBottom="8dp"/>
                 </LinearLayout>
+
             </ScrollView>
 
             <!-- Bottom Navigation -->

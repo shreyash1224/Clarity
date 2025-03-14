@@ -1121,7 +1121,153 @@ public long insertResource(int pageId, String resourceType, String resourceConte
         return rowsAffected > 0;
     }
 
+    //////////////////////
 
+
+
+
+
+
+    //////////////////////////////////////
+// Get Total Savings
+    public float getTotalSavings(int userId) {
+        float totalSavings = 0;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT SUM(amount) FROM transactions WHERE userId = ? AND isExpense = 0",
+                new String[]{String.valueOf(userId)});
+        if (cursor.moveToFirst()) {
+            totalSavings = cursor.getFloat(0);
+        }
+        cursor.close();
+        return totalSavings;
+    }
+
+    // Get Total Tasks
+    public int getTotalTasks(int userId) {
+        int totalTasks = 0;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT COUNT(*) FROM tasks WHERE taskId IN (" +
+                        "SELECT resourceContent FROM resources WHERE pageId IN (" +
+                        "SELECT pageId FROM pages WHERE userId = ?))",
+                new String[]{String.valueOf(userId)}
+        );
+        if (cursor.moveToFirst()) {
+            totalTasks = cursor.getInt(0);
+        }
+        cursor.close();
+        return totalTasks;
+    }
+
+    // Get Pending Tasks
+    public int getPendingTasks(int userId) {
+        int pendingTasks = 0;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT COUNT(*) FROM tasks WHERE completion = 'Pending' AND taskId IN (" +
+                        "SELECT resourceContent FROM resources WHERE pageId IN (" +
+                        "SELECT pageId FROM pages WHERE userId = ?))",
+                new String[]{String.valueOf(userId)}
+        );
+        if (cursor.moveToFirst()) {
+            pendingTasks = cursor.getInt(0);
+        }
+        cursor.close();
+        return pendingTasks;
+    }
+
+    // Get Completed Tasks
+    public int getCompletedTasks(int userId) {
+        int completedTasks = 0;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT COUNT(*) FROM tasks WHERE completion = 'Completed' AND taskId IN (" +
+                        "SELECT resourceContent FROM resources WHERE pageId IN (" +
+                        "SELECT pageId FROM pages WHERE userId = ?))",
+                new String[]{String.valueOf(userId)}
+        );
+        if (cursor.moveToFirst()) {
+            completedTasks = cursor.getInt(0);
+        }
+        cursor.close();
+        return completedTasks;
+    }
+
+    // Get Total Pages
+    public int getTotalPages(int userId) {
+        int totalPages = 0;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM pages WHERE userId = ?",
+                new String[]{String.valueOf(userId)});
+        if (cursor.moveToFirst()) {
+            totalPages = cursor.getInt(0);
+        }
+        cursor.close();
+        return totalPages;
+    }
+
+    // Get Total Text Blocks (Resources with text content)
+    public int getTotalTextBlocks(int userId) {
+        int totalTextBlocks = 0;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT COUNT(*) FROM resources WHERE resourceType = 'text' AND pageId IN (" +
+                        "SELECT pageId FROM pages WHERE userId = ?)",
+                new String[]{String.valueOf(userId)}
+        );
+        if (cursor.moveToFirst()) {
+            totalTextBlocks = cursor.getInt(0);
+        }
+        cursor.close();
+        return totalTextBlocks;
+    }
+
+    // Get Total Images (Resources with image content)
+    public int getTotalImages(int userId) {
+        int totalImages = 0;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT COUNT(*) FROM resources WHERE resourceType = 'image' AND pageId IN (" +
+                        "SELECT pageId FROM pages WHERE userId = ?)",
+                new String[]{String.valueOf(userId)}
+        );
+        if (cursor.moveToFirst()) {
+            totalImages = cursor.getInt(0);
+        }
+        cursor.close();
+        return totalImages;
+    }
+
+    // Get Total Expenses (Sum of all expense transactions)
+    public float getTotalExpenses(int userId) {
+        float totalExpenses = 0;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT SUM(amount) FROM transactions WHERE userId = ? AND isExpense = 1",
+                new String[]{String.valueOf(userId)});
+        if (cursor.moveToFirst()) {
+            totalExpenses = cursor.getFloat(0);
+        }
+        cursor.close();
+        return totalExpenses;
+    }
+
+    // Get Top Expense Categories (Returns top 3 expense categories sorted by total amount)
+    public List<String> getTopExpenseCategories(int userId) {
+        List<String> topCategories = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT category, SUM(amount) as total FROM transactions " +
+                        "WHERE userId = ? AND isExpense = 1 " +
+                        "GROUP BY category ORDER BY total DESC LIMIT 3",
+                new String[]{String.valueOf(userId)}
+        );
+
+        while (cursor.moveToNext()) {
+            topCategories.add(cursor.getString(0) + " - " + cursor.getFloat(1));
+        }
+        cursor.close();
+        return topCategories;
+    }
 
 
 }
