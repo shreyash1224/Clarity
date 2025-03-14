@@ -88,15 +88,7 @@ public class DiaryPageActivity extends AppCompatActivity {
         contentLayout = findViewById(R.id.llDpaContentLayout);
 
         // ✅ Request storage permission before loading data
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // Android 13+
-            if (checkSelfPermission(Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.READ_MEDIA_IMAGES}, REQUEST_CODE_STORAGE_PERMISSION);
-            }
-        } else { // Android 12 and below
-            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE_STORAGE_PERMISSION);
-            }
-        }
+
 
         // ✅ Load the page data only after permissions are granted
         Intent intent = getIntent();
@@ -410,7 +402,11 @@ private void addTextBlockToUI(String textContent) {
     //onResourceImageClick() done
     //Image Trace 1
     public void onResourceImageClick(View view) {
-        openImagePicker();
+        if (PermissionManager.hasStoragePermission(this)) {
+            openImagePicker();
+        } else {
+            PermissionManager.requestStoragePermission(this);
+        }
         Toast.makeText(this, "Adding Image clicked.", Toast.LENGTH_SHORT).show();
     }
 
@@ -938,18 +934,11 @@ private void addTextBlockToUI(String textContent) {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if (requestCode == PermissionManager.NOTIFICATION_PERMISSION_CODE) {
-            if (PermissionManager.hasNotificationPermission(this)) {
-                Log.d("Notification", "✅ Notification permission granted.");
-
-                // ✅ Trigger all pending notifications
-//                for (Task task : pendingTasks) {  // Change from pendingTask to pendingTasks
-//                    if (task.getCompletion().equals("Pending")) {
-//                        TaskNotificationManager.triggerNotification(this, task);
-//                    }
-//                }
-            }else {
-                Log.d("Notification", "❌ Notification permission denied.");
+        if (requestCode == PermissionManager.STORAGE_PERMISSION_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                openImagePicker(); // ✅ Open image picker after permission is granted
+            } else {
+                Toast.makeText(this, "Storage permission is required to add an image.", Toast.LENGTH_SHORT).show();
             }
         }
     }
