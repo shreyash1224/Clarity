@@ -56,15 +56,31 @@ public class TaskDialog {
         buttonStartTime.setText(startTime[0]);
         buttonEndTime.setText(endTime[0]);
 
-        buttonStartTime.setOnClickListener(v -> showDateTimePicker(context, parseDateTime(startTime[0]), null, date -> {
-            startTime[0] = date;
-            buttonStartTime.setText(date);
-        }));
+        buttonStartTime.setOnClickListener(v ->
+                showDateTimePicker(context, null, null, date -> {
+                    startTime[0] = date;
+                    buttonStartTime.setText(date);
 
-        buttonEndTime.setOnClickListener(v -> showDateTimePicker(context, parseDateTime(startTime[0]), parseDateTime(startTime[0]), date -> {
-            endTime[0] = date;
-            buttonEndTime.setText(date);
-        }));
+                    // Ensure the end time is still valid
+                    if (endTime[0] != null && parseDateTime(endTime[0]).before(parseDateTime(startTime[0]))) {
+                        endTime[0] = null;
+                        buttonEndTime.setText("Select End Time");
+                        Toast.makeText(context, "End time reset. Please select a new valid end time.", Toast.LENGTH_SHORT).show();
+                    }
+                })
+        );
+
+        buttonEndTime.setOnClickListener(v -> {
+            if (startTime[0] == null) {
+                Toast.makeText(context, "Please select a start time first!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            showDateTimePicker(context, parseDateTime(startTime[0]), null, date -> {
+                endTime[0] = date;
+                buttonEndTime.setText(date);
+            });
+        });
 
         AlertDialog dialog = builder.create();
 
@@ -74,7 +90,7 @@ public class TaskDialog {
             String title = editTaskTitle.getText().toString().trim();
             boolean isRecurring = checkRecurring.isChecked();
 
-            if (title.isEmpty() || startTime[0].isEmpty() || endTime[0].isEmpty()) {
+            if (title.isEmpty() || startTime[0] == null || endTime[0] == null) {
                 Toast.makeText(context, "All fields are required", Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -86,15 +102,16 @@ public class TaskDialog {
         dialog.show();
     }
 
-    private static void showDateTimePicker(Context context, Calendar minTime, Calendar minEndTime, OnDateSelectedListener listener) {
+    private static void showDateTimePicker(Context context, Calendar minTime, Calendar referenceTime, OnDateSelectedListener listener) {
         Calendar calendar = Calendar.getInstance();
+
         new DatePickerDialog(context, (view, year, month, dayOfMonth) -> {
             new TimePickerDialog(context, (timeView, hourOfDay, minute) -> {
                 Calendar selectedTime = Calendar.getInstance();
                 selectedTime.set(year, month, dayOfMonth, hourOfDay, minute);
 
-                // ✅ Kept Constraint 2: Ensure end time is after start time
-                if (minEndTime != null && selectedTime.before(minEndTime)) {
+                // Ensure END TIME is AFTER START TIME
+                if (minTime != null && selectedTime.before(minTime)) {
                     Toast.makeText(context, "End time must be after start time!", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -103,7 +120,6 @@ public class TaskDialog {
             }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show();
         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
     }
-
 
     private static String formatDateTime(Calendar calendar) {
         return String.format(Locale.getDefault(), "%04d-%02d-%02d %02d:%02d",
@@ -115,6 +131,7 @@ public class TaskDialog {
     }
 
     private static Calendar parseDateTime(String dateTime) {
+        if (dateTime == null || dateTime.isEmpty()) return null;
         String[] parts = dateTime.split(" ");
         String[] dateParts = parts[0].split("-");
         String[] timeParts = parts[1].split(":");
