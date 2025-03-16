@@ -80,6 +80,48 @@ public class ReportsActivity extends AppCompatActivity {
         tvUserId.setText(String.valueOf(userId));
 
         DiaryDatabaseHelper dbHelper = new DiaryDatabaseHelper(this);
+        Cursor cursor = dbHelper.getUserProfilePicture(userId);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            int columnIndex = cursor.getColumnIndex("profilePicture");
+
+            if (columnIndex != -1) {
+                String profilePicturePath = cursor.getString(columnIndex);
+                Log.e("ProfilePicture", "Retrieved Profile Picture Path: " + profilePicturePath);
+
+                if (profilePicturePath != null && !profilePicturePath.isEmpty()) {
+                    Uri imageUri;
+
+                    // ✅ Check if it's already a content URI
+                    if (profilePicturePath.startsWith("content://")) {
+                        imageUri = Uri.parse(profilePicturePath);
+                    } else {
+                        // ✅ If it's a file path, convert it to URI
+                        imageUri = FileProvider.getUriForFile(
+                                this,
+                                "com.yourpackagename.fileprovider",  // ✅ Replace with your package name
+                                new File(profilePicturePath)
+                        );
+                    }
+
+                    try {
+                        // ✅ Load image using ContentResolver
+                        InputStream inputStream = getContentResolver().openInputStream(imageUri);
+                        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                        profileImage.setImageBitmap(bitmap);
+                        Log.e("ProfilePicture", "Profile picture loaded successfully.");
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                        Log.e("ProfilePicture", "Failed to load profile picture.");
+                        profileImage.setImageResource(R.drawable.ic_done); // Fallback image
+                    }
+                } else {
+                    Log.e("ProfilePicture", "Profile picture path is null or empty.");
+                    profileImage.setImageResource(R.drawable.ic_done); // Fallback image
+                }
+            }
+            cursor.close();
+        }
 
         // Update Charts
         loadPieChart(dbHelper, userId);

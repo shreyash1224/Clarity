@@ -619,7 +619,7 @@ public long insertResource(int pageId, String resourceType, String resourceConte
 
 
 
-    public List<Task> getTasksByDate(String selectedDate) {
+    public List<Task> getTasksByDate(String selectedDate, int userId) {
         List<Task> taskList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
         Log.d("DB_DEBUG", "Selected Date: " + selectedDate);
@@ -636,12 +636,18 @@ public long insertResource(int pageId, String resourceType, String resourceConte
 
 
         // Extract only the date part from startTime and endTime
+        String query = "SELECT t.taskId " +
+                "FROM tasks t " +
+                "JOIN resources r ON r.resourceContent = CAST(t.taskId AS TEXT) " +
+                "JOIN pages p ON p.pageId = r.pageId " +
+                "WHERE p.userId = ? AND " +
+                "(t.startTime LIKE ? OR t.endTime LIKE ? OR (? BETWEEN t.startTime AND t.endTime))";
 
 // Step 1: Get task IDs that match the selectedDate
-        Cursor idCursor = db.rawQuery(
-                "SELECT taskId FROM tasks WHERE startTime LIKE ? OR endTime LIKE ? OR (? BETWEEN startTime AND endTime)",
-                new String[]{selectedDate + "%", selectedDate + "%", selectedDate}
+        Cursor idCursor = db.rawQuery(query,
+                new String[]{String.valueOf(userId), selectedDate + "%", selectedDate + "%", selectedDate}
         );
+
 
         Log.d("DB_DEBUG", "Query: SELECT taskId FROM tasks WHERE startTime LIKE '" + selectedDate + "%' OR endTime LIKE '" + selectedDate + "%' OR ('" + selectedDate + "' BETWEEN startTime AND endTime)");
 

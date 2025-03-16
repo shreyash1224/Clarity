@@ -19,7 +19,8 @@
     <color name="brown_fab">#795548</color> <!-- Medium Brown for FAB -->
 
 
-
+    <color name="orange">#FF5722</color>
+    <color name="yellow">#FFEB3B</color>
 
 
 </resources>

@@ -52,6 +52,7 @@ public class TaskListActivity extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
     private DrawerLayout drawerLayout;
 
+    int userId;
     private ListView listView;
 
     @Override
@@ -88,7 +89,7 @@ public class TaskListActivity extends AppCompatActivity {
         profileImage = headerView.findViewById(R.id.ciProfilePicture);
         sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
         String username = sharedPreferences.getString("username", null);
-        int userId = sharedPreferences.getInt("userId", -1);
+        userId = sharedPreferences.getInt("userId", -1);
 
         if (username == null || userId == -1) {
             Intent intent = new Intent(TaskListActivity.this, LoginActivity.class);
@@ -273,7 +274,7 @@ public class TaskListActivity extends AppCompatActivity {
             // Fetch tasks that match the date range
             DiaryDatabaseHelper dbHelper = new DiaryDatabaseHelper(TaskListActivity.this);
             Log.d("DB_DEBUG", "Calling getTasksByDate with date: " + selectedDate);
-            List<Task> filteredTasks = dbHelper.getTasksByDate(selectedDate);
+            List<Task> filteredTasks = dbHelper.getTasksByDate(selectedDate,userId);
 
             if (filteredTasks.isEmpty()) {
                 Toast.makeText(this, "No tasks found for this date", Toast.LENGTH_SHORT).show();

@@ -63,13 +63,25 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Top 3 Expenses"
+                        android:textColor="@color/brown_text"
+                        android:textSize="24dp"
+                        android:textStyle="bold"
+
+                        android:paddingBottom="8dp"/>
+
+
                     <!-- Top Expense Categories -->
                     <TextView
                         android:id="@+id/tvTopExpense1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Top Expense 1: N/A"
-                        android:textColor="@color/brown_text"
+                        android:textColor="@color/error_red"
                         android:textSize="18sp"
                         android:paddingBottom="4dp"/>
 
@@ -78,7 +90,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Top Expense 2: N/A"
-                        android:textColor="@color/brown_text"
+                        android:textColor="@color/orange"
                         android:textSize="18sp"
                         android:paddingBottom="4dp"/>
 
@@ -87,7 +99,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Top Expense 3: N/A"
-                        android:textColor="@color/brown_text"
+                        android:textColor="@color/yellow"
                         android:textSize="18sp"
                         android:paddingBottom="8dp"/>
 
@@ -98,7 +110,9 @@
                         android:layout_height="wrap_content"
                         android:text="Total Tasks: 0"
                         android:textColor="@color/brown_text"
-                        android:textSize="18sp"
+                        android:textSize="24dp"
+                        android:textStyle="bold"
+
                         android:paddingBottom="8dp"/>
 
                     <com.github.mikephil.charting.charts.PieChart
@@ -111,9 +125,10 @@
                         android:id="@+id/totalExpenses"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Total Transactions"
+                        android:text="Total Transactions Pie Chart"
                         android:textColor="@color/brown_text"
-                        android:textSize="18sp"
+                        android:textSize="24dp"
+                        android:textStyle="bold"
                         android:paddingTop="16dp"
                         android:paddingBottom="8dp"/>
 
@@ -122,7 +137,20 @@
                         android:layout_width="match_parent"
                         android:layout_height="200dp"/>
 
+
+
+
                     <!-- Summary Information -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Resources statistics:"
+                        android:textColor="@color/brown_text"
+                        android:textSize="24dp"
+                        android:textStyle="bold"
+                        android:paddingBottom="8dp"/>
+
+
                     <TextView
                         android:id="@+id/totalImages"
                         android:layout_width="match_parent"
