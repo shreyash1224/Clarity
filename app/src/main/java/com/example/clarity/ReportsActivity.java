@@ -155,6 +155,8 @@ public class ReportsActivity extends AppCompatActivity {
         PieData pieData = new PieData(pieDataSet);
         pieChart.setData(pieData);
         pieChart.invalidate();
+        pieChart.getDescription().setEnabled(false);
+
     }
 
 //    private void loadBarChart(DiaryDatabaseHelper dbHelper, int userId) {
@@ -257,6 +259,8 @@ public class ReportsActivity extends AppCompatActivity {
         PieData pieData = new PieData(pieDataSet);
         pieChart.setData(pieData);
         pieChart.invalidate();
+        pieChart.getDescription().setEnabled(false);
+
     }
 
     private void loadTasksPieChart(DiaryDatabaseHelper dbHelper, int userId) {
@@ -272,6 +276,8 @@ public class ReportsActivity extends AppCompatActivity {
         PieData pieData = new PieData(pieDataSet);
         pieChart.setData(pieData);
         pieChart.invalidate();
+        pieChart.getDescription().setEnabled(false);
+
 
     }
 

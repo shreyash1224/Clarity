@@ -32,7 +32,6 @@ public class LoginActivity extends AppCompatActivity {
         String username = etLaUsername.getText().toString().trim();
         String password = etLaPassword.getText().toString().trim();
         
-        Toast.makeText(this, username+" "+password, Toast.LENGTH_LONG).show();
 
 
         if (dbHelper.authenticateUser(username, password)) {

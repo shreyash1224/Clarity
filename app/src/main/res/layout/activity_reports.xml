@@ -118,6 +118,7 @@
                     <com.github.mikephil.charting.charts.PieChart
                         android:id="@+id/tasksChart"
                         android:layout_width="match_parent"
+
                         android:layout_height="200dp"/>
 
                     <!-- Expense Report Section -->

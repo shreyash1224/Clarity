@@ -90,4 +90,9 @@ public class CreateAccountActivity extends AppCompatActivity {
         );
         return PASSWORD_PATTERN.matcher(password).matches();
     }
+
+    public void onBackToLoginClicked(View view) {
+        Intent intent = new Intent(CreateAccountActivity.this, LoginActivity.class);
+        startActivity(intent);
+    }
 }

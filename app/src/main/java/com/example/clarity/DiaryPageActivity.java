@@ -875,10 +875,10 @@ private void addTextBlockToUI(String textContent) {
     @Override
     public void onBackPressed() {
         super.onBackPressed(); // Call default back behavior
-
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
+//
+//        Intent intent = new Intent(this, MainActivity.class);
+//        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+//        startActivity(intent);
 
         // Apply slide-out animation (DiaryPageActivity slides to the right)
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
